@@ -23,10 +23,10 @@
             <form>
                 <header>
                     <field name="state" widget="statusbar" statusbar_visible="DRAFT,PREPARED,DISPATCHED,DELIVERED"/>
-                    <button name="action_prepare" string="Mark Prepared" type="object" states="DRAFT" class="btn-primary"/>
-                    <button name="action_dispatch" string="Mark Dispatched" type="object" states="PREPARED" class="btn-warning"/>
-                    <button name="action_deliver" string="Mark Delivered" type="object" states="DISPATCHED" class="btn-success"/>
-                    <button name="action_back_to_draft" string="Reset to Draft" type="object" states="PREPARED" confirm="Reset package state to Draft?" class="btn-default"/>
+                    <button name="action_prepare" string="Mark Prepared" type="object" invisible="state != 'DRAFT'" class="btn-primary"/>
+                    <button name="action_dispatch" string="Mark Dispatched" type="object" invisible="state != 'PREPARED'" class="btn-warning"/>
+                    <button name="action_deliver" string="Mark Delivered" type="object" invisible="state != 'DISPATCHED'" class="btn-success"/>
+                    <button name="action_back_to_draft" string="Reset to Draft" type="object" invisible="state != 'PREPARED'" confirm="Reset package state to Draft?" class="btn-default"/>
                 </header>
                 <sheet>
                     <div class="oe_title">

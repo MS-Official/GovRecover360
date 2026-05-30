@@ -154,10 +154,11 @@ def seed():
 
         # === DEMO USERS ===
         print("Seeding users...")
+        demo_password = "Demo@12345"
         demo_users = [
             {
-                "email": "admin@govrecover.gov",
-                "password": "Admin@123",
+                "email": "admin@govrecover.local",
+                "password": demo_password,
                 "full_name": "System Administrator",
                 "role": "ROLE_ADMIN",
                 "district": "Colombo",
@@ -165,8 +166,8 @@ def seed():
                 "department": "Administration",
             },
             {
-                "email": "manager@govrecover.gov",
-                "password": "Manager@123",
+                "email": "disaster-manager@govrecover.local",
+                "password": demo_password,
                 "full_name": "Disaster Manager",
                 "role": "ROLE_DISASTER_MANAGER",
                 "district": "Colombo",
@@ -174,8 +175,8 @@ def seed():
                 "department": "Disaster Management",
             },
             {
-                "email": "officer@govrecover.gov",
-                "password": "Officer@123",
+                "email": "field@govrecover.local",
+                "password": demo_password,
                 "full_name": "Field Officer Kamal",
                 "role": "ROLE_FIELD_OFFICER",
                 "district": "Galle",
@@ -184,8 +185,8 @@ def seed():
                 "assigned_region": "Southern Province",
             },
             {
-                "email": "officer2@govrecover.gov",
-                "password": "Officer@123",
+                "email": "field2@govrecover.local",
+                "password": demo_password,
                 "full_name": "Field Officer Nimal",
                 "role": "ROLE_FIELD_OFFICER",
                 "district": "Matara",
@@ -194,8 +195,8 @@ def seed():
                 "assigned_region": "Southern Province",
             },
             {
-                "email": "verifier@govrecover.gov",
-                "password": "Verifier@123",
+                "email": "verifier@govrecover.local",
+                "password": demo_password,
                 "full_name": "Verifier Priya",
                 "role": "ROLE_VERIFIER",
                 "district": "Colombo",
@@ -203,8 +204,8 @@ def seed():
                 "department": "Verification",
             },
             {
-                "email": "program@govrecover.gov",
-                "password": "Program@123",
+                "email": "manager@govrecover.local",
+                "password": demo_password,
                 "full_name": "Program Manager Sampath",
                 "role": "ROLE_PROGRAM_MANAGER",
                 "district": "Colombo",
@@ -212,8 +213,8 @@ def seed():
                 "department": "Program Management",
             },
             {
-                "email": "finance@govrecover.gov",
-                "password": "Finance@123",
+                "email": "finance@govrecover.local",
+                "password": demo_password,
                 "full_name": "Finance Officer Dinesh",
                 "role": "ROLE_FINANCE_OFFICER",
                 "district": "Colombo",
@@ -221,8 +222,8 @@ def seed():
                 "department": "Finance",
             },
             {
-                "email": "warehouse@govrecover.gov",
-                "password": "Warehouse@123",
+                "email": "warehouse@govrecover.local",
+                "password": demo_password,
                 "full_name": "Warehouse Officer Sunil",
                 "role": "ROLE_WAREHOUSE_OFFICER",
                 "district": "Colombo",
@@ -230,8 +231,8 @@ def seed():
                 "department": "Logistics",
             },
             {
-                "email": "gis@govrecover.gov",
-                "password": "GIS@123",
+                "email": "gis@govrecover.local",
+                "password": demo_password,
                 "full_name": "GIS Officer Chathura",
                 "role": "ROLE_GIS_OFFICER",
                 "district": "Colombo",
@@ -239,16 +240,16 @@ def seed():
                 "department": "GIS",
             },
             {
-                "email": "ngo@govrecover.gov",
-                "password": "NGO@123",
+                "email": "ngo@govrecover.local",
+                "password": demo_password,
                 "full_name": "NGO Partner - Red Cross",
                 "role": "ROLE_NGO_PARTNER",
                 "district": "Colombo",
                 "organization": "Red Cross",
             },
             {
-                "email": "auditor@govrecover.gov",
-                "password": "Auditor@123",
+                "email": "auditor@govrecover.local",
+                "password": demo_password,
                 "full_name": "Auditor Kusum",
                 "role": "ROLE_AUDITOR",
                 "district": "Colombo",
@@ -256,15 +257,15 @@ def seed():
                 "department": "Internal Audit",
             },
             {
-                "email": "citizen1@govrecover.gov",
-                "password": "Citizen@123",
+                "email": "citizen@govrecover.local",
+                "password": demo_password,
                 "full_name": "Wijesinghe Family",
                 "role": "ROLE_CITIZEN",
                 "district": "Galle",
             },
             {
-                "email": "citizen2@govrecover.gov",
-                "password": "Citizen@123",
+                "email": "citizen2@govrecover.local",
+                "password": demo_password,
                 "full_name": "Fernando Family",
                 "role": "ROLE_CITIZEN",
                 "district": "Matara",
@@ -274,10 +275,19 @@ def seed():
         user_ids = {}
         for u_data in demo_users:
             existing = db.query(User).filter(User.email == u_data["email"]).first()
+            role_obj = role_objs.get(u_data["role"])
             if existing:
+                existing.password_hash = hash_password(u_data["password"])
+                existing.full_name = u_data["full_name"]
+                existing.role = u_data["role"]
+                existing.role_id = role_obj.id if role_obj else None
+                existing.district = u_data.get("district")
+                existing.organization = u_data.get("organization")
+                existing.department = u_data.get("department")
+                existing.assigned_region = u_data.get("assigned_region")
+                existing.is_active = True
                 user_ids[existing.email] = existing.id
                 continue
-            role_obj = role_objs.get(u_data["role"])
             user = User(
                 id=str(uuid4()),
                 email=u_data["email"],
@@ -311,7 +321,7 @@ def seed():
                 start_date=datetime(2024, 5, 15),
                 end_date=datetime(2024, 6, 30),
                 affected_districts=["Galle", "Matara", "Hambantota", "Trincomalee", "Batticaloa"],
-                created_by_user_id=user_ids.get("admin@govrecover.gov"),
+                created_by_user_id=user_ids.get("admin@govrecover.local"),
             )
             db.add(disaster)
             db.flush()
@@ -427,8 +437,8 @@ def seed():
                          "Bandara", "Kumara", "Rajapaksa", "Herath", "Dissanayake",
                          "Senanayake", "Weerasinghe", "Gunawardena", "Rathnayake", "Samarasinghe"]
 
-            field_officer_id = user_ids.get("officer@govrecover.gov")
-            field_officer2_id = user_ids.get("officer2@govrecover.gov")
+            field_officer_id = user_ids.get("field@govrecover.local")
+            field_officer2_id = user_ids.get("field2@govrecover.local")
 
             for i in range(30):
                 fname = first_names[i]
@@ -438,7 +448,7 @@ def seed():
                 family_size = randint(1, 8)
                 reg_user = choice([field_officer_id, field_officer2_id])
                 if i < 5:
-                    reg_user = user_ids.get("citizen1@govrecover.gov")
+                    reg_user = user_ids.get("citizen@govrecover.local")
 
                 h = Household(
                     id=str(uuid4()),
@@ -466,7 +476,7 @@ def seed():
         print("Seeding damage assessments...")
         if db.query(DamageAssessment).count() == 0:
             households = db.query(Household).all()
-            field_officer_id = user_ids.get("officer@govrecover.gov")
+            field_officer_id = user_ids.get("field@govrecover.local")
             for i, h in enumerate(households[10:], 10):
                 dl = h.damage_level or choice(["MINOR", "MODERATE", "SEVERE", "TOTAL"])
                 score_map = {"MINOR": (10, 30), "MODERATE": (31, 60), "SEVERE": (61, 85), "TOTAL": (86, 100)}
@@ -517,11 +527,11 @@ def seed():
                 )
                 if status in ("VERIFIED", "APPROVED_FOR_RELIEF", "PAYMENT_PENDING",
                               "PAYMENT_APPROVED", "DISPATCHED", "COMPLETED"):
-                    app.verified_by_user_id = user_ids.get("verifier@govrecover.gov")
+                    app.verified_by_user_id = user_ids.get("verifier@govrecover.local")
                     app.verified_at = datetime.utcnow() - timedelta(days=randint(1, 10))
                 if status in ("APPROVED_FOR_RELIEF", "PAYMENT_PENDING", "PAYMENT_APPROVED",
                               "DISPATCHED", "COMPLETED"):
-                    app.approved_by_user_id = user_ids.get("program@govrecover.gov")
+                    app.approved_by_user_id = user_ids.get("manager@govrecover.local")
                     app.approved_at = datetime.utcnow() - timedelta(days=randint(1, 7))
                 db.add(app)
             db.flush()
@@ -533,7 +543,7 @@ def seed():
                 ReliefApplication.status.in_(["VERIFIED", "APPROVED_FOR_RELIEF", "PAYMENT_PENDING",
                                             "PAYMENT_APPROVED", "DISPATCHED", "COMPLETED"])
             ).all()
-            verifier_id = user_ids.get("verifier@govrecover.gov")
+            verifier_id = user_ids.get("verifier@govrecover.local")
             for app in verified_apps:
                 bv = BeneficiaryVerification(
                     id=str(uuid4()),
@@ -562,7 +572,7 @@ def seed():
                     id=str(uuid4()), name=name, description=desc,
                     disaster_event_id=disaster_id, budget=budget, currency=currency,
                     start_date=datetime(2024, 6, 1), end_date=datetime(2024, 9, 30),
-                    status=status, created_by_user_id=user_ids.get("program@govrecover.gov"),
+                    status=status, created_by_user_id=user_ids.get("manager@govrecover.local"),
                 )
                 db.add(rp)
             db.flush()
@@ -626,7 +636,7 @@ def seed():
                     created_at=datetime.utcnow() - timedelta(days=randint(1, 10)),
                 )
                 if pr.status == "PAYMENT_APPROVED":
-                    pr.approved_by_user_id = user_ids.get("finance@govrecover.gov")
+                    pr.approved_by_user_id = user_ids.get("finance@govrecover.local")
                     pr.approved_at = datetime.utcnow() - timedelta(days=randint(1, 5))
                 db.add(pr)
             db.flush()
@@ -644,12 +654,12 @@ def seed():
                     id=str(uuid4()),
                     relief_application_id=app.id,
                     warehouse_id=wh.id,
-                    assigned_ngo_id=user_ids.get("ngo@govrecover.gov"),
+                    assigned_ngo_id=user_ids.get("ngo@govrecover.local"),
                     items_json={
                         "Food Pack": 2, "Water Bottle (1.5L)": 6, "Blanket": 2,
                     },
                     status=choice(["DELIVERED", "IN_TRANSIT"]),
-                    dispatched_by_user_id=user_ids.get("warehouse@govrecover.gov"),
+                    dispatched_by_user_id=user_ids.get("warehouse@govrecover.local"),
                     dispatched_at=datetime.utcnow() - timedelta(days=randint(5, 15)),
                     notes="Priority delivery to affected family",
                 )
@@ -662,8 +672,8 @@ def seed():
         print("Seeding NGO assignments...")
         if db.query(NGOPartnerAssignment).count() == 0:
             dispatch_orders = db.query(DispatchOrder).all()
-            ngo_user_id = user_ids.get("ngo@govrecover.gov")
-            admin_id = user_ids.get("admin@govrecover.gov")
+            ngo_user_id = user_ids.get("ngo@govrecover.local")
+            admin_id = user_ids.get("admin@govrecover.local")
             for do in dispatch_orders:
                 ngo = NGOPartnerAssignment(
                     id=str(uuid4()),

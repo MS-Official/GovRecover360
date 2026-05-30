@@ -166,6 +166,24 @@ services:
     volumes:
       - ./ai-service:/app
 
+  # Choreo-compatible notification service
+  choreo-notification-service:
+    build:
+      context: ./choreo-notification-service
+      dockerfile: Dockerfile
+    container_name: govrecover-notifications
+    restart: unless-stopped
+    ports:
+      - "8095:8095"
+    environment:
+      PORT: 8095
+      NOTIFICATION_PROVIDER: mock
+    healthcheck:
+      test: ["CMD", "wget", "-q", "-O", "-", "http://localhost:8095/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
 volumes:
   postgres_data:
   redis_data:

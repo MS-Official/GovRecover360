@@ -25,10 +25,10 @@
             <form>
                 <header>
                     <field name="status" widget="statusbar" statusbar_visible="PENDING,IN_TRANSIT,DELIVERED"/>
-                    <button name="action_in_transit" string="Mark In Transit" type="object" states="PENDING" class="btn-warning"/>
-                    <button name="action_delivered" string="Mark Delivered" type="object" states="IN_TRANSIT,PARTIAL" class="btn-success"/>
-                    <button name="action_partial" string="Partial Delivery" type="object" states="IN_TRANSIT" class="btn-primary"/>
-                    <button name="action_back_to_pending" string="Reset to Pending" type="object" states="IN_TRANSIT,PARTIAL" confirm="Reset dispatch to Pending state?" class="btn-default"/>
+                    <button name="action_in_transit" string="Mark In Transit" type="object" invisible="status != 'PENDING'" class="btn-warning"/>
+                    <button name="action_delivered" string="Mark Delivered" type="object" invisible="status not in ('IN_TRANSIT', 'PARTIAL')" class="btn-success"/>
+                    <button name="action_partial" string="Partial Delivery" type="object" invisible="status != 'IN_TRANSIT'" class="btn-primary"/>
+                    <button name="action_back_to_pending" string="Reset to Pending" type="object" invisible="status not in ('IN_TRANSIT', 'PARTIAL')" confirm="Reset dispatch to Pending state?" class="btn-default"/>
                 </header>
                 <sheet>
                     <div class="oe_title">

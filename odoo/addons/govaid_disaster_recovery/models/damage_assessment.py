@@ -1,4 +1,5 @@
-from odoo import api, fields, models, validation
+from odoo import api, fields, models, _
+from odoo.exceptions import ValidationError
 
 
 class DamageAssessment(models.Model):
@@ -60,8 +61,8 @@ class DamageAssessment(models.Model):
             if rec.structural_damage_score and (
                 rec.structural_damage_score < 0 or rec.structural_damage_score > 100
             ):
-                raise validation.ValidationError(
-                    'Structural damage score must be between 0 and 100.'
+                raise ValidationError(
+                    _('Structural damage score must be between 0 and 100.')
                 )
 
     @api.constrains('content_loss_score')
@@ -70,8 +71,8 @@ class DamageAssessment(models.Model):
             if rec.content_loss_score and (
                 rec.content_loss_score < 0 or rec.content_loss_score > 100
             ):
-                raise validation.ValidationError(
-                    'Content loss score must be between 0 and 100.'
+                raise ValidationError(
+                    _('Content loss score must be between 0 and 100.')
                 )
 
     _sql_constraints = [

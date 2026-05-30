@@ -9,12 +9,6 @@ class LoginRequest(BaseModel):
     password: str
 
 
-class TokenResponse(BaseModel):
-    access_token: str
-    token_type: str = "bearer"
-    user: Optional["UserResponse"] = None
-
-
 class UserCreate(BaseModel):
     email: str
     password: str
@@ -49,6 +43,12 @@ class UserResponse(BaseModel):
 
     class Config:
         from_attributes = True
+
+
+class TokenResponse(BaseModel):
+    access_token: str
+    token_type: str = "bearer"
+    user: Optional[UserResponse] = None
 
 
 class RoleAssignRequest(BaseModel):

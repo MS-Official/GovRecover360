@@ -27,11 +27,11 @@
             <form>
                 <header>
                     <field name="status" widget="statusbar" statusbar_visible="DRAFT,SUBMITTED,UNDER_VERIFICATION,VERIFIED,APPROVED_FOR_RELIEF,DISPATCHED,COMPLETED" clickable="True"/>
-                    <button name="action_submit" string="Submit" type="object" states="DRAFT" class="btn-primary"/>
-                    <button name="action_start_verification" string="Start Verification" type="object" states="SUBMITTED" class="btn-warning"/>
-                    <button name="action_verify" string="Verify" type="object" states="UNDER_VERIFICATION" class="btn-success"/>
-                    <button name="action_approve_relief" string="Approve for Relief" type="object" states="VERIFIED" class="btn-primary"/>
-                    <button name="action_reject" string="Reject" type="object" states="SUBMITTED,UNDER_VERIFICATION,VERIFIED" confirm="Are you sure you want to reject this application?" class="btn-danger"/>
+                    <button name="action_submit" string="Submit" type="object" invisible="status != 'DRAFT'" class="btn-primary"/>
+                    <button name="action_start_verification" string="Start Verification" type="object" invisible="status != 'SUBMITTED'" class="btn-warning"/>
+                    <button name="action_verify" string="Verify" type="object" invisible="status != 'UNDER_VERIFICATION'" class="btn-success"/>
+                    <button name="action_approve_relief" string="Approve for Relief" type="object" invisible="status != 'VERIFIED'" class="btn-primary"/>
+                    <button name="action_reject" string="Reject" type="object" invisible="status not in ('SUBMITTED', 'UNDER_VERIFICATION', 'VERIFIED')" confirm="Are you sure you want to reject this application?" class="btn-danger"/>
                 </header>
                 <sheet>
                     <div class="oe_title">
@@ -81,7 +81,7 @@
                             </group>
                             <group>
                                 <field name="verification_notes" nolabel="1" placeholder="Verification notes..."/>
-                                <field name="rejection_reason" nolabel="1" placeholder="Rejection reason..." attrs="{'invisible': [('status', '!=', 'REJECTED')]}"/>
+                                <field name="rejection_reason" nolabel="1" placeholder="Rejection reason..." invisible="status != 'REJECTED'"/>
                             </group>
                         </page>
                         <page string="Relief Package">
