@@ -180,7 +180,7 @@ A complete walkthrough of the platform's capabilities from GIS mapping through r
 
 | Variable | Description | Default |
 |---|---|---|
-| `DB_PASSWORD` | PostgreSQL password for application database | govrecover@2026 |
+| `DB_PASSWORD` | PostgreSQL password for application database | govrecover_2026 |
 | `SECRET_KEY` | JWT signing and encryption secret | (change in production) |
 | `REDIS_URL` | Redis connection string | redis://redis:6379/0 |
 | `AI_PROVIDER` | AI provider (mock, openai, gemini, minimax) | mock |

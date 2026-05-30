@@ -15,7 +15,7 @@ Apache Superset provides analytics dashboards, ad-hoc queries, and visualization
 2. Navigate to **Data** -> **Databases** -> **+ Database**
 3. Enter the following connection details:
    - **Database Name**: `GovRecover360`
-   - **SQLAlchemy URI**: `postgresql://govrecover:govrecover@2026@postgres:5432/govrecover`
+   - **SQLAlchemy URI**: `postgresql://govrecover:govrecover_2026@postgres:5432/govrecover`
    - **Expose in SQL Lab**: Checked
 4. Click **Test Connection** to verify
 5. Click **Save**

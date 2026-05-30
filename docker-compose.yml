@@ -11,7 +11,7 @@ services:
     environment:
       POSTGRES_DB: govrecover
       POSTGRES_USER: govrecover
-      POSTGRES_PASSWORD: ${DB_PASSWORD:-govrecover@2026}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-govrecover_2026}
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
@@ -50,7 +50,7 @@ services:
       redis:
         condition: service_healthy
     environment:
-      DATABASE_URL: postgresql://govrecover:${DB_PASSWORD:-govrecover@2026}@postgres:5432/govrecover
+      DATABASE_URL: postgresql://govrecover:${DB_PASSWORD:-govrecover_2026}@postgres:5432/govrecover
       SECRET_KEY: ${SECRET_KEY:-govrecover-super-secret-key-change-in-production}
       REDIS_URL: redis://redis:6379/0
       AI_PROVIDER: ${AI_PROVIDER:-mock}

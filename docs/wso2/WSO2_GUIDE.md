@@ -232,7 +232,7 @@ wso2-apim:
   environment:
     - DATABASE_URL=jdbc:postgresql://postgres:5432/govrecover
     - DATABASE_USER=govrecover
-    - DATABASE_PASSWORD=${DB_PASSWORD:-govrecover@2026}
+    - DATABASE_PASSWORD=${DB_PASSWORD:-govrecover_2026}
   depends_on:
     postgres:
       condition: service_healthy

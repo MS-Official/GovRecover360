@@ -258,7 +258,7 @@ docker compose up -d superset
    ```
 2. Check the database URI. In Superset SQL Lab, use:
    ```
-   postgresql://govrecover:govrecover@2026@postgres:5432/govrecover
+   postgresql://govrecover:govrecover_2026@postgres:5432/govrecover
    ```
 3. Note: Superset runs inside Docker, so `localhost` refers to the container, not the host. Use the Docker service name `postgres`.
 

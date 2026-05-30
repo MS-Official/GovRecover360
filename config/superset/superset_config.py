@@ -4,7 +4,7 @@ SECRET_KEY = os.environ.get("SUPERSET_SECRET_KEY", "superset-super-secret-change
 
 SQLALCHEMY_DATABASE_URI = os.environ.get(
     "SUPERSET_DATABASE_URI",
-    "postgresql://govrecover:govrecover@2026@postgres:5432/govrecover",
+    "postgresql://govrecover:govrecover_2026@postgres:5432/govrecover",
 )
 
 SQLALCHEMY_TRACK_MODIFICATIONS = False
@@ -42,7 +42,7 @@ TALISMAN_ENABLED = False
 EXTRA_DATABASES = [
     {
         "database_name": "GovRecover360",
-        "sqlalchemy_uri": "postgresql://govrecover:govrecover@2026@postgres:5432/govrecover",
+        "sqlalchemy_uri": "postgresql://govrecover:govrecover_2026@postgres:5432/govrecover",
         "cache_timeout": None,
         "expose_in_sqllab": True,
         "allow_dml": False,
