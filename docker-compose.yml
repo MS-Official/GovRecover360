@@ -53,6 +53,15 @@ services:
       DATABASE_URL: postgresql://govrecover:${DB_PASSWORD:-govrecover_2026}@postgres:5432/govrecover
       SECRET_KEY: ${SECRET_KEY:-govrecover-super-secret-key-change-in-production}
       REDIS_URL: redis://redis:6379/0
+      AI_SERVICE_URL: http://ai-service:8050
+      CHOREO_NOTIFIER_API_URL: http://choreo-notification-service:8095
+      AUTH_MODE: ${AUTH_MODE:-mock}
+      ASGARDEO_ISSUER: ${ASGARDEO_ISSUER:-}
+      ASGARDEO_JWKS_URL: ${ASGARDEO_JWKS_URL:-}
+      ASGARDEO_AUDIENCE: ${ASGARDEO_AUDIENCE:-}
+      WSO2_GATEWAY_URL: ${WSO2_GATEWAY_URL:-}
+      WSO2_PUBLISHER_URL: ${WSO2_PUBLISHER_URL:-}
+      SUPERSET_URL: http://superset:8088
       AI_PROVIDER: ${AI_PROVIDER:-mock}
       OPENAI_API_KEY: ${OPENAI_API_KEY:-}
       GEMINI_API_KEY: ${GEMINI_API_KEY:-}

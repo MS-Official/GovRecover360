@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react';
+import { useLocation } from 'react-router-dom';
 import {
   UsersIcon, ExclamationTriangleIcon, HeartIcon, DocumentTextIcon,
-  ShieldCheckIcon, ServerIcon, ChartBarIcon,
+  ShieldCheckIcon, ServerIcon, ChartBarIcon, ArrowPathIcon,
 } from '@heroicons/react/24/outline';
 import { useAuth } from '../context/AuthContext';
 import api from '../services/api';
@@ -10,13 +11,14 @@ import DataTable, { Column } from '../components/common/DataTable';
 import StatusBadge from '../components/common/StatusBadge';
 import LoadingSpinner from '../components/common/LoadingSpinner';
 import toast from 'react-hot-toast';
-import { User, Role } from '../types';
+import { IntegrationStatus, User, Role } from '../types';
 import { ROLE_DISPLAY_NAMES } from '../utils/constants';
 
-type Tab = 'overview' | 'users' | 'disasters' | 'programs' | 'audit';
+type Tab = 'overview' | 'users' | 'disasters' | 'programs' | 'audit' | 'integrations';
 
 export default function AdminDashboard() {
   const { user: currentUser, hasPermission } = useAuth();
+  const location = useLocation();
   const [activeTab, setActiveTab] = useState<Tab>('overview');
   const [loading, setLoading] = useState(true);
   const [stats, setStats] = useState<any>(null);
@@ -35,6 +37,15 @@ export default function AdminDashboard() {
   useEffect(() => {
     fetchData();
   }, [activeTab]);
+
+  useEffect(() => {
+    if (location.pathname.includes('/admin/integrations')) setActiveTab('integrations');
+    else if (location.pathname.includes('/admin/users')) setActiveTab('users');
+    else if (location.pathname.includes('/admin/disasters')) setActiveTab('disasters');
+    else if (location.pathname.includes('/admin/programs')) setActiveTab('programs');
+    else if (location.pathname.includes('/admin/audit')) setActiveTab('audit');
+    else setActiveTab('overview');
+  }, [location.pathname]);
 
   const fetchData = async () => {
     setLoading(true);
@@ -138,6 +149,7 @@ export default function AdminDashboard() {
     { key: 'disasters', label: 'Disaster Events' },
     { key: 'programs', label: 'Relief Programs' },
     { key: 'audit', label: 'Audit Logs' },
+    { key: 'integrations', label: 'Integrations' },
   ];
 
   if (activeTab !== 'overview') {
@@ -197,6 +209,8 @@ export default function AdminDashboard() {
             <p className="text-gray-500 text-center">Audit Logs — Connect to backend to view audit logs.</p>
           </div>
         )}
+
+        {activeTab === 'integrations' && <IntegrationStatusPanel />}
 
         {showCreateModal && (
           <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
@@ -314,6 +328,110 @@ export default function AdminDashboard() {
               </div>
             ))}
           </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function IntegrationStatusPanel() {
+  const [status, setStatus] = useState<IntegrationStatus | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
+
+  const loadStatus = async () => {
+    setLoading(true);
+    setError('');
+    try {
+      const res = await api.get('/integrations/status');
+      setStatus(res.data);
+    } catch {
+      setError('Integration status could not be loaded. Please check backend health.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    loadStatus();
+  }, []);
+
+  const statusCards = status ? [
+    { label: 'Backend API', value: status.backend },
+    { label: 'Database', value: status.database },
+    { label: 'Redis', value: status.redis },
+    { label: 'Odoo', value: status.odoo },
+    { label: 'OpenG2P Alignment', value: status.openg2p },
+    { label: 'Asgardeo', value: status.asgardeo },
+    { label: 'WSO2 API Manager', value: status.wso2 },
+    { label: 'Choreo Notification Service', value: status.choreo },
+    { label: 'Superset', value: status.superset },
+    { label: 'GeoNode', value: status.geonode },
+    { label: 'AI Service', value: status.aiService },
+    { label: 'Auth Mode', value: status.authMode },
+  ] : [];
+
+  const setupCards = [
+    { title: 'Asgardeo Setup', path: 'docs/asgardeo/ASGARDEO_GUIDE.md' },
+    { title: 'WSO2 Setup', path: 'docs/wso2/WSO2_GUIDE.md' },
+    { title: 'Choreo Deployment', path: 'docs/choreo/CHOREO_GUIDE.md' },
+    { title: 'Odoo Module Verification', path: 'docs/INTEGRATION_MANUAL_SETUP.md' },
+    { title: 'Superset Dashboard', path: 'docs/superset/SUPERSET_GUIDE.md' },
+    { title: 'OpenG2P Alignment', path: 'docs/INTEGRATION_MANUAL_SETUP.md' },
+  ];
+
+  return (
+    <div className="space-y-6">
+      <div className="flex items-center justify-between gap-3">
+        <div>
+          <h3 className="text-lg font-semibold text-gray-900">Integration Status</h3>
+          {status?.timestamp && (
+            <p className="text-sm text-gray-500 mt-1">Last checked {new Date(status.timestamp).toLocaleString()}</p>
+          )}
+        </div>
+        <button
+          onClick={loadStatus}
+          className="inline-flex items-center gap-2 px-4 py-2 bg-gov-500 text-white rounded-lg text-sm hover:bg-gov-600 disabled:opacity-60"
+          disabled={loading}
+        >
+          <ArrowPathIcon className={`h-4 w-4 ${loading ? 'animate-spin' : ''}`} />
+          Refresh
+        </button>
+      </div>
+
+      {error && (
+        <div className="bg-red-50 border border-red-200 text-red-700 rounded-lg p-4 text-sm">
+          {error}
+        </div>
+      )}
+
+      {loading && !status ? (
+        <LoadingSpinner size="md" text="Loading integration status..." />
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+          {statusCards.map((item) => (
+            <div key={item.label} className="bg-white rounded-xl shadow-sm border border-gray-200 p-5">
+              <div className="flex items-center justify-between gap-3">
+                <div className="flex items-center gap-3">
+                  <ServerIcon className="h-5 w-5 text-gray-400" />
+                  <p className="text-sm font-medium text-gray-900">{item.label}</p>
+                </div>
+                <StatusBadge status={item.value} />
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+
+      <div>
+        <h3 className="text-lg font-semibold text-gray-900 mb-4">Manual Setup References</h3>
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+          {setupCards.map((item) => (
+            <div key={item.title} className="bg-white rounded-xl shadow-sm border border-gray-200 p-5">
+              <p className="text-sm font-semibold text-gray-900">{item.title}</p>
+              <p className="text-xs text-gray-500 mt-2 font-mono break-all">{item.path}</p>
+            </div>
+          ))}
         </div>
       </div>
     </div>

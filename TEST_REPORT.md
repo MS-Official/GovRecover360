@@ -20,6 +20,8 @@
 - Choreo-compatible notification service
 - AI service health endpoint
 - Superset container availability
+- Backend integration status endpoint
+- Admin Integrations frontend page
 
 ## Commands Executed
 
@@ -38,9 +40,13 @@
 - `docker compose exec -T odoo ... -i govaid_disaster_recovery --stop-after-init --no-http ...`
 - `curl -i http://localhost:8000/api/health`
 - `curl -i http://localhost/api/health`
+- `curl -i http://localhost:8000/api/integrations/status`
+- `curl -i http://localhost/api/integrations/status`
 - `curl -i http://localhost:8000/api/audit-logs`
 - `curl -i http://localhost/api/audit-logs`
 - `curl -i http://localhost:8095/health`
+- `curl -i http://localhost:8050/health`
+- `curl -i http://localhost:3000/admin/integrations`
 - `npm install` in `choreo-notification-service`
 - `npm audit --audit-level=low` in `frontend`
 - `npm audit --audit-level=low` in `choreo-notification-service`
@@ -55,13 +61,14 @@
 | Backend audit endpoint | PASSED | `/api/audit-logs` returns 403 unauthenticated and 200 for auditor token. No crash/reset. |
 | Backend RBAC | PASSED | Minimum RBAC checks passed for Field Officer, Finance Officer, Auditor, and Admin. |
 | Frontend/API | PASSED | `http://localhost:3000` returns 200. `http://localhost` returns 200. Nginx API proxy returns 200 for `/api/health`. |
+| Admin Integrations page | PASSED | Production bundle includes Integration Status, status cards, refresh action, error text, and manual setup references. `http://localhost:3000/admin/integrations` returns the SPA shell. |
 | Seed data/demo users | FIXED | Seeder now creates/updates documented `.local` demo users with shared `Demo@12345` password. |
 | Odoo connector/module | FIXED | Odoo is reachable. Module import error fixed. Odoo 17 view modifiers fixed. CLI install of `govaid_disaster_recovery` completed successfully. |
-| OpenG2P alignment | NOT IMPLEMENTED | No runtime OpenG2P integration was tested in this pass. |
+| OpenG2P alignment | PASSED | Integration status endpoint reports `aligned`. This is demo alignment only, not a live OpenG2P runtime connection. |
 | Asgardeo | MANUAL ACTION REQUIRED | Docs exist, but no live console configuration or JWT validation flow was proven. |
 | WSO2 API Manager | MANUAL ACTION REQUIRED | Docs exist, but no live WSO2 import/publish flow was proven. |
 | Choreo notification service | FIXED | Service added to Compose on port 8095 with healthcheck. `http://localhost:8095/health` returns 200. npm audit reports 0 vulnerabilities. |
-| Integration status endpoint | NOT IMPLEMENTED | `/api/integrations/status` returns 404 directly and through nginx. |
+| Integration status endpoint | FIXED | `/api/integrations/status` returns 200 directly and through nginx with backend, database, Redis, Choreo, Superset, AI, auth mode, and manual/not-configured external statuses. |
 | Frontend dependency audit | BLOCKED | Current Vite 5.4.21 is latest Vite 5.x but still affected by the moderate esbuild dev-server advisory. `npm audit fix --force` would jump to Vite 8, so it was not applied. Production build passes. |
 
 ## Error Messages Found
@@ -70,7 +77,7 @@
 - Odoo module before fix: `ImportError: cannot import name 'validation' from 'odoo'`
 - Odoo module install before view fix: `Since 17.0, the "attrs" and "states" attributes are no longer used.`
 - Backend after full rebuild before DB alignment: `password authentication failed for user "govrecover"`
-- Integration endpoint: `404 Not Found`
+- Integration endpoint before fix: `404 Not Found`
 - Frontend audit: moderate `vite -> esbuild` advisory affecting Vite dev server.
 
 ## Fixes Applied
@@ -85,6 +92,11 @@
 - Added `choreo-notification-service` to Docker Compose with healthcheck.
 - Generated `choreo-notification-service/package-lock.json`.
 - Aligned the existing Postgres role password to the active Compose environment without printing it.
+- Added `/api/integrations/status` backend router with defensive per-integration checks.
+- Added compose environment values for Redis, Choreo notification service, AI service, Superset, mock auth, Asgardeo, and WSO2 detection.
+- Added Admin Integrations status page with status cards, refresh button, and manual setup references.
+- Added `docs/INTEGRATION_MANUAL_SETUP.md`.
+- Added Postman requests for direct and nginx integration status checks.
 
 ## Manual Actions Required
 
@@ -120,10 +132,21 @@ The module is installed by CLI. To verify in the UI:
 1. Deploy `choreo-notification-service`.
 2. Configure environment variables for the Choreo environment.
 3. Confirm the deployed `/health` endpoint.
-4. Configure backend notification URL only after backend integration code exists.
+4. Configure backend `CHOREO_NOTIFIER_API_URL` with the deployed invoke URL.
+
+### Superset
+
+1. Open Superset.
+2. Connect it to the GovRecover360 PostgreSQL database.
+3. Import or create disaster recovery dashboards.
+4. Validate KPI charts against seeded data.
+
+### OpenG2P
+
+The local demo reports OpenG2P as aligned. A full runtime integration still requires real OpenG2P services, registry synchronization, program enrollment API mapping, and benefit delivery testing.
 
 ## Final Demo Readiness Status
 
 Demo-ready with manual platform setup.
 
-Core local demo paths are healthy: frontend, nginx, backend, RBAC, seed users, Odoo module, notification service, Postgres, Redis, AI service, and Superset container availability. External platforms such as Asgardeo, WSO2, and Choreo still require real console setup. The backend integration status endpoint is not implemented, and the frontend retains a moderate Vite dev-server advisory unless a tested major Vite upgrade is accepted.
+Core local demo paths are healthy: frontend, nginx, backend, RBAC, seed users, Odoo module, notification service, integration status endpoint, Postgres, Redis, AI service, and Superset container availability. External platforms such as Asgardeo, WSO2, and Choreo still require real console setup. The frontend retains a moderate Vite dev-server advisory unless a tested major Vite upgrade is accepted.

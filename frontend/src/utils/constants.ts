@@ -17,6 +17,15 @@ export const STATUS_COLORS: Record<string, string> = {
   low: 'bg-blue-100 text-blue-800',
   high: 'bg-red-100 text-red-800',
   medium: 'bg-yellow-100 text-yellow-800',
+  ok: 'bg-green-100 text-green-800',
+  configured: 'bg-green-100 text-green-800',
+  aligned: 'bg-green-100 text-green-800',
+  documented: 'bg-green-100 text-green-800',
+  mock_mode: 'bg-yellow-100 text-yellow-800',
+  manual_setup_required: 'bg-yellow-100 text-yellow-800',
+  manual_check_required: 'bg-yellow-100 text-yellow-800',
+  not_configured: 'bg-yellow-100 text-yellow-800',
+  error: 'bg-red-100 text-red-800',
 };
 
 export const STATUS_LABELS: Record<string, string> = {
@@ -31,6 +40,15 @@ export const STATUS_LABELS: Record<string, string> = {
   cancelled: 'Cancelled',
   active: 'Active',
   inactive: 'Inactive',
+  ok: 'OK',
+  configured: 'Configured',
+  aligned: 'Aligned',
+  documented: 'Documented',
+  mock_mode: 'Mock Mode',
+  manual_setup_required: 'Manual Setup Required',
+  manual_check_required: 'Manual Check Required',
+  not_configured: 'Not Configured',
+  error: 'Error',
 };
 
 export const ROLE_DISPLAY_NAMES: Record<Role, string> = {

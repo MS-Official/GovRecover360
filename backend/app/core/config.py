@@ -6,6 +6,21 @@ class Settings(BaseSettings):
     SECRET_KEY: str = "super-secret-key-change-in-production-12345"
     ALGORITHM: str = "HS256"
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 60
+    REDIS_URL: str | None = None
+    AI_SERVICE_URL: str | None = None
+    CHOREO_NOTIFIER_API_URL: str | None = None
+    ODOO_URL: str | None = None
+    ODOO_DB: str | None = None
+    ODOO_USERNAME: str | None = None
+    ODOO_PASSWORD: str | None = None
+    AUTH_MODE: str = "mock"
+    ASGARDEO_ISSUER: str | None = None
+    ASGARDEO_JWKS_URL: str | None = None
+    ASGARDEO_AUDIENCE: str | None = None
+    WSO2_GATEWAY_URL: str | None = None
+    WSO2_PUBLISHER_URL: str | None = None
+    SUPERSET_URL: str | None = None
+    GEONODE_URL: str | None = None
 
     class Config:
         env_file = ".env"

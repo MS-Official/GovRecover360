@@ -16,6 +16,7 @@ export function getMenuItemsByRole(role: Role): MenuItem[] {
       { label: 'Relief Programs', path: '/admin/programs', icon: 'HeartIcon' },
       { label: 'Reports', path: '/admin/reports', icon: 'DocumentChartBarIcon' },
       { label: 'Audit Logs', path: '/admin/audit-logs', icon: 'ClipboardDocumentListIcon' },
+      { label: 'Integrations', path: '/admin/integrations', icon: 'ServerIcon' },
       { label: 'AI Tools', path: '/admin/ai-tools', icon: 'SparklesIcon' },
     ],
     field_officer: [

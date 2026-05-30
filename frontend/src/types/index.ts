@@ -291,3 +291,32 @@ export interface AIResponse {
   tokens_used?: number;
   latency_ms?: number;
 }
+
+export type IntegrationStatusValue =
+  | 'ok'
+  | 'configured'
+  | 'aligned'
+  | 'documented'
+  | 'mock_mode'
+  | 'manual_setup_required'
+  | 'manual_check_required'
+  | 'not_configured'
+  | 'error'
+  | 'mock'
+  | 'asgardeo';
+
+export interface IntegrationStatus {
+  backend: IntegrationStatusValue;
+  database: IntegrationStatusValue;
+  redis: IntegrationStatusValue;
+  odoo: IntegrationStatusValue;
+  openg2p: IntegrationStatusValue;
+  wso2: IntegrationStatusValue;
+  asgardeo: IntegrationStatusValue;
+  choreo: IntegrationStatusValue;
+  superset: IntegrationStatusValue;
+  geonode: IntegrationStatusValue;
+  aiService: IntegrationStatusValue;
+  authMode: 'mock' | 'asgardeo';
+  timestamp: string;
+}

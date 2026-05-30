@@ -1,0 +1,123 @@
+from datetime import datetime, timezone
+import socket
+from urllib.parse import urlparse
+from urllib.request import urlopen
+import xmlrpc.client
+
+from fastapi import APIRouter
+from sqlalchemy import text
+
+from app.core.config import settings
+from app.db.database import engine
+
+router = APIRouter()
+
+
+def _http_health(url: str | None, path: str = "/health") -> str:
+    if not url:
+        return "not_configured"
+    try:
+        target = url.rstrip("/")
+        if not target.endswith(path):
+            target = f"{target}{path}"
+        with urlopen(target, timeout=3) as response:
+            return "ok" if 200 <= response.status < 300 else "error"
+    except Exception:
+        return "error"
+
+
+def _database_status() -> str:
+    try:
+        with engine.connect() as connection:
+            connection.execute(text("select 1"))
+        return "ok"
+    except Exception:
+        return "error"
+
+
+def _redis_status() -> str:
+    if not settings.REDIS_URL:
+        return "not_configured"
+    try:
+        parsed = urlparse(settings.REDIS_URL)
+        host = parsed.hostname or "localhost"
+        port = parsed.port or 6379
+        with socket.create_connection((host, port), timeout=3) as sock:
+            sock.sendall(b"*1\r\n$4\r\nPING\r\n")
+            return "ok" if b"PONG" in sock.recv(1024) else "error"
+    except Exception:
+        return "error"
+
+
+def _odoo_status() -> str:
+    required = [
+        settings.ODOO_URL,
+        settings.ODOO_DB,
+        settings.ODOO_USERNAME,
+        settings.ODOO_PASSWORD,
+    ]
+    if not all(required):
+        return "not_configured"
+    try:
+        common = xmlrpc.client.ServerProxy(f"{settings.ODOO_URL.rstrip('/')}/xmlrpc/2/common")
+        uid = common.authenticate(
+            settings.ODOO_DB,
+            settings.ODOO_USERNAME,
+            settings.ODOO_PASSWORD,
+            {},
+        )
+        return "ok" if uid else "error"
+    except Exception:
+        return "error"
+
+
+def _asgardeo_status() -> str:
+    auth_mode = (settings.AUTH_MODE or "mock").lower()
+    if auth_mode == "mock":
+        return "mock_mode"
+    if auth_mode == "asgardeo":
+        required = [
+            settings.ASGARDEO_ISSUER,
+            settings.ASGARDEO_JWKS_URL,
+            settings.ASGARDEO_AUDIENCE,
+        ]
+        return "configured" if all(required) else "manual_setup_required"
+    return "not_configured"
+
+
+def _wso2_status() -> str:
+    if settings.WSO2_GATEWAY_URL or settings.WSO2_PUBLISHER_URL:
+        return "configured"
+    return "manual_setup_required"
+
+
+def _superset_status() -> str:
+    if not settings.SUPERSET_URL:
+        return "manual_check_required"
+    return _http_health(settings.SUPERSET_URL, path="/")
+
+
+def _geonode_status() -> str:
+    if not settings.GEONODE_URL:
+        return "not_configured"
+    return "manual_check_required"
+
+
+@router.get("/api/integrations/status")
+def integration_status():
+    auth_mode = (settings.AUTH_MODE or "mock").lower()
+    return {
+        "backend": "ok",
+        "database": _database_status(),
+        "redis": _redis_status(),
+        "odoo": _odoo_status(),
+        "openg2p": "aligned",
+        "wso2": _wso2_status(),
+        "asgardeo": _asgardeo_status(),
+        "choreo": _http_health(settings.CHOREO_NOTIFIER_API_URL),
+        "superset": _superset_status(),
+        "geonode": _geonode_status(),
+        "aiService": _http_health(settings.AI_SERVICE_URL),
+        "authMode": "asgardeo" if auth_mode == "asgardeo" else "mock",
+        "timestamp": datetime.now(timezone.utc).isoformat(),
+    }

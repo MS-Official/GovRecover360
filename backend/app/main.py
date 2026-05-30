@@ -5,6 +5,7 @@ from app.db.database import engine, Base
 from app.api import (
     auth, disasters, households, verification, payments,
     inventory, gis, reports, audit, ai, notifications,
+    integrations,
 )
 from app.middleware.audit_middleware import AuditMiddleware
 from app.middleware.rbac_middleware import RBACMiddleware
@@ -32,6 +33,7 @@ app.include_router(reports.router)
 app.include_router(audit.router)
 app.include_router(ai.router)
 app.include_router(notifications.router)
+app.include_router(integrations.router)
 
 
 @app.on_event("startup")

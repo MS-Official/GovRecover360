@@ -7,6 +7,7 @@
   },
   "variable": [
     { "key": "base_url", "value": "http://localhost:8000", "type": "string" },
+    { "key": "nginx_url", "value": "http://localhost", "type": "string" },
     { "key": "token_admin", "value": "", "type": "string" },
     { "key": "token_field", "value": "", "type": "string" },
     { "key": "token_verifier", "value": "", "type": "string" },
@@ -1164,6 +1165,34 @@
               "path": ["api", "gis", "zones"]
             },
             "description": "Expected: 201 Created. GIS Officers have geo:manage permission."
+          },
+          "response": []
+        },
+        {
+          "name": "Integration Status",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/integrations/status",
+              "host": ["{{base_url}}"],
+              "path": ["api", "integrations", "status"]
+            },
+            "description": "Expected: 200 OK. Returns per-integration status without exposing secrets."
+          },
+          "response": []
+        },
+        {
+          "name": "Integration Status via Nginx",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{nginx_url}}/api/integrations/status",
+              "host": ["{{nginx_url}}"],
+              "path": ["api", "integrations", "status"]
+            },
+            "description": "Expected: 200 OK through local nginx reverse proxy."
           },
           "response": []
         },
