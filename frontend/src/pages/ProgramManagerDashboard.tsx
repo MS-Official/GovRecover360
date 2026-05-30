@@ -49,8 +49,8 @@ export default function ProgramManagerDashboard() {
       }
       if (activeTab === 'approvals') {
         setApprovals([
-          { id: 'H040', head_name: 'Gamini Silva', head_nic: '801234569V', address: '78 Lake View', district: 'matara', family_members: 4, vulnerable_members: 3, damage_level: 'major', status: 'verified', created_at: '2024-03-03', updated_at: '2024-03-07' },
-          { id: 'H041', head_name: 'Dilani Perera', head_nic: '921234570V', address: '22 Beach Rd', district: 'galle', family_members: 2, vulnerable_members: 0, damage_level: 'major', status: 'verified', created_at: '2024-03-04', updated_at: '2024-03-08' },
+          { id: 'H040', head_name: 'Gamini Silva', head_nic: '801234569V', address: '78 Lake View', district: 'matara', family_members: 4, vulnerable_members: 3, damage_level: 'major', status: 'verified', registered_by: '2', created_at: '2024-03-03', updated_at: '2024-03-07' },
+          { id: 'H041', head_name: 'Dilani Perera', head_nic: '921234570V', address: '22 Beach Rd', district: 'galle', family_members: 2, vulnerable_members: 0, damage_level: 'major', status: 'verified', registered_by: '2', created_at: '2024-03-04', updated_at: '2024-03-08' },
         ]);
       }
     } finally {
