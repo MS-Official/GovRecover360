@@ -82,6 +82,7 @@ services:
   # Odoo ERP
   odoo:
     image: odoo:17
+    platform: linux/amd64
     container_name: govrecover-odoo
     restart: unless-stopped
     depends_on:
@@ -113,6 +114,7 @@ services:
   superset:
     image: apache/superset:latest
     container_name: govrecover-superset
+    user: root
     restart: unless-stopped
     depends_on:
       postgres:
@@ -127,6 +129,7 @@ services:
       - ./config/superset/superset_config.py:/app/pythonpath/superset_config.py
     command: >
       sh -c "
+        pip install --target /app/.venv/lib/python3.10/site-packages psycopg2-binary &&
         superset fab create-admin --username admin --firstname Admin --lastname User --email admin@superset.com --password ${SUPERSET_ADMIN_PASSWORD:-admin} &&
         superset db upgrade &&
         superset init &&
