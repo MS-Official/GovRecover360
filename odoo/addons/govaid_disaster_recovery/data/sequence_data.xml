@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+        <!-- Disaster Event Sequence -->
+        <record id="seq_disaster_event" model="ir.sequence">
+            <field name="name">Disaster Event</field>
+            <field name="code">disaster.event</field>
+            <field name="prefix">DE/%(year)s/</field>
+            <field name="padding">5</field>
+            <field name="company_id" eval="False"/>
+        </record>
+
+        <!-- Relief Application Sequence -->
+        <record id="seq_relief_application" model="ir.sequence">
+            <field name="name">Relief Application</field>
+            <field name="code">relief.application</field>
+            <field name="prefix">RA/%(year)s/</field>
+            <field name="padding">5</field>
+            <field name="company_id" eval="False"/>
+        </record>
+
+        <!-- Dispatch Order Sequence -->
+        <record id="seq_dispatch_order" model="ir.sequence">
+            <field name="name">Dispatch Order</field>
+            <field name="code">dispatch.order</field>
+            <field name="prefix">DO/%(year)s/</field>
+            <field name="padding">5</field>
+            <field name="company_id" eval="False"/>
+        </record>
+
+        <!-- Damage Assessment Sequence -->
+        <record id="seq_damage_assessment" model="ir.sequence">
+            <field name="name">Damage Assessment</field>
+            <field name="code">damage.assessment</field>
+            <field name="prefix">DA/%(year)s/</field>
+            <field name="padding">5</field>
+            <field name="company_id" eval="False"/>
+        </record>
+
+        <!-- Payment Request Sequence -->
+        <record id="seq_payment_request" model="ir.sequence">
+            <field name="name">Payment Request</field>
+            <field name="code">payment.request</field>
+            <field name="prefix">PR/%(year)s/</field>
+            <field name="padding">5</field>
+            <field name="company_id" eval="False"/>
+        </record>
+    </data>
+</odoo>

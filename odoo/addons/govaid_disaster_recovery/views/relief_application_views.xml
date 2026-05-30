@@ -1,0 +1,196 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Tree View -->
+    <record id="view_relief_application_tree" model="ir.ui.view">
+        <field name="name">relief.application.tree</field>
+        <field name="model">relief.application</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="name"/>
+                <field name="applicant_name"/>
+                <field name="applicant_nic"/>
+                <field name="disaster_event_id"/>
+                <field name="district"/>
+                <field name="damage_level"/>
+                <field name="status" decoration-danger="status in ('REJECTED','DRAFT')" decoration-success="status in ('COMPLETED','DISPATCHED','PAYMENT_APPROVED')" decoration-warning="status in ('SUBMITTED','UNDER_VERIFICATION')"/>
+                <field name="family_size"/>
+                <field name="date_submitted"/>
+            </tree>
+        </field>
+    </record>
+
+    <!-- Form View -->
+    <record id="view_relief_application_form" model="ir.ui.view">
+        <field name="name">relief.application.form</field>
+        <field name="model">relief.application</field>
+        <field name="arch" type="xml">
+            <form>
+                <header>
+                    <field name="status" widget="statusbar" statusbar_visible="DRAFT,SUBMITTED,UNDER_VERIFICATION,VERIFIED,APPROVED_FOR_RELIEF,DISPATCHED,COMPLETED" clickable="True"/>
+                    <button name="action_submit" string="Submit" type="object" states="DRAFT" class="btn-primary"/>
+                    <button name="action_start_verification" string="Start Verification" type="object" states="SUBMITTED" class="btn-warning"/>
+                    <button name="action_verify" string="Verify" type="object" states="UNDER_VERIFICATION" class="btn-success"/>
+                    <button name="action_approve_relief" string="Approve for Relief" type="object" states="VERIFIED" class="btn-primary"/>
+                    <button name="action_reject" string="Reject" type="object" states="SUBMITTED,UNDER_VERIFICATION,VERIFIED" confirm="Are you sure you want to reject this application?" class="btn-danger"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <h1><field name="name"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="disaster_event_id" options="{'no_create': True}"/>
+                            <field name="applicant_name"/>
+                            <field name="applicant_nic"/>
+                            <field name="applicant_phone" widget="phone"/>
+                        </group>
+                        <group>
+                            <field name="district"/>
+                            <field name="ds_division"/>
+                            <field name="gn_division"/>
+                            <field name="address"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Application Details">
+                            <group>
+                                <group>
+                                    <field name="family_size"/>
+                                    <field name="damage_level"/>
+                                </group>
+                                <group>
+                                    <field name="assigned_ngo_id"/>
+                                    <field name="required_items" nolabel="1" placeholder="Required items (JSON format)..."/>
+                                </group>
+                            </group>
+                        </page>
+                        <page string="Verification &amp; Approval">
+                            <group>
+                                <group>
+                                    <field name="created_by"/>
+                                    <field name="date_submitted"/>
+                                </group>
+                                <group>
+                                    <field name="verified_by"/>
+                                    <field name="date_verified"/>
+                                </group>
+                                <group>
+                                    <field name="approved_by"/>
+                                    <field name="date_approved"/>
+                                </group>
+                            </group>
+                            <group>
+                                <field name="verification_notes" nolabel="1" placeholder="Verification notes..."/>
+                                <field name="rejection_reason" nolabel="1" placeholder="Rejection reason..." attrs="{'invisible': [('status', '!=', 'REJECTED')]}"/>
+                            </group>
+                        </page>
+                        <page string="Relief Package">
+                            <field name="relief_package_id" nolabel="1"/>
+                        </page>
+                        <page string="Dispatch Orders">
+                            <field name="dispatch_order_ids" nolabel="1"/>
+                        </page>
+                        <page string="Damage Assessments">
+                            <field name="damage_assessment_ids" nolabel="1"/>
+                        </page>
+                        <page string="Payment Requests">
+                            <field name="payment_request_ids" nolabel="1"/>
+                        </page>
+                    </notebook>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids" widget="mail_followers"/>
+                    <field name="activity_ids" widget="mail_activity"/>
+                    <field name="message_ids" widget="mail_thread"/>
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <!-- Kanban View -->
+    <record id="view_relief_application_kanban" model="ir.ui.view">
+        <field name="name">relief.application.kanban</field>
+        <field name="model">relief.application</field>
+        <field name="arch" type="xml">
+            <kanban class="o_kanban_mobile">
+                <field name="name"/>
+                <field name="applicant_name"/>
+                <field name="disaster_event_id"/>
+                <field name="damage_level"/>
+                <field name="status"/>
+                <field name="district"/>
+                <field name="family_size"/>
+                <templates>
+                    <t t-name="kanban-box">
+                        <div class="oe_kanban_global_click">
+                            <div class="o_kanban_image">
+                                <field name="applicant_name" widget="kanban_avatar"/>
+                            </div>
+                            <div class="oe_kanban_details">
+                                <strong class="o_kanban_record_title">
+                                    <field name="name"/>
+                                </strong>
+                                <div class="o_kanban_record_subtitle">
+                                    <field name="applicant_name"/>
+                                </div>
+                                <div class="o_kanban_record_body">
+                                    <field name="disaster_event_id"/>
+                                    <br/>
+                                    District: <field name="district"/>
+                                    <br/>
+                                    Damage: <field name="damage_level"/>
+                                    <br/>
+                                    Family: <field name="family_size"/> members
+                                </div>
+                            </div>
+                            <div class="o_kanban_record_bottom">
+                                <div class="oe_kanban_bottom_left">
+                                    <field name="status" widget="badge" decoration-danger="status in ('REJECTED','DRAFT')" decoration-success="status in ('COMPLETED','DISPATCHED','PAYMENT_APPROVED')" decoration-warning="status in ('SUBMITTED','UNDER_VERIFICATION')"/>
+                                </div>
+                            </div>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <!-- Search View -->
+    <record id="view_relief_application_search" model="ir.ui.view">
+        <field name="name">relief.application.search</field>
+        <field name="model">relief.application</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name"/>
+                <field name="applicant_name"/>
+                <field name="applicant_nic"/>
+                <field name="applicant_phone"/>
+                <field name="district"/>
+                <field name="disaster_event_id"/>
+                <field name="damage_level"/>
+                <field name="status"/>
+                <filter name="pending_verification" string="Pending Verification" domain="[('status','=','SUBMITTED')]"/>
+                <filter name="approved" string="Approved" domain="[('status','=','APPROVED_FOR_RELIEF')]"/>
+                <filter name="completed" string="Completed" domain="[('status','=','COMPLETED')]"/>
+                <group expand="0" string="Group By">
+                    <filter name="group_status" string="Status" context="{'group_by': 'status'}"/>
+                    <filter name="group_district" string="District" context="{'group_by': 'district'}"/>
+                    <filter name="group_damage_level" string="Damage Level" context="{'group_by': 'damage_level'}"/>
+                    <filter name="group_disaster_event" string="Disaster Event" context="{'group_by': 'disaster_event_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- Action -->
+    <record id="action_relief_application" model="ir.actions.act_window">
+        <field name="name">Relief Applications</field>
+        <field name="res_model">relief.application</field>
+        <field name="view_mode">tree,form,kanban</field>
+        <field name="search_view_id" ref="view_relief_application_search"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Create a Relief Application</p>
+            <p>Manage beneficiary relief applications from registration through verification to dispatch completion.</p>
+        </field>
+    </record>
+</odoo>

@@ -1,0 +1,1189 @@
+{
+  "info": {
+    "name": "GovRecover360 API",
+    "description": "Complete API collection for GovRecover360 Disaster Recovery Platform. Includes all endpoints organized by domain, with role-based authentication examples. All demo users use password: Demo@12345",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "govrecover360"
+  },
+  "variable": [
+    { "key": "base_url", "value": "http://localhost:8000", "type": "string" },
+    { "key": "token_admin", "value": "", "type": "string" },
+    { "key": "token_field", "value": "", "type": "string" },
+    { "key": "token_verifier", "value": "", "type": "string" },
+    { "key": "token_manager", "value": "", "type": "string" },
+    { "key": "token_finance", "value": "", "type": "string" },
+    { "key": "token_warehouse", "value": "", "type": "string" },
+    { "key": "token_gis", "value": "", "type": "string" },
+    { "key": "token_ngo", "value": "", "type": "string" },
+    { "key": "token_auditor", "value": "", "type": "string" },
+    { "key": "token_citizen", "value": "", "type": "string" },
+    { "key": "household_id", "value": "", "type": "string" },
+    { "key": "application_id", "value": "", "type": "string" },
+    { "key": "payment_id", "value": "", "type": "string" },
+    { "key": "dispatch_id", "value": "", "type": "string" },
+    { "key": "disaster_id", "value": "", "type": "string" }
+  ],
+  "item": [
+    {
+      "name": "Auth",
+      "description": "Authentication requests - login as different roles to obtain JWT tokens",
+      "item": [
+        {
+          "name": "Login Admin",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var jsonData = pm.response.json();",
+                  "if (jsonData.access_token) {",
+                  "  pm.collectionVariables.set('token_admin', jsonData.access_token);",
+                  "  pm.environment.set('token_admin', jsonData.access_token);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"admin@govrecover.local\",\n  \"password\": \"Demo@12345\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/auth/login",
+              "host": ["{{base_url}}"],
+              "path": ["api", "auth", "login"]
+            },
+            "description": "Login as Administrator. Stores JWT token in collection variable token_admin."
+          },
+          "response": []
+        },
+        {
+          "name": "Login Field Officer",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var jsonData = pm.response.json();",
+                  "if (jsonData.access_token) {",
+                  "  pm.collectionVariables.set('token_field', jsonData.access_token);",
+                  "  pm.environment.set('token_field', jsonData.access_token);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"field@govrecover.local\",\n  \"password\": \"Demo@12345\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/auth/login",
+              "host": ["{{base_url}}"],
+              "path": ["api", "auth", "login"]
+            },
+            "description": "Login as Field Officer. Stores JWT token in collection variable token_field."
+          },
+          "response": []
+        },
+        {
+          "name": "Login Verifier",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var jsonData = pm.response.json();",
+                  "if (jsonData.access_token) {",
+                  "  pm.collectionVariables.set('token_verifier', jsonData.access_token);",
+                  "  pm.environment.set('token_verifier', jsonData.access_token);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"verifier@govrecover.local\",\n  \"password\": \"Demo@12345\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/auth/login",
+              "host": ["{{base_url}}"],
+              "path": ["api", "auth", "login"]
+            },
+            "description": "Login as Verifier. Stores JWT token in collection variable token_verifier."
+          },
+          "response": []
+        },
+        {
+          "name": "Login Program Manager",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var jsonData = pm.response.json();",
+                  "if (jsonData.access_token) {",
+                  "  pm.collectionVariables.set('token_manager', jsonData.access_token);",
+                  "  pm.environment.set('token_manager', jsonData.access_token);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"manager@govrecover.local\",\n  \"password\": \"Demo@12345\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/auth/login",
+              "host": ["{{base_url}}"],
+              "path": ["api", "auth", "login"]
+            },
+            "description": "Login as Program Manager. Stores JWT token in collection variable token_manager."
+          },
+          "response": []
+        },
+        {
+          "name": "Login Finance Officer",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var jsonData = pm.response.json();",
+                  "if (jsonData.access_token) {",
+                  "  pm.collectionVariables.set('token_finance', jsonData.access_token);",
+                  "  pm.environment.set('token_finance', jsonData.access_token);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"finance@govrecover.local\",\n  \"password\": \"Demo@12345\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/auth/login",
+              "host": ["{{base_url}}"],
+              "path": ["api", "auth", "login"]
+            },
+            "description": "Login as Finance Officer. Stores JWT token in collection variable token_finance."
+          },
+          "response": []
+        },
+        {
+          "name": "Login Warehouse Officer",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var jsonData = pm.response.json();",
+                  "if (jsonData.access_token) {",
+                  "  pm.collectionVariables.set('token_warehouse', jsonData.access_token);",
+                  "  pm.environment.set('token_warehouse', jsonData.access_token);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"warehouse@govrecover.local\",\n  \"password\": \"Demo@12345\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/auth/login",
+              "host": ["{{base_url}}"],
+              "path": ["api", "auth", "login"]
+            },
+            "description": "Login as Warehouse Officer. Stores JWT token in collection variable token_warehouse."
+          },
+          "response": []
+        },
+        {
+          "name": "Login GIS Officer",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var jsonData = pm.response.json();",
+                  "if (jsonData.access_token) {",
+                  "  pm.collectionVariables.set('token_gis', jsonData.access_token);",
+                  "  pm.environment.set('token_gis', jsonData.access_token);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"gis@govrecover.local\",\n  \"password\": \"Demo@12345\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/auth/login",
+              "host": ["{{base_url}}"],
+              "path": ["api", "auth", "login"]
+            },
+            "description": "Login as GIS Officer. Stores JWT token in collection variable token_gis."
+          },
+          "response": []
+        },
+        {
+          "name": "Login NGO Partner",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var jsonData = pm.response.json();",
+                  "if (jsonData.access_token) {",
+                  "  pm.collectionVariables.set('token_ngo', jsonData.access_token);",
+                  "  pm.environment.set('token_ngo', jsonData.access_token);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"ngo@govrecover.local\",\n  \"password\": \"Demo@12345\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/auth/login",
+              "host": ["{{base_url}}"],
+              "path": ["api", "auth", "login"]
+            },
+            "description": "Login as NGO Partner. Stores JWT token in collection variable token_ngo."
+          },
+          "response": []
+        },
+        {
+          "name": "Login Auditor",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var jsonData = pm.response.json();",
+                  "if (jsonData.access_token) {",
+                  "  pm.collectionVariables.set('token_auditor', jsonData.access_token);",
+                  "  pm.environment.set('token_auditor', jsonData.access_token);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"auditor@govrecover.local\",\n  \"password\": \"Demo@12345\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/auth/login",
+              "host": ["{{base_url}}"],
+              "path": ["api", "auth", "login"]
+            },
+            "description": "Login as Auditor. Stores JWT token in collection variable token_auditor."
+          },
+          "response": []
+        },
+        {
+          "name": "Login Citizen",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var jsonData = pm.response.json();",
+                  "if (jsonData.access_token) {",
+                  "  pm.collectionVariables.set('token_citizen', jsonData.access_token);",
+                  "  pm.environment.set('token_citizen', jsonData.access_token);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"citizen@govrecover.local\",\n  \"password\": \"Demo@12345\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/auth/login",
+              "host": ["{{base_url}}"],
+              "path": ["api", "auth", "login"]
+            },
+            "description": "Login as Citizen. Stores JWT token in collection variable token_citizen."
+          },
+          "response": []
+        },
+        {
+          "name": "Get Current User",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token_admin}}" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/auth/me",
+              "host": ["{{base_url}}"],
+              "path": ["api", "auth", "me"]
+            },
+            "description": "Get current authenticated user's profile. Replace token_admin with any role token."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Disasters",
+      "description": "Disaster event management endpoints",
+      "item": [
+        {
+          "name": "List Disasters",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token_admin}}" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/disasters",
+              "host": ["{{base_url}}"],
+              "path": ["api", "disasters"]
+            },
+            "description": "List all disaster events. Authenticated users can access this endpoint."
+          },
+          "response": []
+        },
+        {
+          "name": "Create Disaster",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token_admin}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Northeast Monsoon Floods 2025\",\n  \"description\": \"Severe flooding in Northern and Eastern provinces due to monsoon rains\",\n  \"disaster_type\": \"FLOOD\",\n  \"severity\": \"SEVERE\",\n  \"status\": \"ACTIVE\",\n  \"start_date\": \"2025-01-15T00:00:00Z\",\n  \"end_date\": \"2025-02-28T00:00:00Z\",\n  \"affected_districts\": [\"Jaffna\", \"Trincomalee\", \"Batticaloa\", \"Ampara\"]\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/disasters",
+              "host": ["{{base_url}}"],
+              "path": ["api", "disasters"]
+            },
+            "description": "Create a new disaster event. Requires Admin, Disaster Manager, or Program Manager role."
+          },
+          "response": []
+        },
+        {
+          "name": "Get Disaster by ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token_admin}}" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/disasters/{{disaster_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["api", "disasters", "{{disaster_id}}"]
+            },
+            "description": "Get details of a specific disaster event by ID."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Households",
+      "description": "Household registration and management endpoints",
+      "item": [
+        {
+          "name": "Register Household",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token_field}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"head_full_name\": \"Saman Weerasinghe\",\n  \"head_nic\": \"901234567V\",\n  \"head_phone\": \"071-2345678\",\n  \"district\": \"Galle\",\n  \"ds_division\": \"Divisional Secretariat A\",\n  \"gn_division\": \"Grama Niladhari 01\",\n  \"address\": \"123, Main Street, Galle\",\n  \"family_size\": 5,\n  \"damage_level\": \"SEVERE\",\n  \"damage_description\": \"House severely damaged by flood waters. Roof collapsed, walls damaged.\",\n  \"latitude\": 6.0367,\n  \"longitude\": 80.217,\n  \"disaster_event_id\": null\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/households/register",
+              "host": ["{{base_url}}"],
+              "path": ["api", "households", "register"]
+            },
+            "description": "Register a new affected household. Requires citizen:create permission (Admin, Field Officer, Citizen)."
+          },
+          "response": []
+        },
+        {
+          "name": "List Households",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var jsonData = pm.response.json();",
+                  "if (jsonData && jsonData.length > 0) {",
+                  "  pm.collectionVariables.set('household_id', jsonData[0].id);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token_admin}}" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/households",
+              "host": ["{{base_url}}"],
+              "path": ["api", "households"]
+            },
+            "description": "List all registered households. Results are filtered by user role."
+          },
+          "response": []
+        },
+        {
+          "name": "Get Household by ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token_admin}}" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/households/{{household_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["api", "households", "{{household_id}}"]
+            },
+            "description": "Get details of a specific household by ID."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Verification",
+      "description": "Relief application submission, verification, and rejection endpoints",
+      "item": [
+        {
+          "name": "Create Application",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token_field}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"household_id\": \"{{household_id}}\",\n  \"disaster_event_id\": null,\n  \"required_items\": [\"Food Pack\", \"Water Bottle\", \"Tent\", \"Blanket\"]\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/applications",
+              "host": ["{{base_url}}"],
+              "path": ["api", "applications"]
+            },
+            "description": "Create a new relief application for a household. Any authenticated user can create an application."
+          },
+          "response": []
+        },
+        {
+          "name": "List Applications",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var jsonData = pm.response.json();",
+                  "if (jsonData && jsonData.length > 0) {",
+                  "  pm.collectionVariables.set('application_id', jsonData[0].id);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token_admin}}" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/applications",
+              "host": ["{{base_url}}"],
+              "path": ["api", "applications"]
+            },
+            "description": "List all relief applications. Results are filtered by user role."
+          },
+          "response": []
+        },
+        {
+          "name": "Submit Application",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token_field}}" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/applications/{{application_id}}/submit",
+              "host": ["{{base_url}}"],
+              "path": ["api", "applications", "{{application_id}}", "submit"]
+            },
+            "description": "Submit a draft application for review. Changes status from DRAFT to SUBMITTED."
+          },
+          "response": []
+        },
+        {
+          "name": "Verify Application",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token_verifier}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"notes\": \"Identity verified. Documentation complete. Household eligible for relief.\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/applications/{{application_id}}/verify",
+              "host": ["{{base_url}}"],
+              "path": ["api", "applications", "{{application_id}}", "verify"]
+            },
+            "description": "Verify a submitted application. Changes status from SUBMITTED to VERIFIED. Requires beneficiary:verify permission."
+          },
+          "response": []
+        },
+        {
+          "name": "Reject Application",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token_verifier}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"notes\": \"Incomplete documentation. Required: proof of residence and damage assessment report.\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/applications/{{application_id}}/reject",
+              "host": ["{{base_url}}"],
+              "path": ["api", "applications", "{{application_id}}", "reject"]
+            },
+            "description": "Reject an application with a reason. Changes status to REJECTED. Requires beneficiary:verify permission."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Relief",
+      "description": "Relief program and approval endpoints",
+      "item": [
+        {
+          "name": "List Relief Programs",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token_manager}}" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/relief-programs",
+              "host": ["{{base_url}}"],
+              "path": ["api", "relief-programs"]
+            },
+            "description": "List all relief programs. Requires relief:read permission."
+          },
+          "response": []
+        },
+        {
+          "name": "Create Relief Program",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token_manager}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Emergency Food Distribution - Phase 2\",\n  \"description\": \"Second phase of emergency food distribution to affected communities\",\n  \"disaster_event_id\": null,\n  \"budget\": 5000000.0,\n  \"currency\": \"LKR\",\n  \"start_date\": \"2025-02-01T00:00:00Z\",\n  \"end_date\": \"2025-04-30T00:00:00Z\",\n  \"status\": \"ACTIVE\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/relief-programs",
+              "host": ["{{base_url}}"],
+              "path": ["api", "relief-programs"]
+            },
+            "description": "Create a new relief program. Requires Admin or Program Manager role."
+          },
+          "response": []
+        },
+        {
+          "name": "Approve Relief",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token_manager}}" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/applications/{{application_id}}/approve-relief",
+              "host": ["{{base_url}}"],
+              "path": ["api", "applications", "{{application_id}}", "approve-relief"]
+            },
+            "description": "Approve relief for a verified application. Changes status from VERIFIED to APPROVED_FOR_RELIEF. Requires relief:approve permission."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Payments",
+      "description": "Payment request and approval endpoints",
+      "item": [
+        {
+          "name": "List Payments",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var jsonData = pm.response.json();",
+                  "if (jsonData && jsonData.length > 0) {",
+                  "  pm.collectionVariables.set('payment_id', jsonData[0].id);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token_finance}}" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/payments",
+              "host": ["{{base_url}}"],
+              "path": ["api", "payments"]
+            },
+            "description": "List all payment requests. Requires payment:read permission."
+          },
+          "response": []
+        },
+        {
+          "name": "Approve Payment",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token_finance}}" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/payments/{{payment_id}}/approve",
+              "host": ["{{base_url}}"],
+              "path": ["api", "payments", "{{payment_id}}", "approve"]
+            },
+            "description": "Approve a payment request. Changes status from PENDING to PAYMENT_APPROVED. Requires payment:approve permission."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Inventory",
+      "description": "Inventory management and dispatch endpoints",
+      "item": [
+        {
+          "name": "List Inventory",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token_warehouse}}" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/inventory",
+              "host": ["{{base_url}}"],
+              "path": ["api", "inventory"]
+            },
+            "description": "List all inventory items with stock levels."
+          },
+          "response": []
+        },
+        {
+          "name": "Create Inventory Item",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token_warehouse}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Emergency Tent (Family Size)\",\n  \"sku\": \"TENT-002\",\n  \"category\": \"Shelter\",\n  \"unit\": \"Units\",\n  \"quantity_available\": 200,\n  \"reorder_level\": 50,\n  \"warehouse_id\": null\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/inventory/items",
+              "host": ["{{base_url}}"],
+              "path": ["api", "inventory", "items"]
+            },
+            "description": "Create a new inventory item. Requires Admin or Warehouse Officer role."
+          },
+          "response": []
+        },
+        {
+          "name": "Create Dispatch Order",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var jsonData = pm.response.json();",
+                  "if (jsonData && jsonData.id) {",
+                  "  pm.collectionVariables.set('dispatch_id', jsonData.id);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token_warehouse}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"relief_application_id\": \"{{application_id}}\",\n  \"warehouse_id\": null,\n  \"assigned_ngo_id\": null,\n  \"items_json\": {\n    \"Food Pack\": 2,\n    \"Water Bottle (1.5L)\": 6,\n    \"Blanket\": 2,\n    \"Tarpaulin Sheet\": 1\n  },\n  \"notes\": \"Priority delivery to flood-affected family\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/dispatch-orders",
+              "host": ["{{base_url}}"],
+              "path": ["api", "dispatch-orders"]
+            },
+            "description": "Create a new dispatch order for a relief application. Requires Admin, Warehouse Officer, or Program Manager role."
+          },
+          "response": []
+        },
+        {
+          "name": "Dispatch Order",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token_warehouse}}" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/dispatch-orders/{{dispatch_id}}/dispatch",
+              "host": ["{{base_url}}"],
+              "path": ["api", "dispatch-orders", "{{dispatch_id}}", "dispatch"]
+            },
+            "description": "Execute a dispatch order. Changes status from PENDING to IN_TRANSIT. Requires inventory:dispatch permission."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "GIS",
+      "description": "Geospatial data management endpoints",
+      "item": [
+        {
+          "name": "List GIS Zones",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token_gis}}" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/gis/zones",
+              "host": ["{{base_url}}"],
+              "path": ["api", "gis", "zones"]
+            },
+            "description": "List all disaster zones with geospatial data."
+          },
+          "response": []
+        },
+        {
+          "name": "Create GIS Zone",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token_gis}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"disaster_event_id\": null,\n  \"name\": \"Jaffna Flood Zone C\",\n  \"zone_type\": \"FLOOD_ZONE\",\n  \"geometry\": \"{\\\"type\\\":\\\"Polygon\\\",\\\"coordinates\\\":[[[80.2,6.0],[80.3,6.0],[80.3,6.1],[80.2,6.1],[80.2,6.0]]]}\",\n  \"risk_level\": \"HIGH\",\n  \"area_km2\": 52.3,\n  \"estimated_population\": 15000\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/gis/zones",
+              "host": ["{{base_url}}"],
+              "path": ["api", "gis", "zones"]
+            },
+            "description": "Create a new GIS disaster zone. Requires geo:manage permission (Admin or GIS Officer)."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Reports",
+      "description": "Aggregated reports and analytics endpoints",
+      "item": [
+        {
+          "name": "Summary Report",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token_auditor}}" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/reports/summary",
+              "host": ["{{base_url}}"],
+              "path": ["api", "reports", "summary"]
+            },
+            "description": "Get summary statistics across all modules. Shows total households, assessments, applications, payments, and dispatch orders."
+          },
+          "response": []
+        },
+        {
+          "name": "By District Report",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token_auditor}}" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/reports/by-district",
+              "host": ["{{base_url}}"],
+              "path": ["api", "reports", "by-district"]
+            },
+            "description": "Get household and population breakdown by district."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Audit",
+      "description": "Audit log retrieval endpoints",
+      "item": [
+        {
+          "name": "List Audit Logs",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token_auditor}}" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/audit-logs",
+              "host": ["{{base_url}}"],
+              "path": ["api", "audit-logs"]
+            },
+            "description": "List all audit logs. Shows who did what and when. Requires audit:read permission."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "AI",
+      "description": "AI-powered content generation endpoints",
+      "item": [
+        {
+          "name": "Summarize Damage",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token_admin}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"prompt\": \"Summarize the damage situation in Galle district after the recent floods\",\n  \"type\": \"summarize-damage\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/ai/summarize-damage",
+              "host": ["{{base_url}}"],
+              "path": ["api", "ai", "summarize-damage"]
+            },
+            "description": "Generate an AI-powered damage assessment summary."
+          },
+          "response": []
+        },
+        {
+          "name": "Generate Citizen Message",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token_admin}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"prompt\": \"Generate a message for citizen Saman Weerasinghe from Galle about their approved relief application\",\n  \"type\": \"generate-citizen-message\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/ai/generate-citizen-message",
+              "host": ["{{base_url}}"],
+              "path": ["api", "ai", "generate-citizen-message"]
+            },
+            "description": "Generate a personalized citizen notification message using AI."
+          },
+          "response": []
+        },
+        {
+          "name": "Generate Disaster Report",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token_admin}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"prompt\": \"Generate a disaster impact report for the Southwest Monsoon Floods 2024\",\n  \"type\": \"generate-disaster-report\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/ai/generate-disaster-report",
+              "host": ["{{base_url}}"],
+              "path": ["api", "ai", "generate-disaster-report"]
+            },
+            "description": "Generate a comprehensive disaster impact report using AI."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Tests",
+      "description": "Role-based access control test scenarios",
+      "item": [
+        {
+          "name": "DENIED: Citizen tries to list audit logs",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token_citizen}}" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/audit-logs",
+              "host": ["{{base_url}}"],
+              "path": ["api", "audit-logs"]
+            },
+            "description": "Expected: 403 Forbidden. Citizens do not have audit:read permission."
+          },
+          "response": []
+        },
+        {
+          "name": "ALLOWED: Auditor lists audit logs",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token_auditor}}" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/audit-logs",
+              "host": ["{{base_url}}"],
+              "path": ["api", "audit-logs"]
+            },
+            "description": "Expected: 200 OK. Auditors have audit:read permission."
+          },
+          "response": []
+        },
+        {
+          "name": "DENIED: Field Officer tries to approve relief",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token_field}}" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/applications/{{application_id}}/approve-relief",
+              "host": ["{{base_url}}"],
+              "path": ["api", "applications", "{{application_id}}", "approve-relief"]
+            },
+            "description": "Expected: 403 Forbidden. Field Officers do not have relief:approve permission."
+          },
+          "response": []
+        },
+        {
+          "name": "ALLOWED: Program Manager approves relief",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token_manager}}" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/applications/{{application_id}}/approve-relief",
+              "host": ["{{base_url}}"],
+              "path": ["api", "applications", "{{application_id}}", "approve-relief"]
+            },
+            "description": "Expected: 200 OK. Program Managers have relief:approve permission."
+          },
+          "response": []
+        },
+        {
+          "name": "DENIED: Warehouse Officer tries to approve payment",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token_warehouse}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/payments/{{payment_id}}/approve",
+              "host": ["{{base_url}}"],
+              "path": ["api", "payments", "{{payment_id}}", "approve"]
+            },
+            "description": "Expected: 403 Forbidden. Warehouse Officers do not have payment:approve permission."
+          },
+          "response": []
+        },
+        {
+          "name": "ALLOWED: Finance Officer approves payment",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token_finance}}" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/payments/{{payment_id}}/approve",
+              "host": ["{{base_url}}"],
+              "path": ["api", "payments", "{{payment_id}}", "approve"]
+            },
+            "description": "Expected: 200 OK. Finance Officers have payment:approve permission."
+          },
+          "response": []
+        },
+        {
+          "name": "DENIED: NGO Partner tries to manage GIS zones",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token_ngo}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"name\": \"Test Zone\", \"zone_type\": \"FLOOD_ZONE\"}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/gis/zones",
+              "host": ["{{base_url}}"],
+              "path": ["api", "gis", "zones"]
+            },
+            "description": "Expected: 403 Forbidden. NGO Partners do not have geo:manage permission."
+          },
+          "response": []
+        },
+        {
+          "name": "ALLOWED: GIS Officer manages zones",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token_gis}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"disaster_event_id\": null,\n  \"name\": \"New Test Zone\",\n  \"zone_type\": \"FLOOD_ZONE\",\n  \"geometry\": null,\n  \"risk_level\": \"MEDIUM\",\n  \"area_km2\": 10,\n  \"estimated_population\": 5000\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/gis/zones",
+              "host": ["{{base_url}}"],
+              "path": ["api", "gis", "zones"]
+            },
+            "description": "Expected: 201 Created. GIS Officers have geo:manage permission."
+          },
+          "response": []
+        },
+        {
+          "name": "ALLOWED: Admin does everything",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token_admin}}" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/audit-logs",
+              "host": ["{{base_url}}"],
+              "path": ["api", "audit-logs"]
+            },
+            "description": "Expected: 200 OK. Admins have all permissions including audit:read."
+          },
+          "response": []
+        }
+      ]
+    }
+  ]
+}

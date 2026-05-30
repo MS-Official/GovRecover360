@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Tree View -->
+    <record id="view_dispatch_order_tree" model="ir.ui.view">
+        <field name="name">dispatch.order.tree</field>
+        <field name="model">dispatch.order</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="name"/>
+                <field name="relief_application_id"/>
+                <field name="warehouse_id"/>
+                <field name="assigned_ngo_partner_id"/>
+                <field name="status" decoration-success="status == 'DELIVERED'" decoration-warning="status == 'IN_TRANSIT'" decoration-info="status == 'PENDING'"/>
+                <field name="dispatched_by"/>
+                <field name="dispatched_date"/>
+            </tree>
+        </field>
+    </record>
+
+    <!-- Form View -->
+    <record id="view_dispatch_order_form" model="ir.ui.view">
+        <field name="name">dispatch.order.form</field>
+        <field name="model">dispatch.order</field>
+        <field name="arch" type="xml">
+            <form>
+                <header>
+                    <field name="status" widget="statusbar" statusbar_visible="PENDING,IN_TRANSIT,DELIVERED"/>
+                    <button name="action_in_transit" string="Mark In Transit" type="object" states="PENDING" class="btn-warning"/>
+                    <button name="action_delivered" string="Mark Delivered" type="object" states="IN_TRANSIT,PARTIAL" class="btn-success"/>
+                    <button name="action_partial" string="Partial Delivery" type="object" states="IN_TRANSIT" class="btn-primary"/>
+                    <button name="action_back_to_pending" string="Reset to Pending" type="object" states="IN_TRANSIT,PARTIAL" confirm="Reset dispatch to Pending state?" class="btn-default"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <h1><field name="name"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="relief_application_id" options="{'no_create': True}"/>
+                            <field name="warehouse_id"/>
+                            <field name="assigned_ngo_partner_id"/>
+                        </group>
+                        <group>
+                            <field name="dispatched_by"/>
+                            <field name="dispatched_date"/>
+                            <field name="delivered_date"/>
+                        </group>
+                    </group>
+                    <field name="items_json" nolabel="1" placeholder="Items (JSON format)..."/>
+                    <field name="notes" nolabel="1" placeholder="Dispatch notes..."/>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids" widget="mail_followers"/>
+                    <field name="activity_ids" widget="mail_activity"/>
+                    <field name="message_ids" widget="mail_thread"/>
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <!-- Action -->
+    <record id="action_dispatch_order" model="ir.actions.act_window">
+        <field name="name">Dispatch Orders</field>
+        <field name="res_model">dispatch.order</field>
+        <field name="view_mode">tree,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Create a Dispatch Order</p>
+            <p>Track relief item dispatches from warehouses to beneficiaries via partner NGOs.</p>
+        </field>
+    </record>
+</odoo>

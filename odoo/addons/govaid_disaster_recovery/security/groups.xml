@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="0">
+        <!-- Field Officer -->
+        <record id="group_govaid_field_officer" model="res.groups">
+            <field name="name">Field Officer</field>
+            <field name="category_id" ref="base.module_category_hidden"/>
+        </record>
+
+        <!-- Verifier -->
+        <record id="group_govaid_verifier" model="res.groups">
+            <field name="name">Verifier</field>
+            <field name="category_id" ref="base.module_category_hidden"/>
+        </record>
+
+        <!-- Program Manager -->
+        <record id="group_govaid_program_manager" model="res.groups">
+            <field name="name">Program Manager</field>
+            <field name="category_id" ref="base.module_category_hidden"/>
+        </record>
+
+        <!-- Finance Officer -->
+        <record id="group_govaid_finance_officer" model="res.groups">
+            <field name="name">Finance Officer</field>
+            <field name="category_id" ref="base.module_category_hidden"/>
+        </record>
+
+        <!-- Warehouse Officer -->
+        <record id="group_govaid_warehouse_officer" model="res.groups">
+            <field name="name">Warehouse Officer</field>
+            <field name="category_id" ref="base.module_category_hidden"/>
+        </record>
+
+        <!-- Auditor -->
+        <record id="group_govaid_auditor" model="res.groups">
+            <field name="name">Auditor</field>
+            <field name="category_id" ref="base.module_category_hidden"/>
+        </record>
+
+        <!-- Admin -->
+        <record id="group_govaid_admin" model="res.groups">
+            <field name="name">Admin</field>
+            <field name="category_id" ref="base.module_category_hidden"/>
+        </record>
+    </data>
+</odoo>

@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Top-level App Menu -->
+    <menuitem id="menu_govaid_root" name="Disaster Recovery"
+              web_icon="govaid_disaster_recovery,static/description/icon.png"
+              sequence="10"/>
+
+    <!-- Disaster Events -->
+    <menuitem id="menu_govaid_disaster_events" name="Disaster Events"
+              parent="menu_govaid_root"
+              action="action_disaster_event"
+              sequence="10"/>
+
+    <!-- Relief Operations -->
+    <menuitem id="menu_govaid_relief" name="Relief Operations"
+              parent="menu_govaid_root"
+              sequence="20"/>
+
+    <menuitem id="menu_govaid_relief_applications" name="Relief Applications"
+              parent="menu_govaid_relief"
+              action="action_relief_application"
+              sequence="10"/>
+
+    <menuitem id="menu_govaid_relief_packages" name="Relief Packages"
+              parent="menu_govaid_relief"
+              action="action_relief_package"
+              sequence="20"/>
+
+    <!-- Logistics -->
+    <menuitem id="menu_govaid_logistics" name="Logistics"
+              parent="menu_govaid_root"
+              sequence="30"/>
+
+    <menuitem id="menu_govaid_dispatch_orders" name="Dispatch Orders"
+              parent="menu_govaid_logistics"
+              action="action_dispatch_order"
+              sequence="10"/>
+
+    <!-- Assessments -->
+    <menuitem id="menu_govaid_assessments" name="Assessments"
+              parent="menu_govaid_root"
+              sequence="40"/>
+
+    <menuitem id="menu_govaid_damage_assessments" name="Damage Assessments"
+              parent="menu_govaid_assessments"
+              action="action_damage_assessment"
+              sequence="10"/>
+
+    <!-- Finance -->
+    <menuitem id="menu_govaid_finance" name="Finance"
+              parent="menu_govaid_root"
+              sequence="50"/>
+
+    <menuitem id="menu_govaid_payment_requests" name="Payment Requests"
+              parent="menu_govaid_finance"
+              action="action_payment_request"
+              sequence="10"/>
+</odoo>

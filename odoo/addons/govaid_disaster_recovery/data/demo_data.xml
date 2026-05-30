@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+        <!-- Demo Disaster Event -->
+        <record id="demo_disaster_event_1" model="disaster.event">
+            <field name="name">Gampaha District Flood 2026</field>
+            <field name="disaster_type">FLOOD</field>
+            <field name="severity">HIGH</field>
+            <field name="status">ACTIVE</field>
+            <field name="description">Severe flooding in Gampaha district affecting multiple DS divisions. Heavy rainfall over 48 hours caused rivers to overflow.</field>
+            <field name="start_date">2026-05-15</field>
+            <field name="affected_districts">{"districts": ["Gampaha", "Divulapitiya", "Mirigama"]}</field>
+            <field name="estimated_affected_population">25000</field>
+        </record>
+
+        <!-- Demo Disaster Event 2 -->
+        <record id="demo_disaster_event_2" model="disaster.event">
+            <field name="name">Badulla Landslide Incident</field>
+            <field name="disaster_type">LANDSLIDE</field>
+            <field name="severity">CRITICAL</field>
+            <field name="status">ACTIVE</field>
+            <field name="description">Landslide in Badulla district following continuous heavy rains. Several villages affected.</field>
+            <field name="start_date">2026-05-20</field>
+            <field name="affected_districts">{"districts": ["Badulla", "Bandarawela"]}</field>
+            <field name="estimated_affected_population">5000</field>
+        </record>
+
+        <!-- Demo Relief Application 1 -->
+        <record id="demo_relief_application_1" model="relief.application">
+            <field name="name">RA/2026/00001</field>
+            <field name="disaster_event_id" ref="demo_disaster_event_1"/>
+            <field name="applicant_name">Nimal Perera</field>
+            <field name="applicant_nic">852412345V</field>
+            <field name="applicant_phone">+94 71 123 4567</field>
+            <field name="district">Gampaha</field>
+            <field name="ds_division">Gampaha DS Division</field>
+            <field name="gn_division">Wegoda GN</field>
+            <field name="address">No. 123, Main Street, Wegoda, Gampaha</field>
+            <field name="family_size">5</field>
+            <field name="damage_level">SEVERE</field>
+            <field name="required_items">{"items": ["Food Pack", "Water Bottles", "Medicine Kit", "Tarpaulin Sheets"]}</field>
+            <field name="status">SUBMITTED</field>
+            <field name="date_submitted">2026-05-16 09:30:00</field>
+        </record>
+
+        <!-- Demo Relief Application 2 -->
+        <record id="demo_relief_application_2" model="relief.application">
+            <field name="name">RA/2026/00002</field>
+            <field name="disaster_event_id" ref="demo_disaster_event_1"/>
+            <field name="applicant_name">Kumari Silva</field>
+            <field name="applicant_nic">908765432V</field>
+            <field name="applicant_phone">+94 77 234 5678</field>
+            <field name="district">Gampaha</field>
+            <field name="ds_division">Divulapitiya DS Division</field>
+            <field name="gn_division">Divulapitiya GN</field>
+            <field name="address">No. 45, Temple Road, Divulapitiya</field>
+            <field name="family_size">3</field>
+            <field name="damage_level">MODERATE</field>
+            <field name="required_items">{"items": ["Dry Rations", "Drinking Water", "Hygiene Kits"]}</field>
+            <field name="status">UNDER_VERIFICATION</field>
+            <field name="date_submitted">2026-05-16 11:15:00</field>
+        </record>
+
+        <!-- Demo Relief Application 3 -->
+        <record id="demo_relief_application_3" model="relief.application">
+            <field name="name">RA/2026/00003</field>
+            <field name="disaster_event_id" ref="demo_disaster_event_2"/>
+            <field name="applicant_name">Saman Jayasuriya</field>
+            <field name="applicant_nic">780123456V</field>
+            <field name="applicant_phone">+94 72 345 6789</field>
+            <field name="district">Badulla</field>
+            <field name="ds_division">Badulla DS Division</field>
+            <field name="gn_division">Welimada GN</field>
+            <field name="address">No. 78, Hill Road, Welimada, Badulla</field>
+            <field name="family_size">6</field>
+            <field name="damage_level">TOTAL</field>
+            <field name="required_items">{"items": ["Emergency Shelter Kit", "Food Pack", "Medical Aid", "Clothing", "Water"]}</field>
+            <field name="status">VERIFIED</field>
+            <field name="date_submitted">2026-05-21 08:00:00</field>
+            <field name="date_verified">2026-05-22 14:30:00</field>
+        </record>
+    </data>
+</odoo>

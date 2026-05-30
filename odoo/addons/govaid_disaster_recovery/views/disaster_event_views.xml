@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Tree View -->
+    <record id="view_disaster_event_tree" model="ir.ui.view">
+        <field name="name">disaster.event.tree</field>
+        <field name="model">disaster.event</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="name"/>
+                <field name="disaster_type"/>
+                <field name="severity" decoration-danger="severity == 'CRITICAL'" decoration-warning="severity == 'HIGH'"/>
+                <field name="status" decoration-success="status == 'CLOSED'" decoration-warning="status == 'ACTIVE'"/>
+                <field name="start_date"/>
+                <field name="estimated_affected_population"/>
+            </tree>
+        </field>
+    </record>
+
+    <!-- Form View -->
+    <record id="view_disaster_event_form" model="ir.ui.view">
+        <field name="name">disaster.event.form</field>
+        <field name="model">disaster.event</field>
+        <field name="arch" type="xml">
+            <form>
+                <header>
+                    <field name="status" widget="statusbar" statusbar_visible="ACTIVE,CONTAINED,RECOVERY,CLOSED"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <h1><field name="name" placeholder="Disaster Event Name"/></h1>
+                        <group>
+                            <field name="disaster_type"/>
+                            <field name="severity"/>
+                        </group>
+                    </div>
+                    <notebook>
+                        <page string="Details">
+                            <group>
+                                <group>
+                                    <field name="start_date"/>
+                                    <field name="end_date"/>
+                                </group>
+                                <group>
+                                    <field name="estimated_affected_population"/>
+                                    <field name="company_id" groups="base.group_multi_company"/>
+                                </group>
+                            </group>
+                            <field name="description" nolabel="1" placeholder="Event description..."/>
+                        </page>
+                        <page string="Affected Districts">
+                            <field name="affected_districts" nolabel="1"/>
+                        </page>
+                        <page string="Relief Applications">
+                            <field name="relief_application_ids" nolabel="1">
+                                <tree>
+                                    <field name="name"/>
+                                    <field name="applicant_name"/>
+                                    <field name="status"/>
+                                    <field name="damage_level"/>
+                                    <field name="family_size"/>
+                                </tree>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids" widget="mail_followers"/>
+                    <field name="activity_ids" widget="mail_activity"/>
+                    <field name="message_ids" widget="mail_thread"/>
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <!-- Search View -->
+    <record id="view_disaster_event_search" model="ir.ui.view">
+        <field name="name">disaster.event.search</field>
+        <field name="model">disaster.event</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name"/>
+                <field name="disaster_type"/>
+                <field name="severity"/>
+                <field name="status"/>
+                <filter name="active_events" string="Active" domain="[('status','=','ACTIVE')]"/>
+                <filter name="critical_events" string="Critical" domain="[('severity','=','CRITICAL')]"/>
+                <group expand="0" string="Group By">
+                    <filter name="group_disaster_type" string="Disaster Type" context="{'group_by': 'disaster_type'}"/>
+                    <filter name="group_severity" string="Severity" context="{'group_by': 'severity'}"/>
+                    <filter name="group_status" string="Status" context="{'group_by': 'status'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- Action -->
+    <record id="action_disaster_event" model="ir.actions.act_window">
+        <field name="name">Disaster Events</field>
+        <field name="res_model">disaster.event</field>
+        <field name="view_mode">tree,form</field>
+        <field name="search_view_id" ref="view_disaster_event_search"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Create a Disaster Event</p>
+            <p>Record disaster events to coordinate relief operations and track affected populations.</p>
+        </field>
+    </record>
+</odoo>

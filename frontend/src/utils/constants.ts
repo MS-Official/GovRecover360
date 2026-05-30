@@ -1,0 +1,133 @@
+import { Role } from '../types';
+
+export const STATUS_COLORS: Record<string, string> = {
+  draft: 'bg-gray-100 text-gray-800',
+  submitted: 'bg-blue-100 text-blue-800',
+  pending: 'bg-yellow-100 text-yellow-800',
+  verified: 'bg-green-100 text-green-800',
+  rejected: 'bg-red-100 text-red-800',
+  approved: 'bg-emerald-100 text-emerald-800',
+  dispatched: 'bg-indigo-100 text-indigo-800',
+  completed: 'bg-teal-100 text-teal-800',
+  cancelled: 'bg-gray-100 text-gray-800',
+  active: 'bg-green-100 text-green-800',
+  inactive: 'bg-gray-100 text-gray-800',
+  critical: 'bg-red-100 text-red-800',
+  moderate: 'bg-yellow-100 text-yellow-800',
+  low: 'bg-blue-100 text-blue-800',
+  high: 'bg-red-100 text-red-800',
+  medium: 'bg-yellow-100 text-yellow-800',
+};
+
+export const STATUS_LABELS: Record<string, string> = {
+  draft: 'Draft',
+  submitted: 'Submitted',
+  pending: 'Pending',
+  verified: 'Verified',
+  rejected: 'Rejected',
+  approved: 'Approved',
+  dispatched: 'Dispatched',
+  completed: 'Completed',
+  cancelled: 'Cancelled',
+  active: 'Active',
+  inactive: 'Inactive',
+};
+
+export const ROLE_DISPLAY_NAMES: Record<Role, string> = {
+  admin: 'System Administrator',
+  field_officer: 'Field Officer',
+  verifier: 'Verification Officer',
+  program_manager: 'Program Manager',
+  finance_officer: 'Finance Officer',
+  warehouse_officer: 'Warehouse Officer',
+  gis_officer: 'GIS Officer',
+  ngo_partner: 'NGO Partner',
+  auditor: 'Auditor',
+  citizen: 'Citizen',
+};
+
+export const ROLE_LABELS: Record<Role, string> = {
+  admin: 'Admin',
+  field_officer: 'Field Officer',
+  verifier: 'Verifier',
+  program_manager: 'Program Manager',
+  finance_officer: 'Finance',
+  warehouse_officer: 'Warehouse',
+  gis_officer: 'GIS Officer',
+  ngo_partner: 'NGO Partner',
+  auditor: 'Auditor',
+  citizen: 'Citizen',
+};
+
+export const DAMAGE_LEVEL_OPTIONS = [
+  { value: 'none', label: 'No Damage' },
+  { value: 'partial', label: 'Partially Damaged' },
+  { value: 'major', label: 'Major Damage' },
+  { value: 'destroyed', label: 'Completely Destroyed' },
+];
+
+export const DISTRICT_OPTIONS = [
+  { value: 'colombo', label: 'Colombo' },
+  { value: 'gampaha', label: 'Gampaha' },
+  { value: 'kalutara', label: 'Kalutara' },
+  { value: 'kandy', label: 'Kandy' },
+  { value: 'matale', label: 'Matale' },
+  { value: 'nuwara_eliya', label: 'Nuwara Eliya' },
+  { value: 'galle', label: 'Galle' },
+  { value: 'matara', label: 'Matara' },
+  { value: 'hambantota', label: 'Hambantota' },
+  { value: 'jaffna', label: 'Jaffna' },
+  { value: 'kilinochchi', label: 'Kilinochchi' },
+  { value: 'mannar', label: 'Mannar' },
+  { value: 'mullaitivu', label: 'Mullaitivu' },
+  { value: 'vavuniya', label: 'Vavuniya' },
+  { value: 'puttalam', label: 'Puttalam' },
+  { value: 'kurunegala', label: 'Kurunegala' },
+  { value: 'ank', label: 'Anuradhapura' },
+  { value: 'polonnaruwa', label: 'Polonnaruwa' },
+  { value: 'badulla', label: 'Badulla' },
+  { value: 'monaragala', label: 'Monaragala' },
+  { value: 'ratnapura', label: 'Ratnapura' },
+  { value: 'kegalle', label: 'Kegalle' },
+  { value: 'trincomalee', label: 'Trincomalee' },
+  { value: 'batticaloa', label: 'Batticaloa' },
+  { value: 'ampara', label: 'Ampara' },
+];
+
+export const ITEM_CATEGORIES = [
+  { value: 'food', label: 'Food & Rations' },
+  { value: 'water', label: 'Water & Sanitation' },
+  { value: 'shelter', label: 'Shelter Materials' },
+  { value: 'medical', label: 'Medical Supplies' },
+  { value: 'clothing', label: 'Clothing & Bedding' },
+  { value: 'hygiene', label: 'Hygiene Kits' },
+  { value: 'kitchen', label: 'Kitchen Sets' },
+  { value: 'tools', label: 'Tools & Equipment' },
+  { value: 'other', label: 'Other' },
+];
+
+export const SEVERITY_OPTIONS = [
+  { value: 'low', label: 'Low' },
+  { value: 'moderate', label: 'Moderate' },
+  { value: 'high', label: 'High' },
+  { value: 'critical', label: 'Critical' },
+];
+
+export const PRIORITY_OPTIONS = [
+  { value: 'low', label: 'Low' },
+  { value: 'medium', label: 'Medium' },
+  { value: 'high', label: 'High' },
+  { value: 'urgent', label: 'Urgent' },
+];
+
+export const DISASTER_TYPES = [
+  { value: 'flood', label: 'Flood' },
+  { value: 'landslide', label: 'Landslide' },
+  { value: 'cyclone', label: 'Cyclone' },
+  { value: 'earthquake', label: 'Earthquake' },
+  { value: 'tsunami', label: 'Tsunami' },
+  { value: 'drought', label: 'Drought' },
+  { value: 'fire', label: 'Fire' },
+  { value: 'epidemic', label: 'Epidemic' },
+  { value: 'other', label: 'Other' },
+];

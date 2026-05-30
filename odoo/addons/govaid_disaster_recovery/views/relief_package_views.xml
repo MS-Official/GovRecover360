@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Tree View -->
+    <record id="view_relief_package_tree" model="ir.ui.view">
+        <field name="name">relief.package.tree</field>
+        <field name="model">relief.package</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="name"/>
+                <field name="relief_application_id"/>
+                <field name="package_type"/>
+                <field name="total_value" widget="monetary"/>
+                <field name="state" decoration-success="state == 'DELIVERED'" decoration-warning="state == 'PREPARED'"/>
+            </tree>
+        </field>
+    </record>
+
+    <!-- Form View -->
+    <record id="view_relief_package_form" model="ir.ui.view">
+        <field name="name">relief.package.form</field>
+        <field name="model">relief.package</field>
+        <field name="arch" type="xml">
+            <form>
+                <header>
+                    <field name="state" widget="statusbar" statusbar_visible="DRAFT,PREPARED,DISPATCHED,DELIVERED"/>
+                    <button name="action_prepare" string="Mark Prepared" type="object" states="DRAFT" class="btn-primary"/>
+                    <button name="action_dispatch" string="Mark Dispatched" type="object" states="PREPARED" class="btn-warning"/>
+                    <button name="action_deliver" string="Mark Delivered" type="object" states="DISPATCHED" class="btn-success"/>
+                    <button name="action_back_to_draft" string="Reset to Draft" type="object" states="PREPARED" confirm="Reset package state to Draft?" class="btn-default"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <h1><field name="name" placeholder="Package Name"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="relief_application_id" options="{'no_create': True}"/>
+                            <field name="package_type"/>
+                        </group>
+                        <group>
+                            <field name="total_value"/>
+                        </group>
+                    </group>
+                    <field name="items_list" nolabel="1" placeholder="Items list (JSON format)..."/>
+                    <field name="notes" nolabel="1" placeholder="Additional notes..."/>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids" widget="mail_followers"/>
+                    <field name="activity_ids" widget="mail_activity"/>
+                    <field name="message_ids" widget="mail_thread"/>
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <!-- Action -->
+    <record id="action_relief_package" model="ir.actions.act_window">
+        <field name="name">Relief Packages</field>
+        <field name="res_model">relief.package</field>
+        <field name="view_mode">tree,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Create a Relief Package</p>
+            <p>Define relief packages with specific items and values for beneficiaries.</p>
+        </field>
+    </record>
+</odoo>
