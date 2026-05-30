@@ -43,8 +43,8 @@ export default function ProgramManagerDashboard() {
       });
       if (activeTab === 'beneficiaries') {
         setBeneficiaries([
-          { id: 'H030', head_name: 'Nimal Fernando', head_nic: '821234567V', address: '123 Main St', district: 'galle', family_members: 5, vulnerable_members: 2, damage_level: 'major', status: 'verified', created_at: '2024-03-01', updated_at: '2024-03-05' },
-          { id: 'H031', head_name: 'Saroja Devi', head_nic: '751234568V', address: '45 Temple Rd', district: 'galle', family_members: 3, vulnerable_members: 1, damage_level: 'destroyed', status: 'verified', created_at: '2024-03-02', updated_at: '2024-03-06' },
+          { id: 'H030', head_name: 'Nimal Fernando', head_nic: '821234567V', address: '123 Main St', district: 'galle', family_members: 5, vulnerable_members: 2, damage_level: 'major', status: 'verified', registered_by: '2', created_at: '2024-03-01', updated_at: '2024-03-05' },
+          { id: 'H031', head_name: 'Saroja Devi', head_nic: '751234568V', address: '45 Temple Rd', district: 'galle', family_members: 3, vulnerable_members: 1, damage_level: 'destroyed', status: 'verified', registered_by: '2', created_at: '2024-03-02', updated_at: '2024-03-06' },
         ]);
       }
       if (activeTab === 'approvals') {
@@ -113,9 +113,8 @@ export default function ProgramManagerDashboard() {
       <div className="flex gap-2 mb-6 flex-wrap">
         {tabs.map((t) => (
           <button key={t.key} onClick={() => setActiveTab(t.key)}
-            className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-              activeTab === t.key ? 'bg-gov-500 text-white' : 'bg-white text-gray-600 hover:bg-gray-50 border border-gray-200'
-            }`}
+            className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${activeTab === t.key ? 'bg-gov-500 text-white' : 'bg-white text-gray-600 hover:bg-gray-50 border border-gray-200'
+              }`}
           >
             {t.label}
           </button>

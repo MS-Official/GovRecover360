@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import {
   UsersIcon, ExclamationTriangleIcon, HeartIcon, DocumentTextIcon,
-  ShieldCheckIcon, ServerIcon, ActivityIcon,
+  ShieldCheckIcon, ServerIcon, ChartBarIcon,
 } from '@heroicons/react/24/outline';
 import { useAuth } from '../context/AuthContext';
 import api from '../services/api';
@@ -151,9 +151,8 @@ export default function AdminDashboard() {
             <button
               key={t.key}
               onClick={() => setActiveTab(t.key)}
-              className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-                activeTab === t.key ? 'bg-gov-500 text-white' : 'bg-white text-gray-600 hover:bg-gray-50 border border-gray-200'
-              }`}
+              className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${activeTab === t.key ? 'bg-gov-500 text-white' : 'bg-white text-gray-600 hover:bg-gray-50 border border-gray-200'
+                }`}
             >
               {t.label}
             </button>
@@ -264,9 +263,8 @@ export default function AdminDashboard() {
           <button
             key={t.key}
             onClick={() => setActiveTab(t.key)}
-            className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-              activeTab === t.key ? 'bg-gov-500 text-white' : 'bg-white text-gray-600 hover:bg-gray-50 border border-gray-200'
-            }`}
+            className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${activeTab === t.key ? 'bg-gov-500 text-white' : 'bg-white text-gray-600 hover:bg-gray-50 border border-gray-200'
+              }`}
           >
             {t.label}
           </button>
@@ -306,7 +304,7 @@ export default function AdminDashboard() {
             {(stats?.api_status || []).map((svc: any, idx: number) => (
               <div key={idx} className="flex items-center justify-between pb-4 border-b border-gray-100 last:border-0">
                 <div className="flex items-center gap-3">
-                  <ActivityIcon className="h-5 w-5 text-gray-400" />
+                  <ChartBarIcon className="h-5 w-5 text-gray-400" />
                   <div>
                     <p className="text-sm font-medium text-gray-800">{svc.name}</p>
                     <p className="text-xs text-gray-500">Uptime: {svc.uptime}</p>

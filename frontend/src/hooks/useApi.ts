@@ -26,7 +26,8 @@ export function useApi<T = any>(
       setState({ data: null, loading: true, error: null });
       try {
         const response = await apiCall(...args);
-        const data = response.data ?? response;
+        const data = (response.data ?? response) as T;
+
         setState({ data, loading: false, error: null });
         return data;
       } catch (err: any) {
