@@ -1,0 +1,131 @@
+openapi: "3.0.3"
+info:
+  title: GovRecover360 - Notification Service
+  description: Choreo deployable notification service for disaster relief communications
+  version: "1.0.0"
+servers:
+  - url: http://localhost:8055
+    description: Local development server
+paths:
+  /health:
+    get:
+      summary: Health check
+      operationId: health
+      responses:
+        "200":
+          description: Service is healthy
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: healthy
+  /api/notifications/send:
+    post:
+      summary: Send a notification
+      operationId: sendNotification
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - to
+                - message
+                - type
+              properties:
+                to:
+                  type: string
+                  description: Phone number or email address
+                subject:
+                  type: string
+                  description: Email subject (required for email type)
+                message:
+                  type: string
+                  description: Notification content
+                type:
+                  type: string
+                  enum: [sms, email, both]
+                  description: Delivery channel
+      responses:
+        "200":
+          description: Notification sent
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+  /api/notifications/application-approved:
+    post:
+      summary: Notify citizen of approved application
+      operationId: applicationApproved
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - applicationId
+                - citizenName
+                - citizenPhone
+              properties:
+                applicationId:
+                  type: string
+                citizenName:
+                  type: string
+                citizenPhone:
+                  type: string
+                message:
+                  type: string
+      responses:
+        "200":
+          description: Approval notification sent
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+  /api/notifications/dispatch-update:
+    post:
+      summary: Log a dispatch status update
+      operationId: dispatchUpdate
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - dispatchId
+                - status
+              properties:
+                dispatchId:
+                  type: string
+                status:
+                  type: string
+                notes:
+                  type: string
+      responses:
+        "200":
+          description: Dispatch update logged
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string

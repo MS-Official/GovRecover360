@@ -1,0 +1,171 @@
+version: '3.8'
+
+services:
+  # PostgreSQL for application data
+  postgres:
+    image: postgis/postgis:15-3.4
+    container_name: govrecover-postgres
+    restart: unless-stopped
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_DB: govrecover
+      POSTGRES_USER: govrecover
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-govrecover@2026}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U govrecover"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Redis for caching and session management
+  redis:
+    image: redis:7-alpine
+    container_name: govrecover-redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Backend API service
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: govrecover-backend
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: postgresql://govrecover:${DB_PASSWORD:-govrecover@2026}@postgres:5432/govrecover
+      SECRET_KEY: ${SECRET_KEY:-govrecover-super-secret-key-change-in-production}
+      REDIS_URL: redis://redis:6379/0
+      AI_PROVIDER: ${AI_PROVIDER:-mock}
+      OPENAI_API_KEY: ${OPENAI_API_KEY:-}
+      GEMINI_API_KEY: ${GEMINI_API_KEY:-}
+      MINIMAX_API_KEY: ${MINIMAX_API_KEY:-}
+    volumes:
+      - ./backend:/app
+    command: >
+      sh -c "python app/seed.py && uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload"
+
+  # Frontend React app
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: govrecover-frontend
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    depends_on:
+      - backend
+    environment:
+      VITE_API_URL: /api
+    volumes:
+      - ./frontend/src:/app/src
+      - ./frontend/public:/app/public
+
+  # Odoo ERP
+  odoo:
+    image: odoo:17
+    container_name: govrecover-odoo
+    restart: unless-stopped
+    depends_on:
+      - odoo-db
+    ports:
+      - "8069:8069"
+    environment:
+      HOST: odoo-db
+      USER: odoo
+      PASSWORD: ${ODOO_DB_PASSWORD:-odoo@2026}
+    volumes:
+      - odoo_data:/var/lib/odoo
+      - ./odoo/addons:/mnt/extra-addons
+      - ./odoo/config:/etc/odoo
+
+  # Odoo PostgreSQL
+  odoo-db:
+    image: postgres:15
+    container_name: govrecover-odoo-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: postgres
+      POSTGRES_USER: odoo
+      POSTGRES_PASSWORD: ${ODOO_DB_PASSWORD:-odoo@2026}
+    volumes:
+      - odoo_db_data:/var/lib/postgresql/data
+
+  # Apache Superset
+  superset:
+    image: apache/superset:latest
+    container_name: govrecover-superset
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+    ports:
+      - "8088:8088"
+    environment:
+      SUPERSET_SECRET_KEY: ${SUPERSET_SECRET_KEY:-superset-super-secret-change-me}
+      SUPERSET_LOAD_EXAMPLES: "no"
+    volumes:
+      - superset_data:/app/superset_home
+      - ./config/superset/superset_config.py:/app/pythonpath/superset_config.py
+    command: >
+      sh -c "
+        superset fab create-admin --username admin --firstname Admin --lastname User --email admin@superset.com --password ${SUPERSET_ADMIN_PASSWORD:-admin} &&
+        superset db upgrade &&
+        superset init &&
+        superset run -p 8088 --host 0.0.0.0 --with-threads --reload
+      "
+
+  # Nginx reverse proxy
+  nginx:
+    image: nginx:alpine
+    container_name: govrecover-nginx
+    restart: unless-stopped
+    ports:
+      - "80:80"
+    depends_on:
+      - frontend
+      - backend
+    volumes:
+      - ./config/nginx/default.conf:/etc/nginx/conf.d/default.conf
+
+  # AI Service
+  ai-service:
+    build:
+      context: ./ai-service
+      dockerfile: Dockerfile
+    container_name: govrecover-ai
+    restart: unless-stopped
+    ports:
+      - "8050:8050"
+    environment:
+      AI_PROVIDER: ${AI_PROVIDER:-mock}
+      OPENAI_API_KEY: ${OPENAI_API_KEY:-}
+      GEMINI_API_KEY: ${GEMINI_API_KEY:-}
+      MINIMAX_API_KEY: ${MINIMAX_API_KEY:-}
+    volumes:
+      - ./ai-service:/app
+
+volumes:
+  postgres_data:
+  redis_data:
+  odoo_data:
+  odoo_db_data:
+  superset_data:
