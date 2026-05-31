@@ -1,8 +1,12 @@
 const AUTH_MODE = import.meta.env.VITE_AUTH_MODE || 'mock';
 const CLIENT_ID = import.meta.env.VITE_ASGARDEO_CLIENT_ID || '';
 const BASE_URL = (import.meta.env.VITE_ASGARDEO_BASE_URL || '').replace(/\/$/, '');
-const REDIRECT_URL = import.meta.env.VITE_ASGARDEO_SIGN_IN_REDIRECT_URL || `${window.location.origin}/callback`;
-const LOGOUT_REDIRECT_URL = import.meta.env.VITE_ASGARDEO_SIGN_OUT_REDIRECT_URL || `${window.location.origin}/login`;
+const REDIRECT_URL =
+  import.meta.env.VITE_ASGARDEO_REDIRECT_URI ||
+  `${window.location.origin}/callback`;
+const LOGOUT_REDIRECT_URL =
+  import.meta.env.VITE_ASGARDEO_LOGOUT_REDIRECT_URI ||
+  `${window.location.origin}/login`;
 const SCOPES = import.meta.env.VITE_ASGARDEO_SCOPES || 'openid profile email groups';
 const SIGN_UP_URL = import.meta.env.VITE_ASGARDEO_SIGN_UP_URL || '';
 

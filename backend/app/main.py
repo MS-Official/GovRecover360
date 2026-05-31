@@ -1,6 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
+from app.core.config import settings
 from app.db.database import engine, Base
 from app.api import (
     auth, disasters, households, verification, payments,
@@ -12,9 +13,13 @@ from app.middleware.rbac_middleware import RBACMiddleware
 
 app = FastAPI(title="GovRecover360 API", version="1.0.0")
 
+cors_origins = ["http://localhost:3000", "http://localhost:5173"]
+if settings.FRONTEND_URL:
+    cors_origins.append(settings.FRONTEND_URL.rstrip("/"))
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000"],
+    allow_origins=cors_origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
