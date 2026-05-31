@@ -127,6 +127,19 @@ const DEMO_USERS: Record<string, User> = {
   },
 };
 
+const DEMO_CREDENTIALS: Record<string, { identifier: string; password: string }> = {
+  admin: { identifier: 'admin@govrecover.local', password: 'Demo@12345' },
+  field_officer: { identifier: 'field@govrecover.local', password: 'Demo@12345' },
+  verifier: { identifier: 'verifier@govrecover.local', password: 'Demo@12345' },
+  program_manager: { identifier: 'manager@govrecover.local', password: 'Demo@12345' },
+  finance_officer: { identifier: 'finance@govrecover.local', password: 'Demo@12345' },
+  warehouse_officer: { identifier: 'warehouse@govrecover.local', password: 'Demo@12345' },
+  gis_officer: { identifier: 'gis@govrecover.local', password: 'Demo@12345' },
+  ngo_partner: { identifier: 'ngo@govrecover.local', password: 'Demo@12345' },
+  auditor: { identifier: 'auditor@govrecover.local', password: 'Demo@12345' },
+  citizen: { identifier: 'citizen@govrecover.local', password: 'Demo@12345' },
+};
+
 const BACKEND_ROLE_MAP: Record<string, Role> = {
   ROLE_ADMIN: 'admin',
   ROLE_DISASTER_MANAGER: 'program_manager',
@@ -211,6 +224,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const loginAsRole = useCallback(async (role: string) => {
+    const credentials = DEMO_CREDENTIALS[role];
+    if (credentials) {
+      try {
+        await login(credentials.identifier, credentials.password);
+        return;
+      } catch {
+        // Keep the offline demo shell available if the API is unavailable.
+      }
+    }
     const userData = DEMO_USERS[role];
     if (!userData) throw new Error('Invalid role');
     const token = `demo-token-${role}-${Date.now()}`;

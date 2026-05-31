@@ -79,7 +79,7 @@ def register(req: UserCreate, db: Session = Depends(get_db)):
     if existing:
         raise HTTPException(status_code=400, detail="Email already registered")
 
-    role_name = req.role or "ROLE_CITIZEN"
+    role_name = "ROLE_CITIZEN"
     role_obj = db.query(Role).filter(Role.name == role_name).first()
     user = User(
         id=str(uuid4()),

@@ -10,6 +10,7 @@ router = APIRouter()
 
 
 @router.get("/api/audit-logs", response_model=list[AuditLogResponse])
+@router.get("/api/audit/logs", response_model=list[AuditLogResponse])
 def list_audit_logs(
     db: Session = Depends(get_db),
     current_user: User = Depends(require_permission("audit:read")),

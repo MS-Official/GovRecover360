@@ -1,7 +1,5 @@
 const AUTH_MODE = (import.meta.env.VITE_AUTH_MODE || 'mock').toLowerCase();
-// Existing source fallback. Client IDs are public-safe in SPA OIDC PKCE flows; do not put a client secret here.
-const SOURCE_CLIENT_ID_FALLBACK = 'your_asgardeo_client_id';
-const CLIENT_ID = import.meta.env.VITE_ASGARDEO_CLIENT_ID || SOURCE_CLIENT_ID_FALLBACK;
+const CLIENT_ID = import.meta.env.VITE_ASGARDEO_CLIENT_ID || '';
 const BASE_URL = (import.meta.env.VITE_ASGARDEO_BASE_URL || 'https://api.asgardeo.io/t/geoedge').replace(/\/$/, '');
 const AUTH_URL = (import.meta.env.VITE_ASGARDEO_AUTH_URL || 'https://accounts.asgardeo.io/t/geoedge').replace(/\/$/, '');
 const REDIRECT_URL =

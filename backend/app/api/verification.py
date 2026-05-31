@@ -8,8 +8,9 @@ from app.core.security import get_current_user, require_permission, require_role
 from app.models.models import User, ReliefApplication, BeneficiaryVerification
 from app.schemas.schemas import (
     ReliefApplicationCreate, ReliefApplicationResponse,
-    VerificationRequest, VerificationResponse,
+    VerificationRequest, VerificationResponse, ApplicationActionRequest,
 )
+from app.services.notification_service import notify_user
 
 router = APIRouter()
 
@@ -41,6 +42,7 @@ def list_applications(
 
 
 @router.get("/api/applications/{application_id}", response_model=ReliefApplicationResponse)
+@router.get("/api/beneficiaries/{application_id}", response_model=ReliefApplicationResponse)
 def get_application(
     application_id: str,
     db: Session = Depends(get_db),
@@ -152,6 +154,15 @@ def verify_application(
     )
 
 
+@router.post("/api/beneficiaries/verify", response_model=VerificationResponse)
+def verify_beneficiary(
+    req: ApplicationActionRequest,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(require_role("ROLE_VERIFIER")),
+):
+    return verify_application(req.application_id, VerificationRequest(notes=req.notes), db, current_user)
+
+
 @router.post("/api/applications/{application_id}/reject", response_model=ReliefApplicationResponse)
 def reject_application(
     application_id: str,
@@ -187,9 +198,23 @@ def approve_relief(
     app = db.query(ReliefApplication).filter(ReliefApplication.id == application_id).first()
     if not app:
         raise HTTPException(status_code=404, detail="Application not found")
-    app.status = "APPROVED_FOR_RELIEF"
+    app.status = "APPROVED"
     app.approved_by_user_id = current_user.id
     app.approved_at = datetime.utcnow()
+    notify_user(
+        db,
+        app.applicant_user_id,
+        "Relief Approved",
+        f"Your relief application {app.id} has been approved.",
+        "APPROVAL",
+        "/api/notifications/application-approved",
+        {
+            "applicationId": app.id,
+            "citizenName": app.household.head_full_name if app.household else "Citizen",
+            "citizenPhone": app.household.head_phone if app.household else "",
+            "message": "Please monitor your status for payment and dispatch updates.",
+        },
+    )
     db.commit()
     db.refresh(app)
     return ReliefApplicationResponse(
@@ -202,3 +227,12 @@ def approve_relief(
         approved_at=app.approved_at, rejection_reason=app.rejection_reason,
         created_at=app.created_at,
     )
+
+
+@router.post("/api/relief/approve", response_model=ReliefApplicationResponse)
+def approve_relief_alias(
+    req: ApplicationActionRequest,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(require_role("ROLE_PROGRAM_MANAGER")),
+):
+    return approve_relief(req.application_id, db, current_user)

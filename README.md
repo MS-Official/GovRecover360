@@ -73,6 +73,8 @@ Once all containers are running, access the platform at the following URLs:
 |---|---|---|
 | Frontend (UI) | http://localhost:3000 | See demo users below |
 | Backend API (Swagger) | http://localhost:8000/docs | - |
+| Backend Health | http://localhost:8000/api/health | - |
+| Notification Health | http://localhost:8095/health | - |
 | Odoo ERP | http://localhost:8069 | admin / admin |
 | Apache Superset | http://localhost:8088 | admin / admin |
 | AI Service | http://localhost:8050 | - |
@@ -95,6 +97,8 @@ All demo users use the password **Demo@12345**:
 | auditor@govrecover.local | Auditor | Colombo | Audit Department |
 | citizen@govrecover.local | Citizen | Galle | - |
 | disaster-manager@govrecover.local | Disaster Manager | Colombo | NDMC |
+
+Seed data includes the demo event **Western Province Flood 2026** with type `Flood`, severity `Critical`, affected districts `Colombo`, `Gampaha`, and `Kalutara`, plus the household **Mohamed Rizwan / 901234567V** in `Gampaha`, `Negombo`, `Pitipana`.
 
 ## Project Structure
 
@@ -214,6 +218,22 @@ Available AI endpoints:
 ## API Documentation
 
 Interactive API documentation is available at http://localhost:8000/docs (Swagger UI) when the backend service is running.
+
+### Postman API Tests
+
+Import `docs/postman/GovRecover360.postman_collection.json` into Postman. Start the stack first, then run the Authentication login requests for each seeded role to populate tokens. The Tests folder includes demo RBAC checks for:
+
+- Field Officer can register a citizen through `POST /api/citizens/register`.
+- Field Officer cannot approve payment through `POST /api/payments/approve`.
+- Finance Officer can approve payment through `POST /api/payments/approve`.
+- Auditor can read `GET /api/audit/logs` but cannot dispatch inventory.
+- Citizen is denied when reading another citizen's beneficiary/application.
+
+The collection also keeps the original resource URLs such as `/api/households/register`, `/api/applications/{id}/approve-relief`, `/api/payments/{id}/approve`, and `/api/dispatch-orders/{id}/dispatch`.
+
+### External Integrations
+
+Local demo mode works without Asgardeo, WSO2 API Manager, GeoNode, Odoo credentials, or Choreo invoke URLs. For an integrated demo, configure these values in `.env`: `AUTH_MODE=hybrid`, `ASGARDEO_*`, `WSO2_*`, `CHOREO_NOTIFIER_API_URL`, `CHOREO_USER_SERVICE_URL`, `GEONODE_URL`, `ODOO_*`, and `OPENG2P_*`. If `CHOREO_NOTIFIER_API_URL` is empty or unavailable, workflow notifications are logged in the local database instead of failing the request.
 
 ## Troubleshooting
 

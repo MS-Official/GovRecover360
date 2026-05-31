@@ -16,6 +16,7 @@ const api = axios.create({
   // Reason: undefined baseURL sends auth requests to /auth/* instead of /api/auth/* in local/Vercel builds.
   // baseURL: apiBaseUrl || undefined,
   baseURL: apiBaseUrl,
+  timeout: 10000,
   headers: {
     'Content-Type': 'application/json',
   },

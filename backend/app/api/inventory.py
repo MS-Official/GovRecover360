@@ -6,7 +6,8 @@ from sqlalchemy.orm import Session
 from app.api.deps import get_db
 from app.core.security import get_current_user, require_permission, require_role
 from app.models.models import User, InventoryItem, Warehouse, DispatchOrder
-from app.schemas.schemas import DispatchOrderCreate, DispatchOrderResponse
+from app.schemas.schemas import DispatchActionRequest, DispatchOrderCreate, DispatchOrderResponse
+from app.services.notification_service import notify_user
 
 router = APIRouter()
 
@@ -204,9 +205,20 @@ def dispatch_order(
     order = db.query(DispatchOrder).filter(DispatchOrder.id == order_id).first()
     if not order:
         raise HTTPException(status_code=404, detail="Dispatch order not found")
-    order.status = "IN_TRANSIT"
+    order.status = "DISPATCHED"
     order.dispatched_by_user_id = current_user.id
     order.dispatched_at = datetime.utcnow()
+    if order.relief_application:
+        order.relief_application.status = "DISPATCHED"
+        notify_user(
+            db,
+            order.relief_application.applicant_user_id,
+            "Relief Items Dispatched",
+            f"Dispatch order {order.id} is on its way.",
+            "DISPATCH",
+            "/api/notifications/dispatch-update",
+            {"dispatchId": order.id, "status": order.status, "notes": order.notes},
+        )
     db.commit()
     db.refresh(order)
     return {
@@ -217,3 +229,12 @@ def dispatch_order(
         "dispatched_at": order.dispatched_at, "delivered_at": order.delivered_at,
         "notes": order.notes, "created_at": order.created_at,
     }
+
+
+@router.post("/api/inventory/dispatch")
+def dispatch_order_alias(
+    req: DispatchActionRequest,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(require_role("ROLE_WAREHOUSE_OFFICER")),
+):
+    return dispatch_order(req.order_id, db, current_user)

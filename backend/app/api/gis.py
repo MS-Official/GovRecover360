@@ -28,6 +28,7 @@ def list_zones(
 
 
 @router.post("/api/gis/zones", status_code=201)
+@router.post("/api/geo/disaster-zone", status_code=201)
 def create_zone(
     req: dict,
     db: Session = Depends(get_db),

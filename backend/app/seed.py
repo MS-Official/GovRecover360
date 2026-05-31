@@ -307,20 +307,20 @@ def seed():
 
         # === DISASTER EVENT ===
         print("Seeding disaster event...")
-        disaster = db.query(DisasterEvent).first()
+        disaster = db.query(DisasterEvent).filter(
+            DisasterEvent.name == "Western Province Flood 2026"
+        ).first()
         if not disaster:
             disaster = DisasterEvent(
                 id=str(uuid4()),
-                name="Southwest Monsoon Floods 2024",
-                description="Severe flooding affecting Southern and Eastern provinces "
-                           "due to heavy monsoon rains. Multiple districts affected with "
-                           "widespread damage to homes and infrastructure.",
-                disaster_type="FLOOD",
-                severity="SEVERE",
+                name="Western Province Flood 2026",
+                description="Critical flood response event for the Western Province demo workflow.",
+                disaster_type="Flood",
+                severity="Critical",
                 status="ACTIVE",
-                start_date=datetime(2024, 5, 15),
-                end_date=datetime(2024, 6, 30),
-                affected_districts=["Galle", "Matara", "Hambantota", "Trincomalee", "Batticaloa"],
+                start_date=datetime(2026, 5, 20),
+                end_date=None,
+                affected_districts=["Colombo", "Gampaha", "Kalutara"],
                 created_by_user_id=user_ids.get("admin@govrecover.local"),
             )
             db.add(disaster)
@@ -428,7 +428,31 @@ def seed():
 
         # === 30 HOUSEHOLDS ===
         print("Seeding 30 households...")
-        if db.query(Household).count() == 0:
+        should_seed_households = db.query(Household).count() == 0
+        demo_household = db.query(Household).filter(Household.head_nic == "901234567V").first()
+        if not demo_household:
+            demo_household = Household(
+                id=str(uuid4()),
+                head_full_name="Mohamed Rizwan",
+                head_nic="901234567V",
+                head_phone="077-1234567",
+                district="Gampaha",
+                ds_division="Negombo",
+                gn_division="Pitipana",
+                address="Pitipana, Negombo",
+                family_size=5,
+                damage_level="SEVERE",
+                damage_description="Requested aid: Food + Cash + Temporary Shelter",
+                latitude=7.2083,
+                longitude=79.8358,
+                status="REGISTERED",
+                registered_by_user_id=user_ids.get("citizen@govrecover.local"),
+                disaster_event_id=disaster_id,
+            )
+            db.add(demo_household)
+            db.flush()
+
+        if should_seed_households:
             first_names = ["Nimal", "Sunil", "Priya", "Kamala", "Saman", "Dilani", "Anura", "Champa",
                           "Ranjan", "Kumari", "Upali", "Sujeewa", "Ajith", "Damayanthi", "Rohan",
                           "Mala", "Asanka", "Deepani", "Sujeewa", "Indika", "Lal", "Nishantha",
@@ -509,7 +533,7 @@ def seed():
                 ["Food Pack", "Water Bottle"],
             ]
             status_cycle = ["DRAFT", "SUBMITTED", "UNDER_VERIFICATION", "VERIFIED",
-                           "APPROVED_FOR_RELIEF", "PAYMENT_PENDING", "PAYMENT_APPROVED",
+                           "APPROVED", "PAYMENT_PENDING", "PAYMENT_APPROVED",
                            "DISPATCHED", "COMPLETED"]
             for i, h in enumerate(households):
                 if i >= 20:
@@ -525,11 +549,11 @@ def seed():
                     submitted_at=datetime.utcnow() - timedelta(days=randint(1, 20)),
                     created_at=datetime.utcnow() - timedelta(days=randint(1, 25)),
                 )
-                if status in ("VERIFIED", "APPROVED_FOR_RELIEF", "PAYMENT_PENDING",
+                if status in ("VERIFIED", "APPROVED", "PAYMENT_PENDING",
                               "PAYMENT_APPROVED", "DISPATCHED", "COMPLETED"):
                     app.verified_by_user_id = user_ids.get("verifier@govrecover.local")
                     app.verified_at = datetime.utcnow() - timedelta(days=randint(1, 10))
-                if status in ("APPROVED_FOR_RELIEF", "PAYMENT_PENDING", "PAYMENT_APPROVED",
+                if status in ("APPROVED", "PAYMENT_PENDING", "PAYMENT_APPROVED",
                               "DISPATCHED", "COMPLETED"):
                     app.approved_by_user_id = user_ids.get("manager@govrecover.local")
                     app.approved_at = datetime.utcnow() - timedelta(days=randint(1, 7))
@@ -540,7 +564,7 @@ def seed():
         print("Seeding verifications...")
         if db.query(BeneficiaryVerification).count() == 0:
             verified_apps = db.query(ReliefApplication).filter(
-                ReliefApplication.status.in_(["VERIFIED", "APPROVED_FOR_RELIEF", "PAYMENT_PENDING",
+                ReliefApplication.status.in_(["VERIFIED", "APPROVED", "PAYMENT_PENDING",
                                             "PAYMENT_APPROVED", "DISPATCHED", "COMPLETED"])
             ).all()
             verifier_id = user_ids.get("verifier@govrecover.local")
@@ -621,7 +645,7 @@ def seed():
         print("Seeding payment requests...")
         if db.query(PaymentRequest).count() == 0:
             approved_apps = db.query(ReliefApplication).filter(
-                ReliefApplication.status.in_(["APPROVED_FOR_RELIEF", "PAYMENT_PENDING",
+                ReliefApplication.status.in_(["APPROVED", "PAYMENT_PENDING",
                                             "PAYMENT_APPROVED", "DISPATCHED", "COMPLETED"])
             ).all()
             for app in approved_apps:

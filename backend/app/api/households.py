@@ -13,6 +13,7 @@ router = APIRouter()
 
 
 @router.post("/api/households/register", response_model=HouseholdResponse, status_code=201)
+@router.post("/api/citizens/register", response_model=HouseholdResponse, status_code=201)
 def register_household(
     req: HouseholdCreate,
     db: Session = Depends(get_db),

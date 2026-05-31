@@ -13,16 +13,21 @@ import {
 import toast from 'react-hot-toast';
 
 const DEMO_ROLES = [
-  // OLD IMPLEMENTATION - kept for reference
-  // 'admin', 'field_officer', 'verifier', 'program_manager',
-  // 'finance_officer', 'warehouse_officer', 'gis_officer',
-  // 'ngo_partner', 'auditor', 'citizen',
-  'admin', 'field_officer', 'citizen',
+  'admin', 'field_officer', 'verifier', 'program_manager',
+  'finance_officer', 'warehouse_officer', 'gis_officer',
+  'ngo_partner', 'auditor', 'citizen',
 ];
 
 const DEMO_ROLE_LABELS: Record<string, string> = {
   admin: 'Admin Demo',
   field_officer: 'Officer Demo',
+  verifier: 'Verifier Demo',
+  program_manager: 'Manager Demo',
+  finance_officer: 'Finance Demo',
+  warehouse_officer: 'Warehouse Demo',
+  gis_officer: 'GIS Demo',
+  ngo_partner: 'NGO Demo',
+  auditor: 'Auditor Demo',
   citizen: 'Citizen Demo',
 };
 

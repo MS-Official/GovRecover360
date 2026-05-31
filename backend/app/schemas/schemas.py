@@ -167,6 +167,11 @@ class VerificationRequest(BaseModel):
     notes: Optional[str] = None
 
 
+class ApplicationActionRequest(BaseModel):
+    application_id: str
+    notes: Optional[str] = None
+
+
 class VerificationResponse(BaseModel):
     id: str
     relief_application_id: str
@@ -249,6 +254,11 @@ class DispatchOrderCreate(BaseModel):
     warehouse_id: Optional[str] = None
     assigned_ngo_id: Optional[str] = None
     items_json: Optional[dict] = None
+    notes: Optional[str] = None
+
+
+class DispatchActionRequest(BaseModel):
+    order_id: str
     notes: Optional[str] = None
 
 

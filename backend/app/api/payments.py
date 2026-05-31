@@ -4,9 +4,10 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 
 from app.api.deps import get_db
-from app.core.security import get_current_user, require_permission
+from app.core.security import get_current_user, require_permission, require_role
 from app.models.models import User, PaymentRequest
 from app.schemas.schemas import PaymentRequestCreate, PaymentRequestResponse
+from app.services.notification_service import notify_user
 
 router = APIRouter()
 
@@ -91,6 +92,15 @@ def approve_payment(
     payment.status = "PAYMENT_APPROVED"
     payment.approved_by_user_id = current_user.id
     payment.approved_at = datetime.utcnow()
+    if payment.relief_application:
+        payment.relief_application.status = "PAYMENT_APPROVED"
+        notify_user(
+            db,
+            payment.relief_application.applicant_user_id,
+            "Payment Approved",
+            f"Payment request {payment.id} has been approved for {payment.currency} {payment.amount:.2f}.",
+            "PAYMENT",
+        )
     db.commit()
     db.refresh(payment)
     return PaymentRequestResponse(
@@ -101,3 +111,15 @@ def approve_payment(
         approved_at=payment.approved_at, processed_at=payment.processed_at,
         notes=payment.notes, created_at=payment.created_at,
     )
+
+
+@router.post("/api/payments/approve", response_model=PaymentRequestResponse)
+def approve_payment_alias(
+    req: dict,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(require_role("ROLE_FINANCE_OFFICER")),
+):
+    payment_id = req.get("payment_id")
+    if not payment_id:
+        raise HTTPException(status_code=400, detail="payment_id is required")
+    return approve_payment(payment_id, db, current_user)
