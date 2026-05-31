@@ -24,7 +24,11 @@ export default function CallbackPage() {
         const user = await completeAsgardeoLogin(tokenResponse.access_token, tokenResponse.id_token);
         navigate(getDefaultRoute(user.role), { replace: true });
       } catch (err: any) {
-        setError(err.message || 'Asgardeo login could not be completed.');
+        const message = err.message || 'Asgardeo login could not be completed.';
+        setError(message);
+        window.setTimeout(() => {
+          navigate(`/login?error=${encodeURIComponent(message)}`, { replace: true });
+        }, 2500);
       }
     };
     finishLogin();

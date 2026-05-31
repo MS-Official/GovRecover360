@@ -5,12 +5,16 @@ from pydantic import BaseModel
 
 # === Auth Schemas ===
 class LoginRequest(BaseModel):
-    email: str
+    identifier: Optional[str] = None
+    # OLD IMPLEMENTATION - kept for reference
+    # email was the only accepted login field. It remains supported for older clients.
+    email: Optional[str] = None
     password: str
 
 
 class UserCreate(BaseModel):
     email: str
+    username: Optional[str] = None
     password: str
     full_name: str
     role: str = "ROLE_CITIZEN"

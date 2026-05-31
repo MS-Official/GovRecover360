@@ -6,12 +6,15 @@ const apiBaseUrl = normalizedApiBaseUrl
   ? normalizedApiBaseUrl.endsWith('/api')
     ? normalizedApiBaseUrl
     : `${normalizedApiBaseUrl}/api`
-  : undefined;
+  : '/api';
 
 const api = axios.create({
   // OLD IMPLEMENTATION - kept for reference
   // Reason: removed local /api fallback so deployed frontend must use VITE_API_BASE_URL.
   // baseURL: import.meta.env.VITE_API_BASE_URL || import.meta.env.VITE_API_URL || '/api',
+  // OLD IMPLEMENTATION - kept for reference
+  // Reason: undefined baseURL sends auth requests to /auth/* instead of /api/auth/* in local/Vercel builds.
+  // baseURL: apiBaseUrl || undefined,
   baseURL: apiBaseUrl,
   headers: {
     'Content-Type': 'application/json',

@@ -5,7 +5,8 @@ import { getAsgardeoLogoutUrl, getAuthMode } from '../services/oidc';
 
 interface AuthContextType {
   user: User | null;
-  login: (email: string, password: string) => Promise<void>;
+  login: (identifier: string, password: string) => Promise<User>;
+  register: (payload: RegisterPayload) => Promise<User>;
   loginAsRole: (role: string) => Promise<void>;
   completeAsgardeoLogin: (accessToken: string, idToken?: string) => Promise<User>;
   logout: () => void;
@@ -15,6 +16,13 @@ interface AuthContextType {
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
+
+interface RegisterPayload {
+  full_name: string;
+  username: string;
+  email: string;
+  password: string;
+}
 
 const DEMO_USERS: Record<string, User> = {
   admin: {
@@ -175,14 +183,31 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setLoading(false);
   }, []);
 
-  const login = useCallback(async (email: string, password: string) => {
-    const response = await api.post('/auth/login', { email, password });
+  const login = useCallback(async (identifier: string, password: string) => {
+    const response = await api.post('/auth/login', {
+      identifier,
+      // OLD IMPLEMENTATION - kept for reference
+      // Reason: backend now accepts identifier while still honoring the old email field.
+      email: identifier,
+      password,
+    });
     const { user: userData, access_token } = response.data;
     const token = access_token;
     const mappedUser = mapBackendUser(userData);
     localStorage.setItem('token', token);
     localStorage.setItem('user', JSON.stringify(mappedUser));
     setUser(mappedUser);
+    return mappedUser;
+  }, []);
+
+  const register = useCallback(async (payload: RegisterPayload) => {
+    const response = await api.post('/auth/register', payload);
+    const { user: userData, access_token } = response.data;
+    const mappedUser = mapBackendUser(userData);
+    localStorage.setItem('token', access_token);
+    localStorage.setItem('user', JSON.stringify(mappedUser));
+    setUser(mappedUser);
+    return mappedUser;
   }, []);
 
   const loginAsRole = useCallback(async (role: string) => {
@@ -210,7 +235,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     localStorage.removeItem('user');
     localStorage.removeItem('id_token');
     setUser(null);
-    if (getAuthMode() === 'asgardeo') {
+    if (['asgardeo', 'hybrid'].includes(getAuthMode())) {
       window.location.href = getAsgardeoLogoutUrl(idToken);
     }
   }, []);
@@ -227,6 +252,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       value={{
         user,
         login,
+        register,
         loginAsRole,
         completeAsgardeoLogin,
         logout,

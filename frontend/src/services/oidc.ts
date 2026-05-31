@@ -1,7 +1,9 @@
-const AUTH_MODE = import.meta.env.VITE_AUTH_MODE || 'mock';
-const CLIENT_ID = import.meta.env.VITE_ASGARDEO_CLIENT_ID || '';
-const BASE_URL = (import.meta.env.VITE_ASGARDEO_BASE_URL || '').replace(/\/$/, '');
-const AUTH_URL = (import.meta.env.VITE_ASGARDEO_AUTH_URL || BASE_URL).replace(/\/$/, '');
+const AUTH_MODE = (import.meta.env.VITE_AUTH_MODE || 'mock').toLowerCase();
+// Existing source fallback. Client IDs are public-safe in SPA OIDC PKCE flows; do not put a client secret here.
+const SOURCE_CLIENT_ID_FALLBACK = 'your_asgardeo_client_id';
+const CLIENT_ID = import.meta.env.VITE_ASGARDEO_CLIENT_ID || SOURCE_CLIENT_ID_FALLBACK;
+const BASE_URL = (import.meta.env.VITE_ASGARDEO_BASE_URL || 'https://api.asgardeo.io/t/geoedge').replace(/\/$/, '');
+const AUTH_URL = (import.meta.env.VITE_ASGARDEO_AUTH_URL || 'https://accounts.asgardeo.io/t/geoedge').replace(/\/$/, '');
 const REDIRECT_URL =
   import.meta.env.VITE_ASGARDEO_REDIRECT_URI ||
   `${window.location.origin}/callback`;
@@ -9,7 +11,9 @@ const LOGOUT_REDIRECT_URL =
   import.meta.env.VITE_ASGARDEO_LOGOUT_REDIRECT_URI ||
   `${window.location.origin}/login`;
 const SCOPES = import.meta.env.VITE_ASGARDEO_SCOPES || 'openid profile email groups';
-const SIGN_UP_URL = import.meta.env.VITE_ASGARDEO_SIGN_UP_URL || '';
+const SIGN_UP_URL =
+  import.meta.env.VITE_ASGARDEO_SIGN_UP_URL ||
+  'https://accounts.asgardeo.io/t/geoedge/accountrecoveryendpoint/register.do';
 
 const encoder = new TextEncoder();
 
@@ -31,7 +35,7 @@ async function sha256(value: string) {
 }
 
 export function isAsgardeoConfigured() {
-  return AUTH_MODE === 'asgardeo' && Boolean(CLIENT_ID && BASE_URL && AUTH_URL && REDIRECT_URL);
+  return ['asgardeo', 'hybrid'].includes(AUTH_MODE) && Boolean(CLIENT_ID && BASE_URL && AUTH_URL && REDIRECT_URL);
 }
 
 export function getAuthMode() {

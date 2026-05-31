@@ -137,12 +137,7 @@ def _validate_asgardeo_token(token: str) -> dict:
 
 
 def _get_or_create_asgardeo_user(db: Session, payload: dict) -> User:
-    role_name = map_asgardeo_role(payload)
-    if not role_name:
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail="No GovRecover360 role found in token. Please assign a role in Asgardeo.",
-        )
+    role_name = map_asgardeo_role(payload) or "ROLE_CITIZEN"
 
     email = (
         payload.get("email")
@@ -176,16 +171,7 @@ def _get_or_create_asgardeo_user(db: Session, payload: dict) -> User:
     return user
 
 
-def get_current_user(
-    credentials: HTTPAuthorizationCredentials | None = Depends(security),
-    db: Session = Depends(get_db),
-) -> User:
-    if credentials is None:
-        raise _credentials_exception()
-    token = credentials.credentials
-    if (settings.AUTH_MODE or "mock").lower() == "asgardeo":
-        return _get_or_create_asgardeo_user(db, _validate_asgardeo_token(token))
-
+def _get_local_user_from_token(db: Session, token: str) -> User:
     try:
         payload = jwt.decode(token, settings.SECRET_KEY, algorithms=[settings.ALGORITHM])
         user_id: str = payload.get("sub")
@@ -198,6 +184,25 @@ def get_current_user(
     if user is None or not user.is_active:
         raise _credentials_exception()
     return user
+
+
+def get_current_user(
+    credentials: HTTPAuthorizationCredentials | None = Depends(security),
+    db: Session = Depends(get_db),
+) -> User:
+    if credentials is None:
+        raise _credentials_exception()
+    token = credentials.credentials
+    auth_mode = (settings.AUTH_MODE or "mock").lower()
+    if auth_mode == "asgardeo":
+        return _get_or_create_asgardeo_user(db, _validate_asgardeo_token(token))
+    if auth_mode == "hybrid":
+        try:
+            return _get_local_user_from_token(db, token)
+        except HTTPException:
+            return _get_or_create_asgardeo_user(db, _validate_asgardeo_token(token))
+
+    return _get_local_user_from_token(db, token)
 
 
 def get_user_permissions(db: Session, user: User) -> list[str]:
