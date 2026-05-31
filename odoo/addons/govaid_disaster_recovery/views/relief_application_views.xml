@@ -96,6 +96,16 @@
                         <page string="Payment Requests">
                             <field name="payment_request_ids" nolabel="1"/>
                         </page>
+                        <page string="OpenG2P">
+                            <group>
+                                <field name="openg2p_beneficiary_id"/>
+                                <field name="openg2p_eligibility_status"/>
+                                <field name="openg2p_entitlement_status"/>
+                            </group>
+                            <p class="text-muted">
+                                TODO OpenG2P integration: link disaster aid applicants with OpenG2P beneficiary IDs, eligibility status, and entitlement/disbursement status.
+                            </p>
+                        </page>
                     </notebook>
                 </sheet>
                 <div class="oe_chatter">

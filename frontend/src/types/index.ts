@@ -311,6 +311,9 @@ export type IntegrationStatusValue =
   | 'ok'
   | 'configured'
   | 'aligned'
+  | 'disabled'
+  | 'live'
+  | 'unreachable'
   | 'documented'
   | 'mock_mode'
   | 'manual_setup_required'
@@ -337,6 +340,7 @@ export interface IntegrationStatus {
     registerUrlConfigured: boolean;
   };
   choreo: IntegrationStatusValue;
+  choreoUserService?: IntegrationStatusValue;
   superset: IntegrationStatusValue;
   geonode: IntegrationStatusValue;
   aiService: IntegrationStatusValue;

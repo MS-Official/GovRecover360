@@ -85,6 +85,12 @@ class ReliefApplication(models.Model):
     payment_request_ids = fields.One2many(
         'payment.request', 'relief_application_id', string='Payment Requests'
     )
+    # TODO OpenG2P integration:
+    # Link disaster aid applicants with OpenG2P beneficiary IDs.
+    # Store OpenG2P beneficiary_id, eligibility_status, entitlement_status.
+    openg2p_beneficiary_id = fields.Char(string='OpenG2P Beneficiary ID', tracking=True)
+    openg2p_eligibility_status = fields.Char(string='OpenG2P Eligibility Status', tracking=True)
+    openg2p_entitlement_status = fields.Char(string='OpenG2P Entitlement Status', tracking=True)
 
     _sql_constraints = [
         ('unique_name', 'unique(name)', 'Application number must be unique.'),

@@ -70,6 +70,12 @@ services:
       ODOO_DB: ${ODOO_DB:-}
       ODOO_USERNAME: ${ODOO_USERNAME:-}
       ODOO_PASSWORD: ${ODOO_PASSWORD:-}
+      OPENG2P_ENABLED: ${OPENG2P_ENABLED:-false}
+      OPENG2P_BASE_URL: ${OPENG2P_BASE_URL:-http://host.docker.internal:8070}
+      OPENG2P_API_BASE_URL: ${OPENG2P_API_BASE_URL:-http://host.docker.internal:8070/api}
+      OPENG2P_DB: ${OPENG2P_DB:-}
+      OPENG2P_USERNAME: ${OPENG2P_USERNAME:-}
+      OPENG2P_PASSWORD: ${OPENG2P_PASSWORD:-}
       WSO2_GATEWAY_URL: ${WSO2_GATEWAY_URL:-}
       WSO2_PUBLISHER_URL: ${WSO2_PUBLISHER_URL:-}
       SUPERSET_URL: http://superset:8088
@@ -223,6 +229,11 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
+
+  # Optional OpenG2P runtime:
+  # Keep the govaid-connect-openg2p-demo stack separate if it is already running.
+  # Point OPENG2P_BASE_URL and OPENG2P_API_BASE_URL at that stack instead of
+  # adding a second OpenG2P deployment here.
 
 volumes:
   postgres_data:

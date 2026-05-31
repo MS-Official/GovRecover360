@@ -10,6 +10,7 @@ from sqlalchemy import text
 from app.core.config import settings
 from app.db.database import engine
 from app.services.choreo_user_service import choreo_user_service
+from app.services.openg2p_service import openg2p_service
 
 router = APIRouter()
 
@@ -123,6 +124,8 @@ def _integration_env_status() -> dict:
             and settings.ODOO_USERNAME
             and settings.ODOO_PASSWORD
         ),
+        "openg2p_configured": openg2p_service.configured,
+        "openg2p_enabled": bool(settings.OPENG2P_ENABLED),
         "odoo_module": "govaid_disaster_recovery",
     }
 
@@ -153,7 +156,10 @@ def integration_status():
         "database": _database_status(),
         "redis": _redis_status(),
         "odoo": _odoo_status(),
-        "openg2p": "aligned",
+        # OLD IMPLEMENTATION - kept for reference
+        # Reason: replaced with OpenG2P-aware runtime health while preserving demo alignment behavior.
+        # "openg2p": "aligned",
+        "openg2p": openg2p_service.health().get("mode", "error"),
         "wso2": _wso2_status(),
         "asgardeo": _asgardeo_status(),
         "choreo": _http_health(settings.CHOREO_NOTIFIER_API_URL),

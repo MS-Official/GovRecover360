@@ -14,7 +14,7 @@ import toast from 'react-hot-toast';
 import { IntegrationStatus, User, Role } from '../types';
 import { ROLE_DISPLAY_NAMES } from '../utils/constants';
 
-type Tab = 'overview' | 'users' | 'disasters' | 'programs' | 'audit' | 'integrations';
+type Tab = 'overview' | 'users' | 'disasters' | 'programs' | 'audit' | 'integrations' | 'openg2p';
 
 export default function AdminDashboard() {
   const { user: currentUser, hasPermission } = useAuth();
@@ -40,6 +40,7 @@ export default function AdminDashboard() {
 
   useEffect(() => {
     if (location.pathname.includes('/admin/integrations')) setActiveTab('integrations');
+    else if (location.pathname.includes('/admin/openg2p')) setActiveTab('openg2p');
     else if (location.pathname.includes('/admin/users')) setActiveTab('users');
     else if (location.pathname.includes('/admin/disasters')) setActiveTab('disasters');
     else if (location.pathname.includes('/admin/programs')) setActiveTab('programs');
@@ -150,6 +151,7 @@ export default function AdminDashboard() {
     { key: 'programs', label: 'Relief Programs' },
     { key: 'audit', label: 'Audit Logs' },
     { key: 'integrations', label: 'Integrations' },
+    { key: 'openg2p', label: 'OpenG2P Demo' },
   ];
 
   if (activeTab !== 'overview') {
@@ -211,6 +213,7 @@ export default function AdminDashboard() {
         )}
 
         {activeTab === 'integrations' && <IntegrationStatusPanel />}
+        {activeTab === 'openg2p' && <OpenG2PDemoPanel />}
 
         {showCreateModal && (
           <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
@@ -361,7 +364,7 @@ function IntegrationStatusPanel() {
     { label: 'Database', value: status.database },
     { label: 'Redis', value: status.redis },
     { label: 'Odoo', value: status.odoo },
-    { label: 'OpenG2P Alignment', value: status.openg2p },
+    { label: 'OpenG2P Runtime', value: status.openg2p },
     { label: 'Asgardeo', value: status.asgardeo.status },
     { label: 'WSO2 API Manager', value: status.wso2 },
     { label: 'Choreo Notification Service', value: status.choreo },
@@ -378,6 +381,7 @@ function IntegrationStatusPanel() {
     { title: 'Odoo Module Verification', path: 'docs/INTEGRATION_MANUAL_SETUP.md' },
     { title: 'Superset Dashboard', path: 'docs/superset/SUPERSET_GUIDE.md' },
     { title: 'OpenG2P Alignment', path: 'docs/INTEGRATION_MANUAL_SETUP.md' },
+    { title: 'OpenG2P Demo Setup', path: 'INTEGRATION_SETUP.md' },
   ];
 
   return (
@@ -430,6 +434,183 @@ function IntegrationStatusPanel() {
             <div key={item.title} className="bg-white rounded-xl shadow-sm border border-gray-200 p-5">
               <p className="text-sm font-semibold text-gray-900">{item.title}</p>
               <p className="text-xs text-gray-500 mt-2 font-mono break-all">{item.path}</p>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function OpenG2PDemoPanel() {
+  const [form, setForm] = useState({
+    full_name: 'Admin Demo Beneficiary',
+    national_id: 'NIC-DEMO-001',
+    phone: '+94110000000',
+    district: 'Colombo',
+    family_size: '4',
+    damage_level: 'SEVERE',
+    disaster_event: 'Southwest Monsoon Flood',
+    requested_support: 'Emergency cash assistance',
+  });
+  const [beneficiary, setBeneficiary] = useState<any>(null);
+  const [eligibility, setEligibility] = useState<any>(null);
+  const [entitlement, setEntitlement] = useState<any>(null);
+  const [health, setHealth] = useState<any>(null);
+  const [loadingAction, setLoadingAction] = useState('');
+
+  const payload = {
+    full_name: form.full_name,
+    national_id: form.national_id,
+    phone: form.phone,
+    district: form.district,
+    family_size: Number(form.family_size || 0),
+    damage_level: form.damage_level,
+    disaster_event: form.disaster_event,
+    requested_support: form.requested_support,
+  };
+
+  const runAction = async (
+    action: string,
+    request: () => Promise<any>,
+    onSuccess: (data: any) => void,
+  ) => {
+    setLoadingAction(action);
+    try {
+      const res = await request();
+      onSuccess(res.data);
+      toast.success(`${action} completed`);
+    } catch {
+      toast.error(`${action} failed. Check backend and OpenG2P configuration.`);
+    } finally {
+      setLoadingAction('');
+    }
+  };
+
+  const createBeneficiary = () => runAction(
+    'Create beneficiary',
+    () => api.post('/openg2p/beneficiaries', payload),
+    setBeneficiary,
+  );
+
+  const checkEligibility = () => runAction(
+    'Eligibility check',
+    () => api.post('/openg2p/eligibility/check', {
+      ...payload,
+      beneficiary_id: beneficiary?.beneficiary_id,
+    }),
+    setEligibility,
+  );
+
+  const createEntitlement = () => runAction(
+    'Create entitlement',
+    () => api.post('/openg2p/entitlements', {
+      beneficiary_id: beneficiary?.beneficiary_id,
+      amount: 25000,
+      currency: 'LKR',
+      program: 'Emergency Disaster Relief',
+      eligibility_status: eligibility?.eligibility_status || 'pending_verification',
+    }),
+    setEntitlement,
+  );
+
+  const loadHealth = () => runAction(
+    'OpenG2P health',
+    () => api.get('/openg2p/health'),
+    setHealth,
+  );
+
+  const fieldClass = 'w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-gov-500 focus:border-gov-500 outline-none';
+  const eligibilityLabel = eligibility?.eligibility_status === 'eligible'
+    ? 'Eligible'
+    : eligibility?.eligibility_status === 'not_eligible'
+      ? 'Not eligible'
+      : eligibility
+        ? 'Pending verification'
+        : 'Not checked';
+
+  return (
+    <div className="space-y-6">
+      <div className="flex items-start justify-between gap-4">
+        <div>
+          <h3 className="text-lg font-semibold text-gray-900">OpenG2P Beneficiary Demo</h3>
+          <p className="text-sm text-gray-500 mt-1">Submit affected citizen details to the backend, then run eligibility and entitlement steps.</p>
+        </div>
+        <button
+          onClick={loadHealth}
+          disabled={Boolean(loadingAction)}
+          className="px-4 py-2 bg-white border border-gray-200 text-gray-700 rounded-lg text-sm hover:bg-gray-50 disabled:opacity-60"
+        >
+          Check OpenG2P
+        </button>
+      </div>
+
+      <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
+        <div className="xl:col-span-2 bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {[
+              ['full_name', 'Full Name'],
+              ['national_id', 'National ID'],
+              ['phone', 'Phone'],
+              ['district', 'District'],
+              ['family_size', 'Family Size'],
+              ['disaster_event', 'Disaster Event'],
+            ].map(([key, label]) => (
+              <label key={key} className="block">
+                <span className="block text-sm font-medium text-gray-700 mb-1">{label}</span>
+                <input
+                  value={(form as any)[key]}
+                  onChange={(e) => setForm({ ...form, [key]: e.target.value })}
+                  className={fieldClass}
+                />
+              </label>
+            ))}
+            <label className="block">
+              <span className="block text-sm font-medium text-gray-700 mb-1">Damage Level</span>
+              <select
+                value={form.damage_level}
+                onChange={(e) => setForm({ ...form, damage_level: e.target.value })}
+                className={fieldClass}
+              >
+                <option value="MINOR">Minor</option>
+                <option value="MODERATE">Moderate</option>
+                <option value="SEVERE">Severe</option>
+                <option value="TOTAL">Total</option>
+              </select>
+            </label>
+            <label className="block md:col-span-2">
+              <span className="block text-sm font-medium text-gray-700 mb-1">Requested Support</span>
+              <textarea
+                value={form.requested_support}
+                onChange={(e) => setForm({ ...form, requested_support: e.target.value })}
+                className={fieldClass}
+                rows={3}
+              />
+            </label>
+          </div>
+          <div className="flex flex-wrap gap-3 mt-5">
+            <button onClick={createBeneficiary} disabled={Boolean(loadingAction)} className="px-4 py-2 bg-gov-500 text-white rounded-lg text-sm hover:bg-gov-600 disabled:opacity-60">Create Beneficiary</button>
+            <button onClick={checkEligibility} disabled={Boolean(loadingAction)} className="px-4 py-2 bg-gov-500 text-white rounded-lg text-sm hover:bg-gov-600 disabled:opacity-60">Check Eligibility</button>
+            <button onClick={createEntitlement} disabled={Boolean(loadingAction)} className="px-4 py-2 bg-gov-500 text-white rounded-lg text-sm hover:bg-gov-600 disabled:opacity-60">Create Entitlement</button>
+          </div>
+        </div>
+
+        <div className="space-y-4">
+          <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-5">
+            <p className="text-sm font-semibold text-gray-900">Eligibility Result</p>
+            <div className="mt-3">
+              <StatusBadge status={eligibility?.eligible ? 'active' : eligibility ? 'pending' : 'not_configured'} label={eligibilityLabel} />
+            </div>
+          </div>
+          {[
+            ['Health', health],
+            ['Beneficiary', beneficiary],
+            ['Eligibility', eligibility],
+            ['Entitlement', entitlement],
+          ].map(([label, data]) => (
+            <div key={label as string} className="bg-white rounded-xl shadow-sm border border-gray-200 p-5">
+              <p className="text-sm font-semibold text-gray-900">{label as string}</p>
+              <pre className="mt-3 text-xs bg-gray-50 rounded-lg p-3 overflow-auto max-h-44">{data ? JSON.stringify(data, null, 2) : 'No result yet'}</pre>
             </div>
           ))}
         </div>

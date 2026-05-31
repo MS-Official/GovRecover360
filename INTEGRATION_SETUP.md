@@ -136,7 +136,58 @@ ODOO_PASSWORD=your_odoo_password
 
 A deployed Vercel frontend cannot access `localhost:8069` directly. Any deployed Odoo integration must go through the backend or a reachable Odoo deployment.
 
-## 7. Local Docker URLs
+## 7. OpenG2P Demo Integration
+
+GovRecover360 handles disaster request intake.
+Asgardeo authenticates users.
+Choreo User Store manages user service API.
+Odoo `govaid_disaster_recovery` manages disaster operation/resource workflow.
+OpenG2P manages beneficiaries, eligibility, program enrollment, and entitlement/disbursement demo flow.
+
+The main GovRecover360 Docker Compose file does not deploy OpenG2P. If your separate `govaid-connect-openg2p-demo` stack is running, point the backend to that stack:
+
+```env
+OPENG2P_ENABLED=true
+OPENG2P_BASE_URL=http://localhost:8070
+OPENG2P_API_BASE_URL=http://localhost:8070/api
+OPENG2P_DB=openg2p
+OPENG2P_USERNAME=admin
+OPENG2P_PASSWORD=admin
+```
+
+When OpenG2P is disabled or unreachable, the backend returns mock demo responses so the disaster-aid flow can still be demonstrated.
+
+OpenG2P backend endpoints:
+
+```txt
+GET  /api/openg2p/health
+POST /api/openg2p/beneficiaries
+GET  /api/openg2p/beneficiaries/{beneficiary_id}
+POST /api/openg2p/eligibility/check
+POST /api/openg2p/entitlements
+```
+
+Demo flow:
+
+1. Sign in to GovRecover360.
+2. Open Admin Dashboard, then `OpenG2P Demo`.
+3. Enter affected citizen details.
+4. Click `Create Beneficiary`.
+5. Click `Check Eligibility`.
+6. Confirm the result: Eligible, Not eligible, or Pending verification.
+7. Click `Create Entitlement`.
+8. Use `GET /api/integration/health` or `GET /api/openg2p/health` in Swagger to confirm configuration.
+
+Values the user must input manually for OpenG2P:
+
+- `OPENG2P_BASE_URL`
+- `OPENG2P_API_BASE_URL`
+- `OPENG2P_DB`
+- `OPENG2P_USERNAME`
+- `OPENG2P_PASSWORD`
+- `OPENG2P_ENABLED`
+
+## 8. Local Docker URLs
 
 Use these while Docker Desktop is running locally:
 
@@ -164,6 +215,12 @@ Notifications: http://localhost:8095
 - `ODOO_USERNAME`
 - `ODOO_PASSWORD`
 - `FRONTEND_URL`
+- `OPENG2P_BASE_URL`
+- `OPENG2P_API_BASE_URL`
+- `OPENG2P_DB`
+- `OPENG2P_USERNAME`
+- `OPENG2P_PASSWORD`
+- `OPENG2P_ENABLED`
 
 ## Validation
 
@@ -188,4 +245,5 @@ Health checks:
 GET /api/health
 GET /api/integrations/status
 GET /api/integration/health
+GET /api/openg2p/health
 ```

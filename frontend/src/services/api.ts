@@ -1,12 +1,18 @@
 import axios from 'axios';
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+const normalizedApiBaseUrl = API_BASE_URL?.replace(/\/$/, '');
+const apiBaseUrl = normalizedApiBaseUrl
+  ? normalizedApiBaseUrl.endsWith('/api')
+    ? normalizedApiBaseUrl
+    : `${normalizedApiBaseUrl}/api`
+  : undefined;
 
 const api = axios.create({
   // OLD IMPLEMENTATION - kept for reference
   // Reason: removed local /api fallback so deployed frontend must use VITE_API_BASE_URL.
   // baseURL: import.meta.env.VITE_API_BASE_URL || import.meta.env.VITE_API_URL || '/api',
-  baseURL: API_BASE_URL,
+  baseURL: apiBaseUrl,
   headers: {
     'Content-Type': 'application/json',
   },

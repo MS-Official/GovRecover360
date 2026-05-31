@@ -29,6 +29,12 @@ class Settings(BaseSettings):
     WSO2_PUBLISHER_URL: str | None = None
     SUPERSET_URL: str | None = None
     GEONODE_URL: str | None = None
+    OPENG2P_ENABLED: bool = False
+    OPENG2P_BASE_URL: str | None = None
+    OPENG2P_API_BASE_URL: str | None = None
+    OPENG2P_DB: str | None = None
+    OPENG2P_USERNAME: str | None = None
+    OPENG2P_PASSWORD: str | None = None
 
     class Config:
         env_file = ".env"
