@@ -2,7 +2,7 @@
 
 ## Test Date
 
-2026-05-30
+2026-05-31
 
 ## Environment
 
@@ -64,10 +64,10 @@
 | Admin Integrations page | PASSED | Production bundle includes Integration Status, status cards, refresh action, error text, and manual setup references. `http://localhost:3000/admin/integrations` returns the SPA shell. |
 | Seed data/demo users | FIXED | Seeder now creates/updates documented `.local` demo users with shared `Demo@12345` password. |
 | Odoo connector/module | FIXED | Odoo is reachable. Module import error fixed. Odoo 17 view modifiers fixed. CLI install of `govaid_disaster_recovery` completed successfully. |
-| OpenG2P alignment | PASSED | Integration status endpoint reports `aligned`. This is demo alignment only, not a live OpenG2P runtime connection. |
+| OpenG2P demo runtime | FIXED | `govrecover-openg2p` is a live local FastAPI demo runtime on port 8070. Fixed missing `/api/beneficiaries/sync` POST alias and `GET /api/entitlements` endpoint. demo.sh now discovers endpoints via OpenAPI spec before calling. All 4 OpenG2P steps pass: sync, eligibility check, entitlements, program enrollment. See `docs/OPENG2P_ALIGNMENT.md`. |
 | Asgardeo | MANUAL ACTION REQUIRED | Docs exist, but no live console configuration or JWT validation flow was proven. |
 | WSO2 API Manager | MANUAL ACTION REQUIRED | Docs exist, but no live WSO2 import/publish flow was proven. |
-| Choreo notification service | FIXED | Service added to Compose on port 8095 with healthcheck. `http://localhost:8095/health` returns 200. npm audit reports 0 vulnerabilities. |
+| Choreo notification service | FIXED | Service runs on port 8095. `/health` returns 200. Added `/notify/application-approved`, `/notify/payment-approved`, `/notify/dispatch-completed` route aliases matching what demo.sh expects. All 3 Choreo notification steps pass in demo.sh. |
 | Integration status endpoint | FIXED | `/api/integrations/status` returns 200 directly and through nginx with backend, database, Redis, Choreo, Superset, AI, auth mode, and manual/not-configured external statuses. |
 | Frontend dependency audit | BLOCKED | Current Vite 5.4.21 is latest Vite 5.x but still affected by the moderate esbuild dev-server advisory. `npm audit fix --force` would jump to Vite 8, so it was not applied. Production build passes. |
 
@@ -97,6 +97,11 @@
 - Added Admin Integrations status page with status cards, refresh button, and manual setup references.
 - Added `docs/INTEGRATION_MANUAL_SETUP.md`.
 - Added Postman requests for direct and nginx integration status checks.
+- **2026-05-31**: Fixed backend/nginx/frontend/superset container restarts (DB password mismatch, nginx upstream resolver, seed non-fatal, superset venv pip).
+- **2026-05-31**: Added `POST /api/beneficiaries/sync` and `GET /api/entitlements` to OpenG2P demo runtime.
+- **2026-05-31**: Added `endpoint_supports()` helper and robust fallback discovery to demo.sh OpenG2P section.
+- **2026-05-31**: Added `/notify/*` route aliases to Choreo notification service.
+- **2026-05-31**: Added `docs/OPENG2P_ALIGNMENT.md`.
 
 ## Manual Actions Required
 
@@ -149,4 +154,4 @@ The local demo reports OpenG2P as aligned. A full runtime integration still requ
 
 Demo-ready with manual platform setup.
 
-Core local demo paths are healthy: frontend, nginx, backend, RBAC, seed users, Odoo module, notification service, integration status endpoint, Postgres, Redis, AI service, and Superset container availability. External platforms such as Asgardeo, WSO2, and Choreo still require real console setup. The frontend retains a moderate Vite dev-server advisory unless a tested major Vite upgrade is accepted.
+Core local demo paths are healthy: frontend, nginx, backend, RBAC, seed users, Odoo module, notification service, integration status endpoint, Postgres, Redis, AI service, Superset, OpenG2P demo runtime (all 4 flow steps), and Choreo notification demo (all 3 notification types). External platforms such as Asgardeo, WSO2, and Choreo still require real console setup. The frontend retains a moderate Vite dev-server advisory unless a tested major Vite upgrade is accepted.

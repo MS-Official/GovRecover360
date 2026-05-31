@@ -241,6 +241,51 @@ get_json_optional() {
   fi
 }
 
+# post_json_optional: POST to a URL; prints warning instead of failing
+post_json_optional() {
+  local name="$1"
+  local url="$2"
+  local data="$3"
+  local outfile="$TMP_DIR/${name// /_}.json"
+
+  echo "POST $url"
+
+  local code
+  code=$(curl -sk -X POST "$url" \
+    -H "Content-Type: application/json" \
+    -o "$outfile" \
+    -w "%{http_code}" \
+    -d "$data" || true)
+
+  if [[ "$code" =~ ^(200|201)$ ]]; then
+    success "$name returned HTTP $code"
+    cat "$outfile" | pretty_json
+    return 0
+  else
+    warn "$name returned HTTP $code (skipping — not fatal)"
+    cat "$outfile" || true
+    return 1
+  fi
+}
+
+# endpoint_supports PATH METHOD
+# Returns "yes" if the OpenG2P OpenAPI spec lists METHOD for PATH.
+endpoint_supports() {
+  local path="$1"
+  local method="$2"
+  curl -s "$OPENG2P_PUBLIC_URL/openapi.json" | python3 -c "
+import sys, json
+path='$path'
+method='$method'.lower()
+try:
+    data=json.load(sys.stdin)
+    methods=data.get('paths', {}).get(path, {})
+    print('yes' if method in methods else 'no')
+except Exception:
+    print('no')
+"
+}
+
 # ----------------------------------------------------
 # 2. Docker service check
 # ----------------------------------------------------
@@ -344,8 +389,25 @@ SYNC_PAYLOAD=$(cat <<EOF
 EOF
 )
 
-post_json "OpenG2P Sync Beneficiary" "$OPENG2P_PUBLIC_URL/api/beneficiaries/sync" "$SYNC_PAYLOAD"
+# ── Discover the beneficiary sync/create endpoint ──
+echo ""
+echo "Discovering OpenG2P beneficiary endpoint via OpenAPI..."
+if [ "$(endpoint_supports "/api/beneficiaries/sync" "post")" = "yes" ]; then
+  SYNC_ENDPOINT="$OPENG2P_PUBLIC_URL/api/beneficiaries/sync"
+  echo "Using endpoint: /api/beneficiaries/sync"
+elif [ "$(endpoint_supports "/api/beneficiaries" "post")" = "yes" ]; then
+  SYNC_ENDPOINT="$OPENG2P_PUBLIC_URL/api/beneficiaries"
+  echo "Using endpoint: /api/beneficiaries"
+else
+  SYNC_ENDPOINT=""
+  warn "No supported OpenG2P beneficiary POST endpoint found. Skipping beneficiary sync."
+fi
 
+if [ -n "$SYNC_ENDPOINT" ]; then
+  post_json_optional "OpenG2P Beneficiary Sync" "$SYNC_ENDPOINT" "$SYNC_PAYLOAD"
+fi
+
+# ── Eligibility check ──
 ELIGIBILITY_PAYLOAD=$(cat <<EOF
 {
   "beneficiaryId": "$BENEFICIARY_ID",
@@ -360,10 +422,32 @@ ELIGIBILITY_PAYLOAD=$(cat <<EOF
 EOF
 )
 
-post_json "OpenG2P Eligibility Check" "$OPENG2P_PUBLIC_URL/api/eligibility/check" "$ELIGIBILITY_PAYLOAD"
+echo ""
+echo "Discovering OpenG2P eligibility endpoint..."
+if [ "$(endpoint_supports "/api/eligibility/check" "post")" = "yes" ]; then
+  post_json_optional "OpenG2P Eligibility Check" \
+    "$OPENG2P_PUBLIC_URL/api/eligibility/check" "$ELIGIBILITY_PAYLOAD"
+else
+  warn "No POST /api/eligibility/check found in OpenG2P spec. Skipping."
+fi
 
-get_json_optional "OpenG2P Entitlements" "$OPENG2P_PUBLIC_URL/api/entitlements"
+# ── Entitlements ──
+echo ""
+echo "Discovering OpenG2P entitlements endpoint..."
+if [ "$(endpoint_supports "/api/entitlements" "get")" = "yes" ]; then
+  get_json_optional "OpenG2P Entitlements" "$OPENG2P_PUBLIC_URL/api/entitlements"
+elif [ "$(endpoint_supports "/api/entitlements" "post")" = "yes" ]; then
+  ENTITLEMENT_PAYLOAD=$(cat <<EOF
+{"beneficiaryId": "$BENEFICIARY_ID", "programId": "$PROGRAM_ID"}
+EOF
+)
+  post_json_optional "OpenG2P Entitlements" \
+    "$OPENG2P_PUBLIC_URL/api/entitlements" "$ENTITLEMENT_PAYLOAD"
+else
+  warn "No /api/entitlements endpoint found in OpenG2P spec. Skipping."
+fi
 
+# ── Program enrollment ──
 ENROLLMENT_PAYLOAD=$(cat <<EOF
 {
   "beneficiaryId": "$BENEFICIARY_ID",
@@ -386,7 +470,14 @@ ENROLLMENT_PAYLOAD=$(cat <<EOF
 EOF
 )
 
-post_json "OpenG2P Program Enrollment" "$OPENG2P_PUBLIC_URL/api/program-enrollments" "$ENROLLMENT_PAYLOAD"
+echo ""
+echo "Discovering OpenG2P program enrollment endpoint..."
+if [ "$(endpoint_supports "/api/program-enrollments" "post")" = "yes" ]; then
+  post_json_optional "OpenG2P Program Enrollment" \
+    "$OPENG2P_PUBLIC_URL/api/program-enrollments" "$ENROLLMENT_PAYLOAD"
+else
+  warn "No POST /api/program-enrollments found in OpenG2P spec. Skipping."
+fi
 
 # ----------------------------------------------------
 # 6. WSO2 demo gateway flow
