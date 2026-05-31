@@ -49,6 +49,14 @@ cp .env.example .env
 
 Edit the `.env` file to configure database passwords, secret keys, and AI provider settings. The default values work for local development.
 
+To use Supabase Postgres instead of the local Docker Postgres database, set `DATABASE_URL` in `.env` to your Supabase shared pooler connection string:
+
+```
+DATABASE_URL=postgresql://postgres.rudxmttefdvebhmpzvsj:YOUR_URL_ENCODED_PASSWORD@aws-1-ap-northeast-1.pooler.supabase.com:6543/postgres?sslmode=require
+```
+
+Replace `YOUR_URL_ENCODED_PASSWORD` with the database password from Supabase. If the password contains characters such as `@`, `#`, `/`, `?`, or `:`, URL-encode it before placing it in the connection string.
+
 ### Step 3: Start All Services
 
 ```
@@ -181,7 +189,9 @@ A complete walkthrough of the platform's capabilities from GIS mapping through r
 | Variable | Description | Default |
 |---|---|---|
 | `DB_PASSWORD` | PostgreSQL password for application database | govrecover_2026 |
+| `DATABASE_URL` | Full backend PostgreSQL/Supabase SQLAlchemy connection URL. Overrides local Docker Postgres when set. | local Docker Postgres |
 | `SECRET_KEY` | JWT signing and encryption secret | (change in production) |
+| `FRONTEND_URL` | Frontend origin allowed by backend CORS | http://localhost:3000 |
 | `REDIS_URL` | Redis connection string | redis://redis:6379/0 |
 | `AI_PROVIDER` | AI provider (mock, openai, gemini, minimax) | mock |
 | `OPENAI_API_KEY` | OpenAI API key | (optional) |

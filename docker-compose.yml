@@ -50,7 +50,7 @@ services:
       redis:
         condition: service_healthy
     environment:
-      DATABASE_URL: postgresql://govrecover:${DB_PASSWORD:-govrecover_2026}@postgres:5432/govrecover
+      DATABASE_URL: ${DATABASE_URL:-postgresql://govrecover:${DB_PASSWORD:-govrecover_2026}@postgres:5432/govrecover}
       SECRET_KEY: ${SECRET_KEY:-govrecover-super-secret-key-change-in-production}
       REDIS_URL: redis://redis:6379/0
       AI_SERVICE_URL: http://ai-service:8050
@@ -84,8 +84,8 @@ services:
         VITE_AUTH_MODE: ${AUTH_MODE:-mock}
         VITE_ASGARDEO_CLIENT_ID: ${ASGARDEO_CLIENT_ID:-}
         VITE_ASGARDEO_BASE_URL: ${VITE_ASGARDEO_BASE_URL:-}
-        VITE_ASGARDEO_SIGN_IN_REDIRECT_URL: ${VITE_ASGARDEO_SIGN_IN_REDIRECT_URL:-http://localhost:3000/callback}
-        VITE_ASGARDEO_SIGN_OUT_REDIRECT_URL: ${VITE_ASGARDEO_SIGN_OUT_REDIRECT_URL:-http://localhost:3000/login}
+        VITE_ASGARDEO_REDIRECT_URI: ${VITE_ASGARDEO_REDIRECT_URI:-http://localhost:3000/callback}
+        VITE_ASGARDEO_LOGOUT_REDIRECT_URI: ${VITE_ASGARDEO_LOGOUT_REDIRECT_URI:-http://localhost:3000/login}
         VITE_ASGARDEO_SCOPES: ${VITE_ASGARDEO_SCOPES:-openid profile email groups}
         VITE_ASGARDEO_SIGN_UP_URL: ${VITE_ASGARDEO_SIGN_UP_URL:-}
     container_name: govrecover-frontend
@@ -95,13 +95,12 @@ services:
     depends_on:
       - backend
     environment:
-      VITE_API_URL: /api
       VITE_API_BASE_URL: /api
       VITE_AUTH_MODE: ${AUTH_MODE:-mock}
       VITE_ASGARDEO_CLIENT_ID: ${ASGARDEO_CLIENT_ID:-}
       VITE_ASGARDEO_BASE_URL: ${VITE_ASGARDEO_BASE_URL:-}
-      VITE_ASGARDEO_SIGN_IN_REDIRECT_URL: ${VITE_ASGARDEO_SIGN_IN_REDIRECT_URL:-http://localhost:3000/callback}
-      VITE_ASGARDEO_SIGN_OUT_REDIRECT_URL: ${VITE_ASGARDEO_SIGN_OUT_REDIRECT_URL:-http://localhost:3000/login}
+      VITE_ASGARDEO_REDIRECT_URI: ${VITE_ASGARDEO_REDIRECT_URI:-http://localhost:3000/callback}
+      VITE_ASGARDEO_LOGOUT_REDIRECT_URI: ${VITE_ASGARDEO_LOGOUT_REDIRECT_URI:-http://localhost:3000/login}
       VITE_ASGARDEO_SCOPES: ${VITE_ASGARDEO_SCOPES:-openid profile email groups}
       VITE_ASGARDEO_SIGN_UP_URL: ${VITE_ASGARDEO_SIGN_UP_URL:-}
     volumes:
