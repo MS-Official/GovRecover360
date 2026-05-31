@@ -4,3 +4,4 @@ from . import relief_package
 from . import dispatch_order
 from . import damage_assessment
 from . import payment_request
+from . import openg2p_demo

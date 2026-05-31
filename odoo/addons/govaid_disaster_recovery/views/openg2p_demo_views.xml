@@ -1,0 +1,237 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_g2p_beneficiary_demo_tree" model="ir.ui.view">
+        <field name="name">g2p.beneficiary.demo.tree</field>
+        <field name="model">g2p.beneficiary.demo</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="beneficiary_ref"/>
+                <field name="name"/>
+                <field name="national_id"/>
+                <field name="district"/>
+                <field name="household_id"/>
+                <field name="eligibility_status"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_g2p_beneficiary_demo_form" model="ir.ui.view">
+        <field name="name">g2p.beneficiary.demo.form</field>
+        <field name="model">g2p.beneficiary.demo</field>
+        <field name="arch" type="xml">
+            <form string="OpenG2P-Aligned Demo Beneficiary">
+                <sheet>
+                    <div class="oe_title">
+                        <h1><field name="beneficiary_ref"/></h1>
+                        <h2><field name="name" placeholder="Beneficiary name"/></h2>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="national_id"/>
+                            <field name="phone"/>
+                            <field name="district"/>
+                        </group>
+                        <group>
+                            <field name="household_id"/>
+                            <field name="relief_application_id"/>
+                            <field name="eligibility_status"/>
+                        </group>
+                    </group>
+                    <field name="notes" nolabel="1" placeholder="This module demonstrates OpenG2P-style beneficiary, entitlement, and program enrollment flows for disaster recovery."/>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids" widget="mail_followers"/>
+                    <field name="activity_ids" widget="mail_activity"/>
+                    <field name="message_ids" widget="mail_thread"/>
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_g2p_beneficiary_demo" model="ir.actions.act_window">
+        <field name="name">Beneficiary Registry</field>
+        <field name="res_model">g2p.beneficiary.demo</field>
+        <field name="view_mode">tree,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Create an OpenG2P-aligned demo beneficiary</p>
+            <p>This module demonstrates OpenG2P-style beneficiary, entitlement, and program enrollment flows for disaster recovery.</p>
+        </field>
+    </record>
+
+    <record id="view_g2p_household_demo_tree" model="ir.ui.view">
+        <field name="name">g2p.household.demo.tree</field>
+        <field name="model">g2p.household.demo</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="name"/>
+                <field name="head_name"/>
+                <field name="district"/>
+                <field name="family_size"/>
+                <field name="damage_level"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_g2p_household_demo_form" model="ir.ui.view">
+        <field name="name">g2p.household.demo.form</field>
+        <field name="model">g2p.household.demo</field>
+        <field name="arch" type="xml">
+            <form string="OpenG2P-Aligned Demo Household">
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="name"/>
+                            <field name="head_name"/>
+                            <field name="district"/>
+                        </group>
+                        <group>
+                            <field name="family_size"/>
+                            <field name="damage_level"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Beneficiaries">
+                            <field name="beneficiary_ids"/>
+                        </page>
+                        <page string="Notes">
+                            <field name="notes" nolabel="1"/>
+                        </page>
+                    </notebook>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids" widget="mail_followers"/>
+                    <field name="activity_ids" widget="mail_activity"/>
+                    <field name="message_ids" widget="mail_thread"/>
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_g2p_household_demo" model="ir.actions.act_window">
+        <field name="name">Household Registry</field>
+        <field name="res_model">g2p.household.demo</field>
+        <field name="view_mode">tree,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Create an OpenG2P-aligned demo household</p>
+            <p>Households group affected citizens for disaster recovery eligibility and assistance workflows.</p>
+        </field>
+    </record>
+
+    <record id="view_g2p_program_enrollment_demo_tree" model="ir.ui.view">
+        <field name="name">g2p.program.enrollment.demo.tree</field>
+        <field name="model">g2p.program.enrollment.demo</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="name"/>
+                <field name="beneficiary_id"/>
+                <field name="program_name"/>
+                <field name="enrollment_status"/>
+                <field name="enrollment_date"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_g2p_program_enrollment_demo_form" model="ir.ui.view">
+        <field name="name">g2p.program.enrollment.demo.form</field>
+        <field name="model">g2p.program.enrollment.demo</field>
+        <field name="arch" type="xml">
+            <form string="OpenG2P-Aligned Demo Program Enrollment">
+                <sheet>
+                    <div class="oe_title">
+                        <h1><field name="name"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="beneficiary_id"/>
+                            <field name="program_name"/>
+                        </group>
+                        <group>
+                            <field name="enrollment_status"/>
+                            <field name="enrollment_date"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Entitlements">
+                            <field name="entitlement_ids"/>
+                        </page>
+                        <page string="Notes">
+                            <field name="notes" nolabel="1"/>
+                        </page>
+                    </notebook>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids" widget="mail_followers"/>
+                    <field name="activity_ids" widget="mail_activity"/>
+                    <field name="message_ids" widget="mail_thread"/>
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_g2p_program_enrollment_demo" model="ir.actions.act_window">
+        <field name="name">Program Enrollments</field>
+        <field name="res_model">g2p.program.enrollment.demo</field>
+        <field name="view_mode">tree,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Create an OpenG2P-aligned demo enrollment</p>
+            <p>Enroll eligible beneficiaries into disaster recovery assistance programs.</p>
+        </field>
+    </record>
+
+    <record id="view_g2p_entitlement_demo_tree" model="ir.ui.view">
+        <field name="name">g2p.entitlement.demo.tree</field>
+        <field name="model">g2p.entitlement.demo</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="name"/>
+                <field name="beneficiary_id"/>
+                <field name="entitlement_type"/>
+                <field name="amount"/>
+                <field name="currency"/>
+                <field name="entitlement_status"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_g2p_entitlement_demo_form" model="ir.ui.view">
+        <field name="name">g2p.entitlement.demo.form</field>
+        <field name="model">g2p.entitlement.demo</field>
+        <field name="arch" type="xml">
+            <form string="OpenG2P-Aligned Demo Entitlement">
+                <sheet>
+                    <div class="oe_title">
+                        <h1><field name="name"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="beneficiary_id"/>
+                            <field name="enrollment_id"/>
+                            <field name="entitlement_type"/>
+                        </group>
+                        <group>
+                            <field name="amount"/>
+                            <field name="currency"/>
+                            <field name="entitlement_status"/>
+                        </group>
+                    </group>
+                    <field name="notes" nolabel="1"/>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids" widget="mail_followers"/>
+                    <field name="activity_ids" widget="mail_activity"/>
+                    <field name="message_ids" widget="mail_thread"/>
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_g2p_entitlement_demo" model="ir.actions.act_window">
+        <field name="name">Entitlements</field>
+        <field name="res_model">g2p.entitlement.demo</field>
+        <field name="view_mode">tree,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Create an OpenG2P-aligned demo entitlement</p>
+            <p>Track cash, voucher, and in-kind entitlements for eligible disaster recovery beneficiaries.</p>
+        </field>
+    </record>
+</odoo>

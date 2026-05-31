@@ -4,16 +4,21 @@ This document covers external platform setup that cannot be completed purely fro
 
 ## A. Odoo UI Verification
 
-1. Open `http://localhost:8069`.
+Developer mode URLs:
+
+- `http://localhost:8069/web?debug=1`
+- `http://localhost:8069/web?debug=assets`
+
+1. Open `http://localhost:8069/web?debug=1`.
 2. Log in as the Odoo admin user.
-3. Enable developer mode.
-4. Go to Apps.
+3. Go to Apps.
+4. Remove the Apps filter if needed.
 5. Click Update Apps List.
 6. Search for `GovAid Disaster Recovery` or `govaid_disaster_recovery`.
 7. Install or Upgrade the module.
 8. Open the Disaster Recovery menu and confirm the views load.
 
-Demo workaround: if General Settings shows `"res.config.settings"."stock_move_sms_validation" field is undefined`, avoid General Settings during the presentation and open the GovAid Disaster Recovery menu directly. A frontend button is available for the direct module URL. Only add an Odoo dependency after confirming which installed standard module owns that settings field.
+The `stock_move_sms_validation` Settings crash is caused by an active `stock_sms` settings view when `stock_sms` is not installed. Install `stock_sms` with the Odoo CLI and restart Odoo. See `docs/ODOO_SETUP.md`.
 
 ## B. Asgardeo
 

@@ -272,7 +272,15 @@ export default function AdminDashboard() {
   return (
     <div>
       <div className="flex items-center justify-between mb-6">
-        <h2 className="text-2xl font-bold text-gray-900">Admin Dashboard</h2>
+        <div>
+          <h2 className="text-2xl font-bold text-gray-900">Government Relief Operations</h2>
+          <p className="text-sm text-gray-500 mt-1">Beneficiary & entitlement management, API governance, ERP back office, and analytics overview.</p>
+        </div>
+        {stats?.demo_fallback && (
+          <span className="px-3 py-1 rounded-full bg-blue-100 text-blue-800 text-xs font-semibold">
+            Demo fallback data
+          </span>
+        )}
       </div>
 
       <div className="flex gap-2 mb-6 flex-wrap">
@@ -414,6 +422,9 @@ function IntegrationStatusPanel() {
 
   const cardClass = 'bg-white rounded-lg shadow-sm border border-gray-200 p-5';
   const buttonClass = 'px-3 py-2 rounded-lg text-sm font-medium bg-white border border-gray-200 text-gray-700 hover:bg-gray-50 disabled:opacity-60';
+  const odooDeveloperUrl = `${env.odoo}/web?debug=1`;
+  const odooAppsUrl = `${env.odoo}/web?debug=1#action=119&model=ir.module.module&view_type=kanban&menu_id=76`;
+  const odooDisasterModuleUrl = `${env.odoo}/web?debug=1#menu_id=govaid_disaster_recovery.menu_govaid_root`;
 
   const integrations = [
     { label: 'Backend API', data: backend, mode: 'Core service', publicUrl: `${env.apiBase.replace(/\/api$/, '')}/api/health`, internalUrl: 'http://backend:8000/api/health', purpose: 'Central API for role-based workflows, disaster records, beneficiary operations, audit logs, and integration orchestration.' },
@@ -429,6 +440,18 @@ function IntegrationStatusPanel() {
     { label: 'GeoNode', data: geonode, mode: geonode.status === 'disabled' ? 'Disabled' : 'GIS integration', purpose: 'External geospatial catalogue integration. Local GIS data remains available when GeoNode is disabled.' },
   ];
 
+  const statusGroups = integrations.reduce(
+    (acc, item) => {
+      const value = String(item.data.status || '');
+      if (['ok', 'live', 'healthy', 'configured'].includes(value)) acc.live += 1;
+      else if (['mock', 'mock_mode', 'demo_runtime', 'demo_gateway'].includes(value) || String(item.mode).toLowerCase().includes('demo')) acc.demo += 1;
+      else if (['not_configured', 'manual_setup_required', 'manual_check_required', 'disabled', 'missing_env', 'not_enabled'].includes(value)) acc.manual += 1;
+      else if (['error', 'failed', 'unreachable'].includes(value)) acc.errors += 1;
+      return acc;
+    },
+    { live: 0, demo: 0, manual: 0, errors: 0 },
+  );
+
   const manualSetup = [
     ['Asgardeo', 'Manual console setup required unless issuer, client ID, and JWKS values are configured.'],
     ['Real WSO2 APIM', 'The bundled gateway is demo-compatible. Production uses full WSO2 API Manager with published APIs and token validation.'],
@@ -443,7 +466,7 @@ function IntegrationStatusPanel() {
         <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
           <div>
             <h3 className="text-2xl font-bold">GovRecover360 Integration Command Center</h3>
-            <p className="text-sm text-gov-100 mt-2 max-w-3xl">Operational view of the local Docker demo, external platform readiness, and government recovery workflow dependencies.</p>
+            <p className="text-sm text-gov-100 mt-2 max-w-3xl">Live view of identity, API governance, beneficiary management, ERP operations, notifications, analytics, and AI services.</p>
           </div>
           <div className="flex flex-wrap gap-2">
             <span className="px-3 py-1 rounded-full bg-white/10 text-sm border border-white/20">Last checked: {checkedAt}</span>
@@ -458,6 +481,20 @@ function IntegrationStatusPanel() {
           <p className="mt-1">{error}</p>
         </div>
       )}
+
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+        {[
+          ['Live Services', statusGroups.live, 'bg-green-50 text-green-800 border-green-100'],
+          ['Demo Mode Services', statusGroups.demo, 'bg-blue-50 text-blue-800 border-blue-100'],
+          ['Manual Setup Required', statusGroups.manual, 'bg-yellow-50 text-yellow-800 border-yellow-100'],
+          ['Errors', statusGroups.errors, 'bg-red-50 text-red-800 border-red-100'],
+        ].map(([label, value, classes]: any) => (
+          <div key={label} className={`rounded-lg border p-4 ${classes}`}>
+            <p className="text-xs font-semibold uppercase tracking-wide">{label}</p>
+            <p className="text-3xl font-bold mt-2">{value}</p>
+          </div>
+        ))}
+      </div>
 
       {loading && !status ? (
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
@@ -504,7 +541,7 @@ function IntegrationStatusPanel() {
           <section className={cardClass}>
             <h3 className="text-lg font-semibold text-gray-900 mb-4">Architecture Journey</h3>
             <div className="flex flex-col md:flex-row md:items-center gap-3 text-sm">
-              {['Citizen / Officer', 'Asgardeo Login', 'WSO2 API Gateway', 'GovRecover360 Backend', 'OpenG2P / Odoo / Choreo / Superset'].map((step, idx) => (
+              {['Citizen / Officer', 'Asgardeo', 'WSO2 API Manager', 'GovRecover360 Backend', 'OpenG2P / Odoo / Choreo / Superset / AI'].map((step, idx) => (
                 <div key={step} className="flex md:flex-1 items-center gap-3">
                   <div className="w-full rounded-lg border border-blue-100 bg-blue-50 px-4 py-3 text-blue-950 font-medium text-center">{step}</div>
                   {idx < 4 && <span className="hidden md:block text-gray-400">→</span>}
@@ -524,7 +561,9 @@ function IntegrationStatusPanel() {
               <button className={buttonClass} disabled={Boolean(actionLoading)} onClick={() => testEndpoint('AI health', () => api.get('/integrations/status').then((res) => normalizeStatus(res.data?.aiService).status === 'ok' ? res : Promise.reject(new Error('AI service is unreachable'))))}>Test AI Health</button>
               <button className={buttonClass} onClick={() => openUrl(env.superset)}>Open Superset</button>
               <button className={buttonClass} onClick={() => openUrl(env.odoo)}>Open Odoo</button>
-              <button className={buttonClass} onClick={() => openUrl(`${env.odoo}/web#menu_id=govaid_disaster_recovery.menu_govaid_root`)}>Open Odoo Disaster Recovery Module</button>
+              <button className={buttonClass} onClick={() => openUrl(odooDeveloperUrl)}>Open Odoo Developer Mode</button>
+              <button className={buttonClass} onClick={() => openUrl(odooAppsUrl)}>Open Odoo Apps</button>
+              <button className={buttonClass} onClick={() => openUrl(odooDisasterModuleUrl)}>Open Odoo Disaster Recovery Module</button>
               <button className={buttonClass} onClick={() => openUrl(env.asgardeoConsole)}>Open Asgardeo Console</button>
               <button className={buttonClass} onClick={() => openUrl(env.choreoConsole)}>Open Choreo Console</button>
               <button className={buttonClass} onClick={() => openUrl(env.wso2Gateway)}>Open WSO2 Gateway</button>
@@ -539,7 +578,7 @@ function IntegrationStatusPanel() {
                 ['Asgardeo', `Auth mode: ${asgardeo.authMode || authMode.status}. Client ID: ${asgardeo.clientIdConfigured ? 'configured' : 'not configured'}. Issuer: ${asgardeo.issuerConfigured ? 'configured' : 'not configured'}. JWKS: ${asgardeo.jwksConfigured ? 'configured' : 'not configured'}.`, ['Open Asgardeo Console', env.asgardeoConsole], ['Open GovRecover360 Asgardeo Application', env.asgardeoApplication], 'External console opens in a new tab because cloud consoles may block iframe embedding.'],
                 ['Choreo', `Local notifier: ${env.choreoNotifier}/health. Organization: ${env.choreoOrg}`, ['Open Choreo Console', env.choreoConsole], ['Open Local Notification Service', `${env.choreoNotifier}/health`], 'Use local notifier for the Docker demo and Choreo Cloud for production invoke URLs.'],
                 ['Superset', `URL: ${env.superset}`, ['Open Superset', env.superset], undefined, 'Analytics dashboard for disaster recovery KPIs.'],
-                ['Odoo', `URL: ${env.odoo}`, ['Open Odoo', env.odoo], ['Open Odoo Disaster Recovery Module', `${env.odoo}/web#menu_id=govaid_disaster_recovery.menu_govaid_root`], 'If an Odoo settings popup appears, use the module menu directly during the demo.'],
+                ['Odoo', `URL: ${env.odoo}`, ['Open Odoo Developer Mode', odooDeveloperUrl], ['Open Odoo Apps', odooAppsUrl], 'ERP back office for relief operations. Use developer mode to install or upgrade GovAid Disaster Recovery.'],
                 ['OpenG2P', `Health: ${env.openg2p}/api/health`, ['Open OpenG2P Health', `${env.openg2p}/api/health`], ['Open OpenAPI', `${env.openg2p}/openapi.json`], 'Use the backend OpenG2P demo tab for beneficiary sync, eligibility, entitlement, and enrollment flows.'],
               ].map(([title, details, primary, secondary, note]: any) => (
                 <div key={title} className={cardClass}>

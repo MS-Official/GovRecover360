@@ -40,3 +40,11 @@ access_payment_request_finance_officer,payment.request.finance_officer,model_pay
 access_payment_request_warehouse_officer,payment.request.warehouse_officer,model_payment_request,group_govaid_warehouse_officer,1,0,0,0
 access_payment_request_auditor,payment.request.auditor,model_payment_request,group_govaid_auditor,1,0,0,0
 access_payment_request_admin,payment.request.admin,model_payment_request,group_govaid_admin,1,1,1,1
+access_g2p_beneficiary_demo_user,g2p.beneficiary.demo.user,model_g2p_beneficiary_demo,base.group_user,1,1,1,0
+access_g2p_beneficiary_demo_admin,g2p.beneficiary.demo.admin,model_g2p_beneficiary_demo,group_govaid_admin,1,1,1,1
+access_g2p_household_demo_user,g2p.household.demo.user,model_g2p_household_demo,base.group_user,1,1,1,0
+access_g2p_household_demo_admin,g2p.household.demo.admin,model_g2p_household_demo,group_govaid_admin,1,1,1,1
+access_g2p_program_enrollment_demo_user,g2p.program.enrollment.demo.user,model_g2p_program_enrollment_demo,base.group_user,1,1,1,0
+access_g2p_program_enrollment_demo_admin,g2p.program.enrollment.demo.admin,model_g2p_program_enrollment_demo,group_govaid_admin,1,1,1,1
+access_g2p_entitlement_demo_user,g2p.entitlement.demo.user,model_g2p_entitlement_demo,base.group_user,1,1,1,0
+access_g2p_entitlement_demo_admin,g2p.entitlement.demo.admin,model_g2p_entitlement_demo,group_govaid_admin,1,1,1,1

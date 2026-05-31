@@ -45,5 +45,29 @@
             <field name="padding">5</field>
             <field name="company_id" eval="False"/>
         </record>
+
+        <record id="seq_g2p_beneficiary_demo" model="ir.sequence">
+            <field name="name">OpenG2P Demo Beneficiary</field>
+            <field name="code">g2p.beneficiary.demo</field>
+            <field name="prefix">G2P-BEN/%(year)s/</field>
+            <field name="padding">5</field>
+            <field name="company_id" eval="False"/>
+        </record>
+
+        <record id="seq_g2p_program_enrollment_demo" model="ir.sequence">
+            <field name="name">OpenG2P Demo Program Enrollment</field>
+            <field name="code">g2p.program.enrollment.demo</field>
+            <field name="prefix">G2P-ENR/%(year)s/</field>
+            <field name="padding">5</field>
+            <field name="company_id" eval="False"/>
+        </record>
+
+        <record id="seq_g2p_entitlement_demo" model="ir.sequence">
+            <field name="name">OpenG2P Demo Entitlement</field>
+            <field name="code">g2p.entitlement.demo</field>
+            <field name="prefix">G2P-ENT/%(year)s/</field>
+            <field name="padding">5</field>
+            <field name="company_id" eval="False"/>
+        </record>
     </data>
 </odoo>

@@ -1,6 +1,6 @@
 {
     'name': 'GovAid Disaster Recovery',
-    'version': '17.0.1.0.0',
+    'version': '17.0.1.1.0',
     'category': 'Government',
     'summary': 'Disaster Recovery, Beneficiary Management & Relief Operations',
     'description': """
@@ -8,11 +8,12 @@
         ================================
         Part of GovRecover360 Platform.
         Manages disaster events, relief applications, beneficiary verification,
-        relief packages, dispatch orders, damage assessments, and payment requests.
+        relief packages, dispatch orders, damage assessments, payment requests,
+        and OpenG2P-aligned demo beneficiary/entitlement flows.
     """,
     'author': 'GovRecover360',
     'website': 'https://govrecover360.local',
-    'depends': ['base', 'mail', 'stock', 'purchase'],
+    'depends': ['base', 'mail', 'contacts', 'stock'],
     'data': [
         'security/groups.xml',
         'security/ir.model.access.csv',
@@ -24,6 +25,7 @@
         'views/dispatch_order_views.xml',
         'views/damage_assessment_views.xml',
         'views/payment_request_views.xml',
+        'views/openg2p_demo_views.xml',
         'views/menu_views.xml',
     ],
     'installable': True,

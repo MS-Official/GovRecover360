@@ -1,24 +1,52 @@
 import { Fragment } from 'react';
 import { Menu, Transition } from '@headlessui/react';
 import { BellIcon, ChevronDownIcon } from '@heroicons/react/24/outline';
+import { useLocation } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { ROLE_LABELS } from '../../utils/constants';
 
 export default function Header() {
   const { user, logout } = useAuth();
+  const location = useLocation();
 
   if (!user) return null;
 
+  const breadcrumbs = location.pathname
+    .split('/')
+    .filter(Boolean)
+    .map((part) => part.replace(/-/g, ' '))
+    .slice(0, 3);
+
   return (
-    <header className="h-16 bg-white border-b border-gray-200 flex items-center justify-between px-6 lg:px-8">
-      <div className="flex items-center gap-4">
-        <h1 className="text-lg font-semibold text-gray-900">GovRecover360</h1>
+    <header className="min-h-16 bg-white border-b border-gray-200 flex items-center justify-between gap-4 px-6 lg:px-8 py-3">
+      <div className="min-w-0">
+        <div className="flex items-center gap-3 flex-wrap">
+          <h1 className="text-lg font-semibold text-gray-900">GovRecover360</h1>
+          <span className="hidden sm:inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gov-100 text-gov-700">
+            Disaster Recovery Command Platform
+          </span>
+        </div>
+        <div className="mt-1 flex items-center gap-2 text-xs text-gray-500 capitalize truncate">
+          {breadcrumbs.length ? breadcrumbs.map((crumb, idx) => (
+            <span key={`${crumb}-${idx}`} className="truncate">
+              {idx > 0 && <span className="mx-2 text-gray-300">/</span>}
+              {crumb}
+            </span>
+          )) : <span>Dashboard</span>}
+        </div>
+      </div>
+
+      <div className="flex items-center gap-3 flex-wrap justify-end">
+        <span className="hidden md:inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-700">
+          Local Docker Demo
+        </span>
+        <span className="hidden sm:inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-emerald-100 text-emerald-700">
+          Demo Mode
+        </span>
         <span className="hidden sm:inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gov-100 text-gov-700">
           {ROLE_LABELS[user.role]}
         </span>
-      </div>
 
-      <div className="flex items-center gap-4">
         <button className="relative p-2 rounded-lg hover:bg-gray-100 transition-colors">
           <BellIcon className="h-6 w-6 text-gray-500" />
           <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full" />

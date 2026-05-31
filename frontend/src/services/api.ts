@@ -25,6 +25,24 @@ const api = axios.create({
   },
 });
 
+function friendlyApiError(error: any): Error {
+  const status = error.response?.status;
+  const contentType = String(error.response?.headers?.['content-type'] || '');
+  if (contentType.includes('text/html')) {
+    return new Error('Backend API returned HTML instead of JSON. Check VITE_API_BASE_URL.');
+  }
+  if (status === 401) {
+    return new Error('Session expired or permission required.');
+  }
+  if (status === 403) {
+    return new Error('You do not have permission for this action.');
+  }
+  if (!error.response) {
+    return new Error('Backend service unavailable.');
+  }
+  return error;
+}
+
 api.interceptors.request.use((config) => {
   const token = localStorage.getItem('token');
   if (token) {
@@ -42,10 +60,6 @@ api.interceptors.response.use(
     return response;
   },
   (error) => {
-    const contentType = String(error.response?.headers?.['content-type'] || '');
-    if (contentType.includes('text/html')) {
-      return Promise.reject(new Error('Backend API returned HTML instead of JSON. Check VITE_API_BASE_URL.'));
-    }
     if (error.response?.status === 401) {
       localStorage.removeItem('token');
       localStorage.removeItem('user');
@@ -53,7 +67,7 @@ api.interceptors.response.use(
         window.location.href = '/login';
       }
     }
-    return Promise.reject(error);
+    return Promise.reject(friendlyApiError(error));
   }
 );
 
