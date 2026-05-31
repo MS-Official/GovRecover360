@@ -9,7 +9,7 @@ Before beginning the demo, ensure the following:
 - [ ] Frontend is accessible at http://localhost:3000
 - [ ] Backend API is accessible at http://localhost:8000/docs
 - [ ] Superset is accessible at http://localhost:8088 (admin/admin)
-- [ ] Odoo is accessible at http://localhost:8069 (admin/admin)
+- [ ] Odoo is accessible at http://localhost:8069 (demo/demo)
 - [ ] Browser tabs are open and ready for each step
 - [ ] Presenter has admin credentials ready
 
@@ -292,6 +292,7 @@ Total demo time: approximately 30-40 minutes.
 3. Confirm the banner says `GovRecover360 Integration Command Center`.
 4. Show the architecture journey: Citizen / Officer -> Asgardeo Login -> WSO2 API Gateway -> Backend -> OpenG2P / Odoo / Choreo / Superset.
 5. Click test actions for Backend, OpenG2P, WSO2 gateway, Choreo notifier, and AI health.
+5a. Point out the newly added "Odoo OpenG2P Modules & Workflows" section, showing that the official OpenG2P registry addons are mounted and installed, connected to our GovAid module via the bridge module.
 6. Open Superset, Odoo, Asgardeo, Choreo, and WSO2 in new tabs from the Platform Console Hub.
 
 **Presenter Talking Points**:

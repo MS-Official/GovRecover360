@@ -181,7 +181,9 @@ services:
     volumes:
       - odoo_data:/var/lib/odoo
       - ./odoo/addons:/mnt/extra-addons
+      - ./odoo/openg2p-addons:/mnt/openg2p-addons
       - ./odoo/config:/etc/odoo
+    command: odoo --config=/etc/odoo/odoo.conf --addons-path=/usr/lib/python3/dist-packages/odoo/addons,/mnt/extra-addons,/mnt/openg2p-addons/openg2p-registry,/mnt/openg2p-addons/openg2p-program,/mnt/openg2p-addons/oca-queue
 
   # Odoo PostgreSQL
   odoo-db:

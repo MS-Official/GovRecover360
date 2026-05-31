@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_relief_application_form_inherit_openg2p_bridge" model="ir.ui.view">
+        <field name="name">relief.application.form.inherit.openg2p.bridge</field>
+        <field name="model">relief.application</field>
+        <field name="inherit_id" ref="govaid_disaster_recovery.view_relief_application_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='openg2p_beneficiary_id']" position="after">
+                <field name="g2p_individual_id" options="{'no_create': True}"/>
+                <field name="g2p_group_id" options="{'no_create': True}"/>
+            </xpath>
+        </field>
+    </record>
+</odoo>

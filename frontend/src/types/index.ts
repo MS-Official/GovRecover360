@@ -355,4 +355,11 @@ export interface IntegrationStatus {
   aiService?: IntegrationStatusField;
   authMode?: 'mock' | 'asgardeo';
   timestamp?: string;
+  odoo_g2p_modules?: {
+    mounted: boolean;
+    registry_installed: boolean;
+    pbms_installed: boolean;
+    bridge_installed: boolean;
+    error?: string | null;
+  };
 }

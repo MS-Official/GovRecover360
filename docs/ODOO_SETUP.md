@@ -44,3 +44,36 @@ docker compose --env-file .env.demo restart odoo
 ```
 
 Then open `http://localhost:8069/web?debug=1` and verify Settings and Apps load.
+
+## Official OpenG2P Addons & Bridge Module Setup
+
+To test with official OpenG2P Odoo addons, the stack is configured to mount:
+- `./odoo/openg2p-addons` directly inside the container as `/mnt/openg2p-addons`
+- The addons path includes: `openg2p-registry`, `openg2p-program` (PBMS), and the `oca-queue` dependency repository.
+
+### Manual Mount Verification
+If you need to query or verify the mounted addons in the database:
+```bash
+docker compose --env-file .env.demo exec odoo-db psql -U odoo -d GovRecover360 -c "SELECT name, state FROM ir_module_module WHERE name ILIKE 'g2p_%' OR name ILIKE '%openg2p%' ORDER BY name;"
+```
+
+### Registry Modules Installation
+The minimum set of registry modules is installed in the database:
+- `g2p_registry_base`
+- `g2p_registry_individual`
+- `g2p_registry_group`
+- `g2p_registry_membership`
+
+Install them via Odoo CLI:
+```bash
+docker compose --env-file .env.demo exec odoo odoo -d GovRecover360 --db_host=odoo-db --db_user=odoo --db_password=odoo@2026 -i g2p_registry_base,g2p_registry_individual,g2p_registry_group,g2p_registry_membership --stop-after-init
+```
+
+### GovAid OpenG2P Bridge Module
+We have added a custom bridge module `govaid_openg2p_bridge` which connects our custom relief operations workflow with official OpenG2P records.
+It adds Many2one fields to `relief.application`:
+- `g2p_individual_id` pointing to `res.partner` (filtered by individuals)
+- `g2p_group_id` pointing to `res.partner` (filtered by groups)
+
+This module depends on `g2p_registry_individual` and `g2p_registry_group` and is auto-installed when they are enabled in Odoo.
+

@@ -153,3 +153,26 @@ Backend connector endpoints are available for UI and script-driven demos:
 - `POST /api/integrations/openg2p/program-enrollment`
 
 The sync connector tries `/api/beneficiaries/sync` first and falls back to `/api/beneficiaries` for runtimes that only expose the create endpoint. Optional connector failures should not stop the full demo flow; the core OpenG2P runtime health and direct beneficiary flow remain the primary proof points.
+
+---
+
+## Three Layers of OpenG2P Alignment in GovRecover360
+
+We have three distinct OpenG2P-related layers in our architecture:
+
+1. **OpenG2P Demo Runtime**
+   - FastAPI-based mock server running on port `8070`.
+   - Used by the frontend OpenG2P demo tab and the `demo.sh` script.
+   - Provides a lightweight API simulator for fast, isolated verification of beneficiary and program synchronization flows.
+
+2. **Official OpenG2P Odoo Addons**
+   - Official Odoo 17 compatible branches (`17.0-develop`) cloned from `OpenG2P/openg2p-registry` and `OpenG2P/openg2p-program` repositories.
+   - Mounted separately under `./odoo/openg2p-addons` (to `/mnt/openg2p-addons` in the container).
+   - Core registry modules (`g2p_registry_base`, `g2p_registry_individual`, `g2p_registry_group`, `g2p_registry_membership`) are installed in the Odoo database.
+   - These official modules are searchable under "g2p" in Odoo Apps.
+
+3. **GovAid Disaster Recovery Custom Module**
+   - Located under `odoo/addons/govaid_disaster_recovery`.
+   - Manages the custom disaster relief ERP workflow (disaster events, relief applications, assessments, payment requests, dispatch orders).
+   - Connected to the official OpenG2P registry records through the bridge module `govaid_openg2p_bridge` (which adds safe Many2one links for `g2p_individual_id` and `g2p_group_id` pointing to registry contacts).
+

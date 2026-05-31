@@ -82,6 +82,68 @@ def _odoo_status() -> str:
         return "error"
 
 
+def _odoo_modules_status() -> dict:
+    odoo_url = settings.ODOO_BASE_URL or settings.ODOO_URL
+    required = [
+        odoo_url,
+        settings.ODOO_DB,
+        settings.ODOO_USERNAME,
+        settings.ODOO_PASSWORD,
+    ]
+    res = {
+        "mounted": False,
+        "registry_installed": False,
+        "pbms_installed": False,
+        "bridge_installed": False,
+        "error": None
+    }
+    if not all(required):
+        return res
+    try:
+        common = xmlrpc.client.ServerProxy(f"{odoo_url.rstrip('/')}/xmlrpc/2/common")
+        uid = common.authenticate(
+            settings.ODOO_DB,
+            settings.ODOO_USERNAME,
+            settings.ODOO_PASSWORD,
+            {},
+        )
+        if not uid:
+            res["error"] = "Authentication failed"
+            return res
+        
+        models = xmlrpc.client.ServerProxy(f"{odoo_url.rstrip('/')}/xmlrpc/2/object")
+        modules = models.execute_kw(
+            settings.ODOO_DB,
+            uid,
+            settings.ODOO_PASSWORD,
+            'ir.module.module',
+            'search_read',
+            [[['name', 'in', [
+                'g2p_registry_base', 
+                'g2p_registry_individual', 
+                'g2p_registry_group', 
+                'g2p_registry_membership',
+                'g2p_programs',
+                'govaid_openg2p_bridge'
+            ]]]],
+            {'fields': ['name', 'state']}
+        )
+        
+        module_states = {m['name']: m['state'] for m in modules}
+        
+        res["mounted"] = 'g2p_registry_base' in module_states
+        
+        registry_required = ['g2p_registry_base', 'g2p_registry_individual', 'g2p_registry_group', 'g2p_registry_membership']
+        res["registry_installed"] = all(module_states.get(m) == 'installed' for m in registry_required)
+        res["pbms_installed"] = module_states.get('g2p_programs') == 'installed'
+        res["bridge_installed"] = module_states.get('govaid_openg2p_bridge') == 'installed'
+        
+    except Exception as e:
+        res["error"] = str(e)
+    
+    return res
+
+
 def _asgardeo_status() -> dict:
     auth_mode = (settings.AUTH_MODE or "mock").lower()
     client_id_configured = bool(settings.ASGARDEO_CLIENT_ID)
@@ -176,6 +238,7 @@ def integration_status():
         "database": _database_status(),
         "redis": _redis_status(),
         "odoo": _odoo_status(),
+        "odoo_g2p_modules": _odoo_modules_status(),
         # OLD IMPLEMENTATION - kept for reference
         # Reason: replaced with OpenG2P-aware runtime health while preserving demo alignment behavior.
         # "openg2p": "aligned",

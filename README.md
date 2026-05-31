@@ -84,7 +84,7 @@ Once all containers are running, access the platform at the following URLs:
 | WSO2 Demo Gateway | http://localhost:8243/health | - |
 | Backend through WSO2 Gateway | http://localhost:8243/api/health | - |
 | Notification Health | http://localhost:8095/health | - |
-| Odoo ERP | http://localhost:8069 | admin / admin |
+| Odoo ERP | http://localhost:8069 | demo / demo |
 | Apache Superset | http://localhost:8088 | admin / admin |
 | AI Service | http://localhost:8050 | - |
 | Nginx Reverse Proxy | http://localhost:80 | - |
@@ -252,7 +252,7 @@ WSO2_APIM_ENABLED=false
 GEONODE_ENABLED=false
 ```
 
-For the bundled connected demo, run `docker compose --env-file .env.demo up -d --build`. For live external platforms, configure these values in `.env`: `AUTH_MODE=hybrid`, `ASGARDEO_*`, `WSO2_APIM_ENABLED=true`, `WSO2_*`, `CHOREO_NOTIFIER_API_URL`, `CHOREO_USER_SERVICE_URL`, `GEONODE_ENABLED=true`, `GEONODE_URL`, `ODOO_*`, and `OPENG2P_ENABLED=true` with `OPENG2P_*`. If any external service is disabled or unavailable, the backend returns a clear health status and keeps using local fallback behavior.
+For the bundled connected demo, run `docker compose --env-file .env.demo up -d --build`. We also mount the official OpenG2P Odoo addons under `./odoo/openg2p-addons` and connect them with the custom `govaid_disaster_recovery` module via the `govaid_openg2p_bridge` bridge module, allowing disaster relief applications to link directly with official OpenG2P registry contacts in Odoo. For live external platforms, configure these values in `.env`: `AUTH_MODE=hybrid`, `ASGARDEO_*`, `WSO2_APIM_ENABLED=true`, `WSO2_*`, `CHOREO_NOTIFIER_API_URL`, `CHOREO_USER_SERVICE_URL`, `GEONODE_ENABLED=true`, `GEONODE_URL`, `ODOO_*`, and `OPENG2P_ENABLED=true` with `OPENG2P_*`. If any external service is disabled or unavailable, the backend returns a clear health status and keeps using local fallback behavior.
 
 Integration health endpoints:
 

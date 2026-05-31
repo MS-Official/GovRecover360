@@ -65,19 +65,14 @@ The frontend opens Choreo in a new browser tab instead of relying on iframe embe
 3. Import or create dashboards.
 4. Test disaster recovery KPIs, including household counts, relief application status, payments, and dispatches.
 
-## F. OpenG2P
+## F. OpenG2P & Odoo Addons
 
-The current demo is aligned with OpenG2P concepts through model mapping and workflow naming. It is not connected to a live OpenG2P runtime.
+GovRecover360 has three layers of OpenG2P integration:
+1. **OpenG2P Demo Runtime**: A FastAPI-based API simulator running on port `8070` for isolated API synchronization checks.
+2. **Official OpenG2P Odoo Addons**: Cloned from the official repository `OpenG2P/openg2p-registry` (branch `17.0-develop`) and mounted under `odoo/openg2p-addons`. The core registry modules (`g2p_registry_base`, `g2p_registry_individual`, `g2p_registry_group`, `g2p_registry_membership`) are installed in the Odoo database.
+3. **GovAid Disaster Recovery Custom Module**: Our custom relief operations module (`govaid_disaster_recovery`) linked to official OpenG2P registry records using a separate bridge module (`govaid_openg2p_bridge`), which adds Many2one fields for `g2p_individual_id` and `g2p_group_id` pointing to registry contacts.
 
-Current demo alignment:
-
-- Household and citizen records align to beneficiary registry concepts.
-- Relief programs align to G2P program concepts.
-- Relief applications align to enrollment concepts.
-- Relief packages align to entitlement concepts.
-- Payment requests and dispatch orders align to benefit delivery concepts.
-
-The local Docker demo also includes an OpenG2P-compatible runtime with `/api/health`, beneficiary sync, eligibility, entitlements, and program enrollment endpoints. Future full runtime integration would require connecting to actual OpenG2P services, synchronizing beneficiary registry data, mapping program enrollment APIs, and validating benefit delivery flows end to end.
+Note: The official OpenG2P PBMS/program modules (`g2p_programs` etc.) require external dependencies (such as `formio` and `formio_storage_filestore`) that are not present in this workspace. Installing those modules is documented as a manual production setup step.
 
 ## G. Admin Integration Command Center
 

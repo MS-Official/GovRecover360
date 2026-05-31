@@ -539,6 +539,76 @@ function IntegrationStatusPanel() {
           </section>
 
           <section className={cardClass}>
+            <h3 className="text-lg font-semibold text-gray-900 mb-4">Odoo OpenG2P Modules & Workflows</h3>
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              <div>
+                <h4 className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-3">Module Layer Configuration</h4>
+                <div className="space-y-4">
+                  <div className="flex items-start justify-between pb-3 border-b border-gray-100">
+                    <div>
+                      <p className="text-sm font-semibold text-gray-800">GovAid Disaster Recovery Module</p>
+                      <p className="text-xs text-gray-500">Custom disaster management, relief applications, assessments, payment requests & dispatch operations.</p>
+                    </div>
+                    <span className="px-3 py-1 rounded-full bg-green-100 text-green-800 text-xs font-semibold">Active & Installed</span>
+                  </div>
+                  <div className="flex items-start justify-between pb-3 border-b border-gray-100">
+                    <div>
+                      <p className="text-sm font-semibold text-gray-800">OpenG2P Odoo Addons</p>
+                      <p className="text-xs text-gray-500">Official OpenG2P social registry and program modules mounted separately.</p>
+                    </div>
+                    <span className={`px-3 py-1 rounded-full text-xs font-semibold ${status?.odoo_g2p_modules?.registry_installed ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'}`}>
+                      {status?.odoo_g2p_modules?.registry_installed ? 'Registry Installed' : 'Not Installed'}
+                    </span>
+                  </div>
+                  <div className="flex items-start justify-between">
+                    <div>
+                      <p className="text-sm font-semibold text-gray-800">OpenG2P Demo Runtime</p>
+                      <p className="text-xs text-gray-500">FastAPI-based API simulator running on port 8070 to echo registry and entitlement operations.</p>
+                    </div>
+                    <span className="px-3 py-1 rounded-full bg-blue-100 text-blue-800 text-xs font-semibold">Demo Active (8070)</span>
+                  </div>
+                </div>
+              </div>
+
+              <div>
+                <h4 className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-3">Addon Installation Status</h4>
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="bg-gray-50 rounded-lg p-3 border border-gray-100">
+                    <p className="text-xs font-medium text-gray-500">G2P Modules Mounted</p>
+                    <p className="text-lg font-bold text-gray-800 mt-1">{status?.odoo_g2p_modules?.mounted ? 'Yes' : 'No'}</p>
+                  </div>
+                  <div className="bg-gray-50 rounded-lg p-3 border border-gray-100">
+                    <p className="text-xs font-medium text-gray-500">Registry Installed</p>
+                    <p className="text-lg font-bold text-gray-800 mt-1">{status?.odoo_g2p_modules?.registry_installed ? 'Yes' : 'No'}</p>
+                  </div>
+                  <div className="bg-gray-50 rounded-lg p-3 border border-gray-100">
+                    <p className="text-xs font-medium text-gray-500">PBMS Installed</p>
+                    <p className="text-lg font-bold text-gray-800 mt-1">
+                      {status?.odoo_g2p_modules?.pbms_installed ? 'Yes' : 'No (Manual Setup Required)'}
+                    </p>
+                  </div>
+                  <div className="bg-gray-50 rounded-lg p-3 border border-gray-100">
+                    <p className="text-xs font-medium text-gray-500">Bridge Installed</p>
+                    <p className="text-lg font-bold text-gray-800 mt-1">{status?.odoo_g2p_modules?.bridge_installed ? 'Yes' : 'No'}</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="mt-6 pt-6 border-t border-gray-200">
+              <h4 className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-3">Odoo Actions</h4>
+              <div className="flex flex-wrap gap-3">
+                <button className={buttonClass} onClick={() => openUrl(odooAppsUrl)}>Open Odoo Apps (search "g2p")</button>
+                <button className={buttonClass} onClick={() => openUrl(odooDeveloperUrl)}>Open Odoo Developer Mode</button>
+                <button className={buttonClass} onClick={() => openUrl(odooDisasterModuleUrl)}>Open GovAid Disaster Recovery Menu</button>
+                {status?.odoo_g2p_modules?.registry_installed && (
+                  <button className={buttonClass} onClick={() => openUrl(`${env.odoo}/web?debug=1#menu_id=g2p_registry_base.g2p_main_menu_root`)}>Open G2P Registry Menu</button>
+                )}
+              </div>
+            </div>
+          </section>
+
+          <section className={cardClass}>
             <h3 className="text-lg font-semibold text-gray-900 mb-4">Architecture Journey</h3>
             <div className="flex flex-col md:flex-row md:items-center gap-3 text-sm">
               {['Citizen / Officer', 'Asgardeo', 'WSO2 API Manager', 'GovRecover360 Backend', 'OpenG2P / Odoo / Choreo / Superset / AI'].map((step, idx) => (
