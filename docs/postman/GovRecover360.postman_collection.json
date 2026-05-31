@@ -95,6 +95,11 @@
       "key": "disaster_id",
       "value": "",
       "type": "string"
+    },
+    {
+      "key": "gateway_url",
+      "value": "http://localhost:8243",
+      "type": "string"
     }
   ],
   "item": [
@@ -2377,6 +2382,44 @@
               "mode": "raw",
               "raw": "{\n  \"latitude\": 7.2083,\n  \"longitude\": 79.8358,\n  \"damage_level\": \"SEVERE\"\n}"
             }
+          },
+          "response": []
+        },
+        {
+          "name": "WSO2 Gateway Version",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{gateway_url}}/services/Version",
+              "host": [
+                "{{gateway_url}}"
+              ],
+              "path": [
+                "services",
+                "Version"
+              ]
+            },
+            "description": "Expected: 200 from bundled WSO2-compatible demo gateway."
+          },
+          "response": []
+        },
+        {
+          "name": "Backend Health Through WSO2 Gateway",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{gateway_url}}/api/health",
+              "host": [
+                "{{gateway_url}}"
+              ],
+              "path": [
+                "api",
+                "health"
+              ]
+            },
+            "description": "Expected: 200. Proves gateway service proxies to GovRecover360 backend."
           },
           "response": []
         }

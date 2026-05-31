@@ -65,6 +65,12 @@ docker compose up -d
 
 This command builds and starts all services defined in `docker-compose.yml`. The initial startup may take several minutes as Docker images are downloaded and built.
 
+For a connected integration demo with bundled OpenG2P and WSO2 gateway containers, run:
+
+```
+docker compose --env-file .env.demo up -d --build
+```
+
 ### Step 4: Access the Services
 
 Once all containers are running, access the platform at the following URLs:
@@ -74,6 +80,9 @@ Once all containers are running, access the platform at the following URLs:
 | Frontend (UI) | http://localhost:3000 | See demo users below |
 | Backend API (Swagger) | http://localhost:8000/docs | - |
 | Backend Health | http://localhost:8000/api/health | - |
+| OpenG2P Demo Runtime | http://localhost:8070/api/health | - |
+| WSO2 Demo Gateway | http://localhost:8243/health | - |
+| Backend through WSO2 Gateway | http://localhost:8243/api/health | - |
 | Notification Health | http://localhost:8095/health | - |
 | Odoo ERP | http://localhost:8069 | admin / admin |
 | Apache Superset | http://localhost:8088 | admin / admin |
@@ -233,7 +242,9 @@ The collection also keeps the original resource URLs such as `/api/households/re
 
 ### External Integrations
 
-Local demo mode works without Asgardeo, WSO2 API Manager, GeoNode, Odoo credentials, OpenG2P, or Choreo invoke URLs. Keep external runtimes disabled with:
+Local demo mode works without Asgardeo, GeoNode, Odoo credentials, or Choreo invoke URLs. The Docker Compose demo includes OpenG2P-compatible and WSO2 API Manager-compatible services so they appear in `docker compose ps` and can be shown during the demo.
+
+To force all external integrations off, use:
 
 ```
 OPENG2P_ENABLED=false
@@ -241,7 +252,7 @@ WSO2_APIM_ENABLED=false
 GEONODE_ENABLED=false
 ```
 
-For an integrated demo, configure these values in `.env`: `AUTH_MODE=hybrid`, `ASGARDEO_*`, `WSO2_APIM_ENABLED=true`, `WSO2_*`, `CHOREO_NOTIFIER_API_URL`, `CHOREO_USER_SERVICE_URL`, `GEONODE_ENABLED=true`, `GEONODE_URL`, `ODOO_*`, and `OPENG2P_ENABLED=true` with `OPENG2P_*`. If any external service is disabled or unavailable, the backend returns a clear health status and keeps using local fallback behavior.
+For the bundled connected demo, run `docker compose --env-file .env.demo up -d --build`. For live external platforms, configure these values in `.env`: `AUTH_MODE=hybrid`, `ASGARDEO_*`, `WSO2_APIM_ENABLED=true`, `WSO2_*`, `CHOREO_NOTIFIER_API_URL`, `CHOREO_USER_SERVICE_URL`, `GEONODE_ENABLED=true`, `GEONODE_URL`, `ODOO_*`, and `OPENG2P_ENABLED=true` with `OPENG2P_*`. If any external service is disabled or unavailable, the backend returns a clear health status and keeps using local fallback behavior.
 
 Integration health endpoints:
 

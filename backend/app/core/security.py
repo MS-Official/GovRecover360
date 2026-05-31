@@ -253,7 +253,10 @@ def get_current_user(
                 return _get_or_create_asgardeo_user(db, _validate_asgardeo_token(token))
             except HTTPException:
                 if settings.WSO2_APIM_ENABLED:
-                    return _get_or_create_wso2_user(db, wso2_service.validate_access_token(token))
+                    try:
+                        return _get_or_create_wso2_user(db, wso2_service.validate_access_token(token))
+                    except JWTError:
+                        raise _credentials_exception()
                 raise
     if settings.WSO2_APIM_ENABLED:
         try:

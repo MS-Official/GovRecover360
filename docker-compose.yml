@@ -94,8 +94,7 @@ services:
       MINIMAX_API_KEY: ${MINIMAX_API_KEY:-}
     volumes:
       - ./backend:/app
-    command: >
-      sh -c "python app/seed.py && uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload"
+    command: sh -c "chmod +x /app/entrypoint.sh && /app/entrypoint.sh"
     healthcheck:
       test: ["CMD-SHELL", "python -c \"import urllib.request; urllib.request.urlopen('http://localhost:8000/api/health', timeout=5).read()\""]
       interval: 10s
@@ -140,7 +139,7 @@ services:
       - ./frontend/src:/app/src
       - ./frontend/public:/app/public
     healthcheck:
-      test: ["CMD", "wget", "-q", "-O", "-", "http://localhost:3000/"]
+      test: ["CMD-SHELL", "curl -fs http://localhost:3000/ -o /dev/null || exit 1"]
       interval: 10s
       timeout: 5s
       retries: 10
@@ -195,7 +194,7 @@ services:
       - ./config/superset/superset_config.py:/app/pythonpath/superset_config.py
     command: >
       sh -c "
-        pip install --target /app/.venv/lib/python3.10/site-packages psycopg2-binary &&
+        pip3 install psycopg2-binary -t /app/.venv/lib/python3.10/site-packages/ &&
         superset fab create-admin --username admin --firstname Admin --lastname User --email admin@superset.com --password ${SUPERSET_ADMIN_PASSWORD:-admin} &&
         superset db upgrade &&
         superset init &&
@@ -209,11 +208,11 @@ services:
     restart: unless-stopped
     ports:
       - "80:80"
+    # Nginx resolves upstreams at request-time via 127.0.0.11 resolver,
+    # so no hard dependency on backend/frontend being healthy at startup.
     depends_on:
-      frontend:
-        condition: service_healthy
-      backend:
-        condition: service_healthy
+      - frontend
+      - backend
     volumes:
       - ./config/nginx/default.conf:/etc/nginx/conf.d/default.conf
 
