@@ -1,11 +1,13 @@
 import React, { createContext, useContext, useState, useEffect, useCallback, ReactNode } from 'react';
-import { User, Permission } from '../types';
+import { CurrentUserResponse, User, Permission, Role } from '../types';
 import api from '../services/api';
+import { getAsgardeoLogoutUrl, getAuthMode } from '../services/oidc';
 
 interface AuthContextType {
   user: User | null;
   login: (email: string, password: string) => Promise<void>;
   loginAsRole: (role: string) => Promise<void>;
+  completeAsgardeoLogin: (accessToken: string, idToken?: string) => Promise<User>;
   logout: () => void;
   isAuthenticated: boolean;
   hasPermission: (perm: Permission) => boolean;
@@ -117,6 +119,44 @@ const DEMO_USERS: Record<string, User> = {
   },
 };
 
+const BACKEND_ROLE_MAP: Record<string, Role> = {
+  ROLE_ADMIN: 'admin',
+  ROLE_DISASTER_MANAGER: 'program_manager',
+  ROLE_FIELD_OFFICER: 'field_officer',
+  ROLE_VERIFIER: 'verifier',
+  ROLE_PROGRAM_MANAGER: 'program_manager',
+  ROLE_FINANCE_OFFICER: 'finance_officer',
+  ROLE_WAREHOUSE_OFFICER: 'warehouse_officer',
+  ROLE_GIS_OFFICER: 'gis_officer',
+  ROLE_NGO_PARTNER: 'ngo_partner',
+  ROLE_AUDITOR: 'auditor',
+  ROLE_CITIZEN: 'citizen',
+};
+
+function mapCurrentUser(data: CurrentUserResponse): User {
+  const backendRole = data.roles?.[0] || 'ROLE_CITIZEN';
+  return {
+    id: data.id,
+    email: data.email,
+    full_name: data.name,
+    role: BACKEND_ROLE_MAP[backendRole] || 'citizen',
+    permissions: data.permissions as Permission[],
+    district: data.claims?.district || undefined,
+    organization: data.claims?.organization || undefined,
+    is_active: true,
+    created_at: new Date().toISOString(),
+  };
+}
+
+function mapBackendUser(data: any): User {
+  return {
+    ...data,
+    full_name: data.full_name || data.name || data.email,
+    role: BACKEND_ROLE_MAP[data.role] || data.role,
+    permissions: data.permissions || [],
+  };
+}
+
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
@@ -137,10 +177,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const login = useCallback(async (email: string, password: string) => {
     const response = await api.post('/auth/login', { email, password });
-    const { user: userData, token } = response.data;
+    const { user: userData, access_token } = response.data;
+    const token = access_token;
+    const mappedUser = mapBackendUser(userData);
     localStorage.setItem('token', token);
-    localStorage.setItem('user', JSON.stringify(userData));
-    setUser(userData);
+    localStorage.setItem('user', JSON.stringify(mappedUser));
+    setUser(mappedUser);
   }, []);
 
   const loginAsRole = useCallback(async (role: string) => {
@@ -152,10 +194,25 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setUser(userData);
   }, []);
 
+  const completeAsgardeoLogin = useCallback(async (accessToken: string, idToken?: string) => {
+    localStorage.setItem('token', accessToken);
+    if (idToken) localStorage.setItem('id_token', idToken);
+    const response = await api.get<CurrentUserResponse>('/me');
+    const userData = mapCurrentUser(response.data);
+    localStorage.setItem('user', JSON.stringify(userData));
+    setUser(userData);
+    return userData;
+  }, []);
+
   const logout = useCallback(() => {
+    const idToken = localStorage.getItem('id_token');
     localStorage.removeItem('token');
     localStorage.removeItem('user');
+    localStorage.removeItem('id_token');
     setUser(null);
+    if (getAuthMode() === 'asgardeo') {
+      window.location.href = getAsgardeoLogoutUrl(idToken);
+    }
   }, []);
 
   const hasPermission = useCallback(
@@ -171,6 +228,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         user,
         login,
         loginAsRole,
+        completeAsgardeoLogin,
         logout,
         isAuthenticated: !!user,
         hasPermission,

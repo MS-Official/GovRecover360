@@ -362,7 +362,7 @@ function IntegrationStatusPanel() {
     { label: 'Redis', value: status.redis },
     { label: 'Odoo', value: status.odoo },
     { label: 'OpenG2P Alignment', value: status.openg2p },
-    { label: 'Asgardeo', value: status.asgardeo },
+    { label: 'Asgardeo', value: status.asgardeo.status },
     { label: 'WSO2 API Manager', value: status.wso2 },
     { label: 'Choreo Notification Service', value: status.choreo },
     { label: 'Superset', value: status.superset },

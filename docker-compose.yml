@@ -59,6 +59,9 @@ services:
       ASGARDEO_ISSUER: ${ASGARDEO_ISSUER:-}
       ASGARDEO_JWKS_URL: ${ASGARDEO_JWKS_URL:-}
       ASGARDEO_AUDIENCE: ${ASGARDEO_AUDIENCE:-}
+      ASGARDEO_CLIENT_ID: ${ASGARDEO_CLIENT_ID:-}
+      ASGARDEO_ORG_NAME: ${ASGARDEO_ORG_NAME:-}
+      ASGARDEO_SIGN_UP_URL: ${ASGARDEO_SIGN_UP_URL:-}
       WSO2_GATEWAY_URL: ${WSO2_GATEWAY_URL:-}
       WSO2_PUBLISHER_URL: ${WSO2_PUBLISHER_URL:-}
       SUPERSET_URL: http://superset:8088
@@ -76,6 +79,15 @@ services:
     build:
       context: ./frontend
       dockerfile: Dockerfile
+      args:
+        VITE_API_BASE_URL: /api
+        VITE_AUTH_MODE: ${AUTH_MODE:-mock}
+        VITE_ASGARDEO_CLIENT_ID: ${ASGARDEO_CLIENT_ID:-}
+        VITE_ASGARDEO_BASE_URL: ${VITE_ASGARDEO_BASE_URL:-}
+        VITE_ASGARDEO_SIGN_IN_REDIRECT_URL: ${VITE_ASGARDEO_SIGN_IN_REDIRECT_URL:-http://localhost:3000/callback}
+        VITE_ASGARDEO_SIGN_OUT_REDIRECT_URL: ${VITE_ASGARDEO_SIGN_OUT_REDIRECT_URL:-http://localhost:3000/login}
+        VITE_ASGARDEO_SCOPES: ${VITE_ASGARDEO_SCOPES:-openid profile email groups}
+        VITE_ASGARDEO_SIGN_UP_URL: ${VITE_ASGARDEO_SIGN_UP_URL:-}
     container_name: govrecover-frontend
     restart: unless-stopped
     ports:
@@ -84,6 +96,14 @@ services:
       - backend
     environment:
       VITE_API_URL: /api
+      VITE_API_BASE_URL: /api
+      VITE_AUTH_MODE: ${AUTH_MODE:-mock}
+      VITE_ASGARDEO_CLIENT_ID: ${ASGARDEO_CLIENT_ID:-}
+      VITE_ASGARDEO_BASE_URL: ${VITE_ASGARDEO_BASE_URL:-}
+      VITE_ASGARDEO_SIGN_IN_REDIRECT_URL: ${VITE_ASGARDEO_SIGN_IN_REDIRECT_URL:-http://localhost:3000/callback}
+      VITE_ASGARDEO_SIGN_OUT_REDIRECT_URL: ${VITE_ASGARDEO_SIGN_OUT_REDIRECT_URL:-http://localhost:3000/login}
+      VITE_ASGARDEO_SCOPES: ${VITE_ASGARDEO_SCOPES:-openid profile email groups}
+      VITE_ASGARDEO_SIGN_UP_URL: ${VITE_ASGARDEO_SIGN_UP_URL:-}
     volumes:
       - ./frontend/src:/app/src
       - ./frontend/public:/app/public

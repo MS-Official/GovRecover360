@@ -25,6 +25,9 @@ export const STATUS_COLORS: Record<string, string> = {
   manual_setup_required: 'bg-yellow-100 text-yellow-800',
   manual_check_required: 'bg-yellow-100 text-yellow-800',
   not_configured: 'bg-yellow-100 text-yellow-800',
+  missing_env: 'bg-yellow-100 text-yellow-800',
+  mock: 'bg-yellow-100 text-yellow-800',
+  asgardeo: 'bg-green-100 text-green-800',
   error: 'bg-red-100 text-red-800',
 };
 
@@ -48,6 +51,9 @@ export const STATUS_LABELS: Record<string, string> = {
   manual_setup_required: 'Manual Setup Required',
   manual_check_required: 'Manual Check Required',
   not_configured: 'Not Configured',
+  missing_env: 'Missing Env',
+  mock: 'Mock',
+  asgardeo: 'Asgardeo',
   error: 'Error',
 };
 

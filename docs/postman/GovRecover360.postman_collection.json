@@ -8,6 +8,7 @@
   "variable": [
     { "key": "base_url", "value": "http://localhost:8000", "type": "string" },
     { "key": "nginx_url", "value": "http://localhost", "type": "string" },
+    { "key": "access_token", "value": "", "type": "string" },
     { "key": "token_admin", "value": "", "type": "string" },
     { "key": "token_field", "value": "", "type": "string" },
     { "key": "token_verifier", "value": "", "type": "string" },
@@ -25,6 +26,156 @@
     { "key": "disaster_id", "value": "", "type": "string" }
   ],
   "item": [
+    {
+      "name": "Authentication",
+      "description": "Authentication smoke tests. Paste a real Asgardeo access token into access_token before running Asgardeo Token Test.",
+      "item": [
+        {
+          "name": "Backend Health",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/health",
+              "host": ["{{base_url}}"],
+              "path": ["api", "health"]
+            },
+            "description": "Expected: 200 OK."
+          },
+          "response": []
+        },
+        {
+          "name": "Current User",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{access_token}}" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/me",
+              "host": ["{{base_url}}"],
+              "path": ["api", "me"]
+            },
+            "description": "Expected: 200 OK with a valid mock or Asgardeo token; 401 without a valid token."
+          },
+          "response": []
+        },
+        {
+          "name": "Integration Status",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/integrations/status",
+              "host": ["{{base_url}}"],
+              "path": ["api", "integrations", "status"]
+            },
+            "description": "Expected: 200 OK."
+          },
+          "response": []
+        },
+        {
+          "name": "Mock Login - Admin",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var jsonData = pm.response.json();",
+                  "if (jsonData.access_token) {",
+                  "  pm.collectionVariables.set('access_token', jsonData.access_token);",
+                  "  pm.collectionVariables.set('token_admin', jsonData.access_token);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"admin@govrecover.local\",\n  \"password\": \"Demo@12345\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/auth/login",
+              "host": ["{{base_url}}"],
+              "path": ["api", "auth", "login"]
+            },
+            "description": "Mock mode local login. Stores token in access_token and token_admin."
+          },
+          "response": []
+        },
+        {
+          "name": "Mock Login - Field Officer",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var jsonData = pm.response.json();",
+                  "if (jsonData.access_token) {",
+                  "  pm.collectionVariables.set('access_token', jsonData.access_token);",
+                  "  pm.collectionVariables.set('token_field', jsonData.access_token);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"field@govrecover.local\",\n  \"password\": \"Demo@12345\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/auth/login",
+              "host": ["{{base_url}}"],
+              "path": ["api", "auth", "login"]
+            },
+            "description": "Mock mode local login. Stores token in access_token and token_field."
+          },
+          "response": []
+        },
+        {
+          "name": "Unauthorized Test",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/me",
+              "host": ["{{base_url}}"],
+              "path": ["api", "me"]
+            },
+            "description": "Expected: 401 Unauthorized without a token."
+          },
+          "response": []
+        },
+        {
+          "name": "Asgardeo Token Test",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{access_token}}" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/me",
+              "host": ["{{base_url}}"],
+              "path": ["api", "me"]
+            },
+            "description": "Paste a real Asgardeo access token into access_token, run this request, and confirm roles and permissions are returned."
+          },
+          "response": []
+        }
+      ]
+    },
     {
       "name": "Auth",
       "description": "Authentication requests - login as different roles to obtain JWT tokens",

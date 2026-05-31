@@ -53,6 +53,21 @@ export interface User {
   created_at: string;
 }
 
+export interface CurrentUserResponse {
+  id: string;
+  email: string;
+  name: string;
+  authProvider: 'mock' | 'asgardeo';
+  roles: string[];
+  permissions: string[];
+  claims: {
+    district?: string | null;
+    department?: string | null;
+    assigned_region?: string | null;
+    organization?: string | null;
+  };
+}
+
 export interface DisasterEvent {
   id: string;
   name: string;
@@ -301,6 +316,7 @@ export type IntegrationStatusValue =
   | 'manual_setup_required'
   | 'manual_check_required'
   | 'not_configured'
+  | 'missing_env'
   | 'error'
   | 'mock'
   | 'asgardeo';
@@ -312,7 +328,14 @@ export interface IntegrationStatus {
   odoo: IntegrationStatusValue;
   openg2p: IntegrationStatusValue;
   wso2: IntegrationStatusValue;
-  asgardeo: IntegrationStatusValue;
+  asgardeo: {
+    status: IntegrationStatusValue;
+    authMode: 'mock' | 'asgardeo';
+    clientIdConfigured: boolean;
+    issuerConfigured: boolean;
+    jwksConfigured: boolean;
+    registerUrlConfigured: boolean;
+  };
   choreo: IntegrationStatusValue;
   superset: IntegrationStatusValue;
   geonode: IntegrationStatusValue;

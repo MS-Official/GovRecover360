@@ -17,6 +17,9 @@ class Settings(BaseSettings):
     ASGARDEO_ISSUER: str | None = None
     ASGARDEO_JWKS_URL: str | None = None
     ASGARDEO_AUDIENCE: str | None = None
+    ASGARDEO_CLIENT_ID: str | None = None
+    ASGARDEO_ORG_NAME: str | None = None
+    ASGARDEO_SIGN_UP_URL: str | None = None
     WSO2_GATEWAY_URL: str | None = None
     WSO2_PUBLISHER_URL: str | None = None
     SUPERSET_URL: str | None = None

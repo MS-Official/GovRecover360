@@ -7,6 +7,7 @@ from app.core.security import (
     create_access_token, hash_password, verify_password,
     get_current_user, get_user_permissions, require_role,
 )
+from app.core.config import settings
 from app.models.models import User, Role, RolePermission, Permission
 from app.schemas.schemas import (
     LoginRequest, TokenResponse, UserCreate, UserResponse, UserUpdate, RoleAssignRequest,
@@ -66,6 +67,29 @@ def get_me(current_user: User = Depends(get_current_user)):
         is_active=current_user.is_active,
         created_at=current_user.created_at,
     )
+
+
+@router.get("/api/me")
+def get_current_profile(
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    permissions = get_user_permissions(db, current_user)
+    auth_provider = "asgardeo" if (settings.AUTH_MODE or "mock").lower() == "asgardeo" else "mock"
+    return {
+        "id": current_user.id,
+        "email": current_user.email,
+        "name": current_user.full_name or current_user.email,
+        "authProvider": auth_provider,
+        "roles": [current_user.role],
+        "permissions": permissions,
+        "claims": {
+            "district": current_user.district,
+            "department": current_user.department,
+            "assigned_region": current_user.assigned_region,
+            "organization": current_user.organization,
+        },
+    }
 
 
 @router.get("/api/users", response_model=list[UserResponse])

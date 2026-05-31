@@ -71,18 +71,31 @@ def _odoo_status() -> str:
         return "error"
 
 
-def _asgardeo_status() -> str:
+def _asgardeo_status() -> dict:
     auth_mode = (settings.AUTH_MODE or "mock").lower()
+    client_id_configured = bool(settings.ASGARDEO_CLIENT_ID)
+    issuer_configured = bool(settings.ASGARDEO_ISSUER)
+    jwks_configured = bool(settings.ASGARDEO_JWKS_URL)
+    register_url_configured = bool(settings.ASGARDEO_SIGN_UP_URL)
     if auth_mode == "mock":
-        return "mock_mode"
-    if auth_mode == "asgardeo":
-        required = [
-            settings.ASGARDEO_ISSUER,
-            settings.ASGARDEO_JWKS_URL,
-            settings.ASGARDEO_AUDIENCE,
-        ]
-        return "configured" if all(required) else "manual_setup_required"
-    return "not_configured"
+        status_value = "mock_mode"
+    elif auth_mode == "asgardeo":
+        status_value = "configured" if all([
+            client_id_configured,
+            issuer_configured,
+            jwks_configured,
+            bool(settings.ASGARDEO_AUDIENCE or settings.ASGARDEO_CLIENT_ID),
+        ]) else "missing_env"
+    else:
+        status_value = "manual_setup_required"
+    return {
+        "status": status_value,
+        "authMode": "asgardeo" if auth_mode == "asgardeo" else "mock",
+        "clientIdConfigured": client_id_configured,
+        "issuerConfigured": issuer_configured,
+        "jwksConfigured": jwks_configured,
+        "registerUrlConfigured": register_url_configured,
+    }
 
 
 def _wso2_status() -> str:

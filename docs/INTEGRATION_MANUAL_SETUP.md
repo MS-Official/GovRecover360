@@ -15,6 +15,8 @@ This document covers external platform setup that cannot be completed purely fro
 
 ## B. Asgardeo
 
+Detailed setup is also available in `integrations/asgardeo/ASGARDEO_SETUP.md`.
+
 1. Create an application in Asgardeo.
 2. Add redirect URL `http://localhost:3000/callback`.
 3. Add allowed origin `http://localhost:3000`.

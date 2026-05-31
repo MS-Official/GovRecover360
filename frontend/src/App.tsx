@@ -4,6 +4,8 @@ import { getDefaultRoute, canAccessRoute } from './utils/permissions';
 import LoadingSpinner from './components/common/LoadingSpinner';
 import Layout from './components/layout/Layout';
 import LoginPage from './pages/LoginPage';
+import CallbackPage from './pages/CallbackPage';
+import LogoutPage from './pages/LogoutPage';
 import AdminDashboard from './pages/AdminDashboard';
 import FieldOfficerDashboard from './pages/FieldOfficerDashboard';
 import VerifierDashboard from './pages/VerifierDashboard';
@@ -47,6 +49,9 @@ export default function App() {
   return (
     <Routes>
       <Route path="/login" element={<LoginPage />} />
+      <Route path="/register" element={<LoginPage />} />
+      <Route path="/callback" element={<CallbackPage />} />
+      <Route path="/logout" element={<LogoutPage />} />
       <Route path="/unauthorized" element={<UnauthorizedPage />} />
 
       <Route
