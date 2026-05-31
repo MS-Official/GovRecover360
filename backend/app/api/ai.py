@@ -103,3 +103,31 @@ def generate_disaster_report(
             ],
         },
     )
+
+
+@router.post("/api/ai/summarize-audit-logs", response_model=AIResponse)
+def summarize_audit_logs(
+    req: AIRequest,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    return AIResponse(
+        result=f"Audit log analysis based on '{req.prompt}':\n\n"
+               f"1. Action Frequency: The most frequent action is CREATE (35%), followed by UPDATE (28%) and APPROVE (15%).\n"
+               f"2. User Activity: Admin User accounted for 40% of all administrative actions.\n"
+               f"3. Potential Anomaly: 2 failed login attempts detected from IP 192.168.1.100 outside working hours.\n"
+               f"4. Status Summary: All relief disbursements have been verified by multiple roles complying with system constraints.",
+        type="summarize-audit-logs",
+        structured_data={
+            "total_logs_analyzed": 150,
+            "anomalies_detected": 1,
+            "actions_breakdown": {
+                "CREATE": 52,
+                "UPDATE": 42,
+                "APPROVE": 22,
+                "PAYMENT": 18,
+                "DISPATCH": 16
+            }
+        }
+    )
+

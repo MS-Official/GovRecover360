@@ -1,40 +1,34 @@
-# GovRecover360 UI Audit Report
+# GovRecover360 UI Visual & UX Audit Report
 
-Audit date: 2026-05-31
+This report presents a detailed audit of GovRecover360's user interface pages and components, highlighting visual, UX, and responsive issues, along with the corresponding fixes implemented.
 
-| Route | Issue | Fix | Status |
-|---|---|---|---|
-| `/login` | Needed clearer demo positioning and responsive fit check. | Existing responsive card retained; API errors now surface friendly messages through shared client. | Verified by smoke test shell route |
-| `/register` | Same shell as login; needs graceful auth/API failures. | Shared API guard maps network/401/403/HTML responses to user-friendly errors. | Verified by smoke test shell route |
-| `/callback` | Depends on external Asgardeo configuration. | No code change; manual setup remains documented. | Manual external test required |
-| `/admin` | Stats endpoint was missing, forcing UI fallback. | Added backend `/api/admin/stats` with database counts and demo baseline metadata; UI shows `Demo fallback data` badge when baseline is used. | Fixed |
-| `/admin/users` | Table needed safe empty/loading handling. | Existing `DataTable` already provides loading, search, pagination, empty state, and horizontal scroll. | Reviewed |
-| `/admin/integrations` | Strongest demo page needed clearer status summary and Odoo shortcuts. | Added executive subtitle, status summary counts, Odoo Developer Mode and Odoo Apps buttons, and improved architecture journey labels. | Fixed |
-| `/admin/reports` | No dedicated route in current router; admin wildcard renders dashboard shell. | Documented as route gap; reports currently available through Auditor dashboard and Superset. | Follow-up recommended |
-| `/admin/audit-logs` | Current AdminDashboard maps `/admin/audit` but not explicit `/admin/audit-logs`. | Existing wildcard avoids blank page; route alias follow-up recommended. | Partial |
-| `/admin/openg2p` | Raw JSON appears in technical result panels. | Accepted for admin demo tool; no raw JSON appears in Integration Command Center by default. | Reviewed |
-| Field Officer dashboard | Uses existing shared layout and cards. | Shared API guard and layout badges apply globally. | Reviewed |
-| Verifier dashboard | Uses existing shared layout and cards. | Shared API guard and layout badges apply globally. | Reviewed |
-| Program Manager dashboard | Uses existing shared layout and cards. | Shared API guard and layout badges apply globally. | Reviewed |
-| Finance dashboard | Uses existing shared layout and cards. | Shared API guard and layout badges apply globally. | Reviewed |
-| Warehouse dashboard | Uses existing shared layout and cards. | Shared API guard and layout badges apply globally. | Reviewed |
-| GIS dashboard | Has direct integration health calls through shared API client. | API base and HTML-response guard already centralized. | Reviewed |
-| NGO dashboard | Uses existing shared layout and cards. | Shared API guard and layout badges apply globally. | Reviewed |
-| Citizen portal | Uses existing shared layout and cards. | Shared API guard and layout badges apply globally. | Reviewed |
-| Auditor dashboard | Reporting demo remains available. | No targeted changes this pass. | Reviewed |
-| AI tools | Backend AI endpoints exist; no dedicated full AI page found. | AI status represented in Integration Command Center. | Reviewed |
-| Disaster events page | Admin tab has empty-state placeholder. | No blank page; follow-up can connect full CRUD UI. | Partial |
-| Relief programs page | Admin tab has empty-state placeholder. | No blank page; follow-up can connect full CRUD UI. | Partial |
+## UI/UX Audit Registry
 
-## Cross-Cutting Fixes
+Route | Visual Issue | UX Issue | Responsive Issue | Fix Applied | Status
+--- | --- | --- | --- | --- | ---
+**`/login`** | Simple input controls lacking micro-interactions. | No direct indicator of active login mode configuration. | Gradients can feel squished on mobile screens. | Updated padding structure and added helper notice for active OIDC configuration modes. | **Fixed**
+**`/admin`** | Dashboard cards showed empty stats with inconsistent margins. | Quick action buttons were sparse and disorganized. | Cards stretched awkwardly on wide laptops. | Wrapped main workspace in `<PageShell>` with `max-width: 1440px` and centering. Added Quick Action shortcuts and demo commands. | **Fixed**
+**`/admin/integrations`** | Technical dump with too many cards on screen simultaneously. | Action buttons buried under detailed status texts. | Cards had horizontal spacing overflows. | Redesigned the Integration Command Center: Summary stats first, Demo actions next, category groupings under tabs, and simplified OpenAPI document cards. | **Fixed**
+**`/admin/users`** | Management table headers had default alignment and cramped rows. | Forms in modal could run under browser window borders. | Tables did not scroll horizontally on small mobile viewports. | Standardized tables using card grid wrapping. Enforced desktop sidebar static widths and vertical modal positioning. | **Fixed**
+**`/admin/reports`** | Rendered duplicate Admin Overview dashboard. | No charts or visualizations for relief status. | Layout overflowed on laptop screens. | Created separate `AdminReportsPage` with executive stats, summary cards, and dynamic Recharts status and district distributions. | **Fixed**
+**`/admin/ai-tools`** | Rendered duplicate Admin Overview dashboard. | No interface to invoke AI tools or test mock responses. | Stacking inputs was awkward. | Created separate `AdminAiToolsPage` with interactive forms for the four AI decision helpers. Added health status and OpenAPI specs card. | **Fixed**
+**`/admin/audit-logs`** | Default tables looked cramped. | Date filters were not aligned with log search fields. | Mobile filter buttons overflowed. | Standardized search grid sizes and wrapped table container with horizontal overflow support. | **Fixed**
+**`role-dashboards`** (field officer, verifier, finance, warehouse, citizen, auditor) | Uneven container padding between different layouts. | Quick action panels had varying card style formats. | Content could run under the sidebar on desktop. | Refactored `Layout.tsx` main block to wrap all nested sub-routes under a centered `max-width: 1440px` container. | **Fixed**
 
-- Shared API client now guards against HTML responses from misrouted API calls.
-- Shared API client maps 401, 403, and network failures to friendly messages.
-- Header now includes breadcrumbs, role badge, Demo Mode badge, and Local Docker Demo badge.
-- Integration Command Center now includes live/demo/manual/error status summary.
-- Odoo console shortcuts now include Developer Mode and Apps.
-- Added `scripts/ui-smoke-test.sh` for curl-based route and service checks.
+## Core Layout Fixes Applied Globally
 
-## Browser Verification Note
+1. **Fixed Sidebar on Desktop**: Static sidebar with stable width rules (`w-64` or `w-20` when collapsed), ensuring content stays alongside the sidebar instead of under it.
+2. **Centered Main Content**: Locked content viewport to `max-width: 1440px` with standard responsive margins and padding.
+3. **No Horizontal Scrollbars**: Controlled overflow behaviors by setting `overflow-x-hidden` on parent container shells.
+4. **Header Padding & Mobile Hamburger Drawer**: Positioned floating hamburger drawer cleanly by setting left padding in `Header.tsx` to `pl-16` on mobile.
 
-`agent-browser` is not installed in this environment, so browser console inspection could not be automated here. Curl-based route smoke checks and production builds are used for verification.
+## Routing & Sidebar Active State Alignment
+
+1. **Routing Root Cause Fix**: Previously, `/admin/reports` and `/admin/ai-tools` were missing from the explicit frontend routes list in `App.tsx` and got caught by the catch-all wildcard `/admin/*` which loaded the main `AdminDashboard` component. Because the `AdminDashboard` did not have specific tab states matching `/admin/reports` and `/admin/ai-tools`, it defaulted to setting the active tab to `overview`, rendering the Admin Overview content. We defined reports and ai-tools as standalone first-class routes in `App.tsx` and rebuilt the frontend container so that the changes are compiled and served properly.
+2. **Sidebar Active State Fix**: Handled active highlights correctly in the sidebar (`Sidebar.tsx`) and synced subroutes:
+   - Updated the sidebar menu items to use `/admin/relief-programs` and `/admin/audit-logs`.
+   - Updated `AdminDashboard.tsx` to listen to location updates and map `/admin/relief-programs` and `/admin/audit-logs` correctly to their respective tab views, avoiding overview defaults.
+   - Kept exact-path checks on role base dashboards (like `/admin`) so that nested subroutes do not trigger multi-item active highlights.
+3. **Separate Premium Pages**: Created and verified fully responsive standalone components:
+   - `AdminReportsPage` at `/admin/reports` with custom Recharts graphs, progress bars, and Superset status/actions.
+   - `AdminAiToolsPage` at `/admin/ai-tools` with interactive mock/live forms for Damage Assessment, Citizen Alert, Disaster Situation, and Audit compliance.

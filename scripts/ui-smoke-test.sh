@@ -72,6 +72,8 @@ check_status "Frontend root" "$FRONTEND_URL" "200"
 check_spa_route "/login"
 check_spa_route "/admin"
 check_spa_route "/admin/integrations"
+check_spa_route "/admin/reports"
+check_spa_route "/admin/ai-tools"
 
 check_status "Backend health" "$BACKEND_URL/api/health" "200"
 check_status "Integration status direct" "$BACKEND_URL/api/integrations/status" "200"

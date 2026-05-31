@@ -13,7 +13,7 @@ export function getMenuItemsByRole(role: Role): MenuItem[] {
       { label: 'Dashboard', path: '/admin', icon: 'HomeIcon' },
       { label: 'Users', path: '/admin/users', icon: 'UsersIcon' },
       { label: 'Disaster Events', path: '/admin/disasters', icon: 'ExclamationTriangleIcon' },
-      { label: 'Relief Programs', path: '/admin/programs', icon: 'HeartIcon' },
+      { label: 'Relief Programs', path: '/admin/relief-programs', icon: 'HeartIcon' },
       { label: 'Reports', path: '/admin/reports', icon: 'DocumentChartBarIcon' },
       { label: 'Audit Logs', path: '/admin/audit-logs', icon: 'ClipboardDocumentListIcon' },
       { label: 'Integrations', path: '/admin/integrations', icon: 'ServerIcon' },

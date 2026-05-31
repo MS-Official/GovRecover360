@@ -43,8 +43,8 @@ export default function AdminDashboard() {
     else if (location.pathname.includes('/admin/openg2p')) setActiveTab('openg2p');
     else if (location.pathname.includes('/admin/users')) setActiveTab('users');
     else if (location.pathname.includes('/admin/disasters')) setActiveTab('disasters');
-    else if (location.pathname.includes('/admin/programs')) setActiveTab('programs');
-    else if (location.pathname.includes('/admin/audit')) setActiveTab('audit');
+    else if (location.pathname.includes('/admin/relief-programs')) setActiveTab('programs');
+    else if (location.pathname.includes('/admin/audit-logs')) setActiveTab('audit');
     else setActiveTab('overview');
   }, [location.pathname]);
 
@@ -466,357 +466,350 @@ function IntegrationStatusPanel() {
     ['GeoNode', 'Disabled unless GEONODE_ENABLED and GeoNode credentials are configured.'],
   ];
 
+  const [activeCategoryTab, setActiveCategoryTab] = useState<'core' | 'govt' | 'cloud' | 'analytics' | 'manual'>('core');
+
+  const categoryTabs = [
+    { id: 'core', label: 'Core Services' },
+    { id: 'govt', label: 'Government Platforms' },
+    { id: 'cloud', label: 'Cloud & Identity' },
+    { id: 'analytics', label: 'Analytics & AI' },
+    { id: 'manual', label: 'Manual Setup' }
+  ];
+
   return (
-    <div className="space-y-6">
-      <div className="bg-gov-800 text-white rounded-lg p-6">
+    <div className="space-y-8">
+      {/* Header Banner */}
+      <div className="bg-gov-800 text-white rounded-2xl p-6 shadow-sm">
         <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
           <div>
             <h3 className="text-2xl font-bold">GovRecover360 Integration Command Center</h3>
-            <p className="text-sm text-gov-100 mt-2 max-w-3xl">Live view of identity, API governance, beneficiary management, ERP operations, notifications, analytics, and AI services.</p>
+            <p className="text-sm text-gov-100 mt-2 max-w-3xl leading-relaxed">
+              Live operational view of identity, API governance, beneficiary management, ERP, notifications, analytics, AI, and disaster recovery services.
+            </p>
           </div>
           <div className="flex flex-wrap gap-2">
-            <span className="px-3 py-1 rounded-full bg-white/10 text-sm border border-white/20">Last checked: {checkedAt}</span>
-            {authMode.status === 'mock' && <span className="px-3 py-1 rounded-full bg-blue-100 text-blue-800 text-sm font-medium">Demo Mode</span>}
+            <span className="px-3 py-1 rounded-full bg-white/10 text-xs border border-white/20">Last checked: {checkedAt}</span>
+            {authMode.status === 'mock' && <span className="px-3 py-1 rounded-full bg-blue-100/20 text-blue-300 text-xs font-semibold">Demo Mode</span>}
           </div>
         </div>
       </div>
 
       {error && (
-        <div className="bg-red-50 border border-red-200 text-red-800 rounded-lg p-4 text-sm">
+        <div className="bg-red-50 border border-red-200 text-red-800 rounded-xl p-4 text-sm">
           <p className="font-semibold">Integration status is unavailable</p>
           <p className="mt-1">{error}</p>
         </div>
       )}
 
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+      {/* A. Executive Summary */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
         {[
-          ['Live Services', statusGroups.live, 'bg-green-50 text-green-800 border-green-100'],
-          ['Demo Mode Services', statusGroups.demo, 'bg-blue-50 text-blue-800 border-blue-100'],
-          ['Manual Setup Required', statusGroups.manual, 'bg-yellow-50 text-yellow-800 border-yellow-100'],
-          ['Errors', statusGroups.errors, 'bg-red-50 text-red-800 border-red-100'],
-        ].map(([label, value, classes]: any) => (
-          <div key={label} className={`rounded-lg border p-4 ${classes}`}>
-            <p className="text-xs font-semibold uppercase tracking-wide">{label}</p>
-            <p className="text-3xl font-bold mt-2">{value}</p>
+          ['Live Services', statusGroups.live, 'bg-green-50 text-green-800 border-green-200', 'Active running platforms'],
+          ['Demo Mode Services', statusGroups.demo, 'bg-blue-50 text-blue-800 border-blue-200', 'Seeded sandbox nodes'],
+          ['Manual Setup Required', statusGroups.manual, 'bg-yellow-50 text-yellow-800 border-yellow-200', 'Requires configuration'],
+          ['Errors', statusGroups.errors, 'bg-red-50 text-red-800 border-red-200', 'Failed connection checks'],
+        ].map(([label, value, classes, desc]: any) => (
+          <div key={label} className={`rounded-xl border-2 p-6 shadow-sm flex flex-col justify-between ${classes}`}>
+            <div>
+              <p className="text-xs font-bold uppercase tracking-wider">{label}</p>
+              <p className="text-4xl font-extrabold mt-2 leading-none">{value}</p>
+            </div>
+            <p className="text-xs opacity-80 mt-3 font-medium">{desc}</p>
           </div>
         ))}
       </div>
 
-      {loading && !status ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
-          {Array.from({ length: 6 }).map((_, idx) => (
-            <div key={idx} className={`${cardClass} animate-pulse`}>
-              <div className="h-4 bg-gray-200 rounded w-1/2" />
-              <div className="h-3 bg-gray-100 rounded w-full mt-5" />
-              <div className="h-3 bg-gray-100 rounded w-2/3 mt-3" />
+      {/* B. Critical Demo Actions */}
+      <div className="bg-white rounded-xl border border-gray-200 p-6 shadow-sm">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-5 border-b border-gray-100 pb-4">
+          <div>
+            <h3 className="text-base font-semibold text-gray-900">Critical Demo Actions</h3>
+            <p className="text-xs text-gray-500 mt-1">Direct developer and stakeholder execution endpoints.</p>
+          </div>
+          <button onClick={loadStatus} className="inline-flex items-center gap-2 px-3 py-1.5 bg-gov-600 text-white rounded-lg text-xs hover:bg-gov-700 disabled:opacity-60 transition-colors" disabled={loading}>
+            <ArrowPathIcon className={`h-3.5 w-3.5 ${loading ? 'animate-spin' : ''}`} />
+            Refresh
+          </button>
+        </div>
+        
+        <div className="flex flex-wrap gap-3">
+          <button className={buttonClass} onClick={() => openUrl(env.backendSwagger)}>Open Backend Swagger</button>
+          <button className={buttonClass} disabled={Boolean(actionLoading)} onClick={() => testEndpoint('Integration status check', loadStatus)}>Test Integration Status</button>
+          <button className={buttonClass} disabled={Boolean(actionLoading)} onClick={() => testEndpoint('OpenG2P health check', () => api.get('/openg2p/health'))}>Test OpenG2P Health</button>
+          <button className={buttonClass} disabled={Boolean(actionLoading)} onClick={() => testEndpoint('WSO2 gateway check', () => api.get('/integrations/wso2/status'))}>Test WSO2 Gateway</button>
+          <button className={buttonClass} disabled={Boolean(actionLoading)} onClick={() => testEndpoint('Choreo notifier check', () => api.get('/integrations/status').then((res) => normalizeStatus(res.data?.choreo).status === 'ok' ? res : Promise.reject(new Error('Choreo notifier unreachable'))))}>Test Choreo Health</button>
+          <button className={buttonClass} onClick={() => openUrl(env.odoo)}>Open Odoo</button>
+          <button className={buttonClass} onClick={() => openUrl(odooDeveloperUrl)}>Open Odoo Developer Mode</button>
+          <button className={buttonClass} onClick={() => openUrl(env.superset)}>Open Superset</button>
+          <button className={buttonClass} onClick={() => openUrl(env.asgardeoConsole)}>Open Asgardeo Console</button>
+          <button className={buttonClass} onClick={() => openUrl(env.choreoConsole)}>Open Choreo Console</button>
+        </div>
+      </div>
+
+      {/* C. Architecture Journey */}
+      <div className="bg-white rounded-xl border border-gray-200 p-6 shadow-sm">
+        <h3 className="text-base font-semibold text-gray-900 mb-4">Architecture Journey</h3>
+        <div className="grid grid-cols-1 md:grid-cols-5 gap-3 text-xs">
+          {[
+            { step: 'Citizen / Officer', desc: 'Submits application via portal / field officer app' },
+            { step: 'Asgardeo', desc: 'Secures and manages role identity' },
+            { step: 'WSO2 API Manager', desc: 'Governs API traffic & validates client rate limits' },
+            { step: 'GovRecover360 Backend', desc: 'Orchestrates relief workflows & audits database' },
+            { step: 'Core Connectors', desc: 'OpenG2P registry / Odoo ERP / Choreo notifier / Superset / AI' }
+          ].map((item, idx) => (
+            <div key={item.step} className="flex flex-col md:flex-row items-center gap-3">
+              <div className="w-full flex flex-col justify-between rounded-xl border border-blue-100 bg-blue-50/50 p-4 min-h-[90px] text-center md:text-left">
+                <p className="font-bold text-blue-900">{item.step}</p>
+                <p className="text-[10px] text-blue-700 mt-1 leading-snug">{item.desc}</p>
+              </div>
+              {idx < 4 && <span className="hidden md:block text-gray-300 font-bold text-lg flex-shrink-0">→</span>}
             </div>
           ))}
         </div>
-      ) : (
-        <>
-          <section>
-            <div className="flex items-center justify-between gap-3 mb-4">
-              <h3 className="text-lg font-semibold text-gray-900">Integration Overview</h3>
-              <button onClick={loadStatus} className="inline-flex items-center gap-2 px-4 py-2 bg-gov-600 text-white rounded-lg text-sm hover:bg-gov-700 disabled:opacity-60" disabled={loading}>
-                <ArrowPathIcon className={`h-4 w-4 ${loading ? 'animate-spin' : ''}`} />
-                Refresh
-              </button>
-            </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
-              {integrations.map((item) => (
-                <div key={item.label} className={cardClass}>
-                  <div className="flex items-start justify-between gap-3">
-                    <div className="flex items-center gap-3 min-w-0">
-                      <ServerIcon className="h-5 w-5 text-gov-600 flex-shrink-0" />
-                      <p className="text-sm font-semibold text-gray-900">{item.label}</p>
-                    </div>
+      </div>
+
+      {/* D. Core Platform Status */}
+      <div className="space-y-4">
+        <div className="flex border-b border-gray-200 overflow-x-auto">
+          {categoryTabs.map((tab) => (
+            <button
+              key={tab.id}
+              onClick={() => setActiveCategoryTab(tab.id as any)}
+              className={`px-5 py-3 border-b-2 font-medium text-sm whitespace-nowrap transition-colors ${
+                activeCategoryTab === tab.id
+                  ? 'border-gov-500 text-gov-600'
+                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+              }`}
+            >
+              {tab.label}
+            </button>
+          ))}
+        </div>
+
+        {loading && !status ? (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {Array.from({ length: 3 }).map((_, idx) => (
+              <div key={idx} className="bg-white rounded-xl border border-gray-200 p-6 animate-pulse space-y-3">
+                <div className="h-4 bg-gray-200 rounded w-1/2" />
+                <div className="h-12 bg-gray-100 rounded w-full" />
+              </div>
+            ))}
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {activeCategoryTab === 'core' && [
+              { label: 'Backend API', data: backend, mode: 'FastAPI core', purpose: 'Central API managing household registries, audits, and program allocations.', url: `${env.apiBase.replace(/\/api$/, '')}/api/health` },
+              { label: 'Database', data: database, mode: 'PostgreSQL / PostGIS', purpose: 'System of record database holding citizen information and geographical disaster zones.', url: 'postgres:5432' },
+              { label: 'Redis', data: redis, mode: 'Cache support', purpose: 'Cache support service storing operational sessions and rate limits.', url: 'redis:6379' },
+              { label: 'Nginx Gateway', data: { status: 'ok' }, mode: 'Reverse Proxy', purpose: 'Web gateway routing public requests to the frontend and api backend safely.', url: 'http://localhost' }
+            ].map((item) => (
+              <div key={item.label} className="bg-white rounded-xl border border-gray-200 p-6 shadow-sm hover:shadow-md transition-shadow flex flex-col justify-between min-h-[220px]">
+                <div>
+                  <div className="flex items-center justify-between mb-2">
+                    <h4 className="text-base font-semibold text-gray-900">{item.label}</h4>
                     <StatusBadge status={item.data.status} />
                   </div>
-                  <p className="text-sm text-gray-600 mt-4 min-h-[60px]">{item.purpose}</p>
-                  <div className="mt-4 space-y-2 text-xs text-gray-500">
-                    <p><span className="font-semibold text-gray-700">Mode:</span> {String(item.mode || item.data.status)}</p>
-                    {item.publicUrl && <p className="break-all"><span className="font-semibold text-gray-700">Public URL:</span> {item.publicUrl}</p>}
-                    {item.internalUrl && <p className="break-all"><span className="font-semibold text-gray-700">Docker URL:</span> {item.internalUrl}</p>}
-                    <p><span className="font-semibold text-gray-700">Last checked:</span> {checkedAt}</p>
-                  </div>
+                  <p className="text-xs text-gray-500 mb-2 font-mono">Mode: {item.mode}</p>
+                  <p className="text-xs text-gray-600 leading-relaxed">{item.purpose}</p>
                 </div>
-              ))}
-            </div>
-          </section>
-
-          <section className={cardClass}>
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">Odoo OpenG2P Modules & Workflows</h3>
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              <div>
-                <h4 className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-3">Module Layer Configuration</h4>
-                <div className="space-y-4">
-                  <div className="flex items-start justify-between pb-3 border-b border-gray-100">
-                    <div>
-                      <p className="text-sm font-semibold text-gray-800">GovAid Disaster Recovery Module</p>
-                      <p className="text-xs text-gray-500">Custom disaster management, relief applications, assessments, payment requests & dispatch operations.</p>
-                    </div>
-                    <span className="px-3 py-1 rounded-full bg-green-100 text-green-800 text-xs font-semibold">Active & Installed</span>
-                  </div>
-                  <div className="flex items-start justify-between pb-3 border-b border-gray-100">
-                    <div>
-                      <p className="text-sm font-semibold text-gray-800">OpenG2P Odoo Addons</p>
-                      <p className="text-xs text-gray-500">Official OpenG2P social registry and program modules mounted separately.</p>
-                    </div>
-                    <span className={`px-3 py-1 rounded-full text-xs font-semibold ${status?.odoo_g2p_modules?.registry_installed ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'}`}>
-                      {status?.odoo_g2p_modules?.registry_installed ? 'Registry Installed' : 'Not Installed'}
-                    </span>
-                  </div>
-                  <div className="flex items-start justify-between">
-                    <div>
-                      <p className="text-sm font-semibold text-gray-800">OpenG2P Demo Runtime</p>
-                      <p className="text-xs text-gray-500">FastAPI-based API simulator running on port 8070 to echo registry and entitlement operations.</p>
-                    </div>
-                    <span className="px-3 py-1 rounded-full bg-blue-100 text-blue-800 text-xs font-semibold">Demo Active (8070)</span>
-                  </div>
+                <div className="mt-4 pt-3 border-t border-gray-100 text-[10px] text-gray-400 break-all font-mono">
+                  URL: {item.url}
                 </div>
               </div>
+            ))}
 
-              <div>
-                <h4 className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-3">Addon Installation Status</h4>
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="bg-gray-50 rounded-lg p-3 border border-gray-100">
-                    <p className="text-xs font-medium text-gray-500">G2P Modules Mounted</p>
-                    <p className="text-lg font-bold text-gray-800 mt-1">{status?.odoo_g2p_modules?.mounted ? 'Yes' : 'No'}</p>
-                  </div>
-                  <div className="bg-gray-50 rounded-lg p-3 border border-gray-100">
-                    <p className="text-xs font-medium text-gray-500">Registry Installed</p>
-                    <p className="text-lg font-bold text-gray-800 mt-1">{status?.odoo_g2p_modules?.registry_installed ? 'Yes' : 'No'}</p>
-                  </div>
-                  <div className="bg-gray-50 rounded-lg p-3 border border-gray-100">
-                    <p className="text-xs font-medium text-gray-500">PBMS Installed</p>
-                    <p className="text-lg font-bold text-gray-800 mt-1">
-                      {status?.odoo_g2p_modules?.pbms_installed ? 'Yes' : 'No (Manual Setup Required)'}
-                    </p>
-                  </div>
-                  <div className="bg-gray-50 rounded-lg p-3 border border-gray-100">
-                    <p className="text-xs font-medium text-gray-500">Bridge Installed</p>
-                    <p className="text-lg font-bold text-gray-800 mt-1">{status?.odoo_g2p_modules?.bridge_installed ? 'Yes' : 'No'}</p>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <div className="mt-6 pt-6 border-t border-gray-200">
-              <h4 className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-3">Odoo Actions</h4>
-              <div className="flex flex-wrap gap-3">
-                <button className={buttonClass} onClick={() => openUrl(odooAppsUrl)}>Open Odoo Apps (search "g2p")</button>
-                <button className={buttonClass} onClick={() => openUrl(odooDeveloperUrl)}>Open Odoo Developer Mode</button>
-                <button className={buttonClass} onClick={() => openUrl(odooDisasterModuleUrl)}>Open GovAid Disaster Recovery Menu</button>
-                {status?.odoo_g2p_modules?.registry_installed && (
-                  <button className={buttonClass} onClick={() => openUrl(`${env.odoo}/web?debug=1#menu_id=g2p_registry_base.g2p_main_menu_root`)}>Open G2P Registry Menu</button>
-                )}
-              </div>
-            </div>
-          </section>
-
-          <section className={cardClass}>
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">Architecture Journey</h3>
-            <div className="flex flex-col md:flex-row md:items-center gap-3 text-sm">
-              {['Citizen / Officer', 'Asgardeo', 'WSO2 API Manager', 'GovRecover360 Backend', 'OpenG2P / Odoo / Choreo / Superset / AI'].map((step, idx) => (
-                <div key={step} className="flex md:flex-1 items-center gap-3">
-                  <div className="w-full rounded-lg border border-blue-100 bg-blue-50 px-4 py-3 text-blue-950 font-medium text-center">{step}</div>
-                  {idx < 4 && <span className="hidden md:block text-gray-400">→</span>}
-                </div>
-              ))}
-            </div>
-          </section>
-
-          <section className={cardClass}>
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">Demo Actions</h3>
-            <div className="flex flex-wrap gap-3">
-              <button className={buttonClass} disabled={Boolean(actionLoading)} onClick={() => testEndpoint('Backend health', () => api.get('/health'))}>Test Backend Health</button>
-              <button className={buttonClass} disabled={Boolean(actionLoading)} onClick={() => testEndpoint('OpenG2P health', () => api.get('/openg2p/health'))}>Test OpenG2P Health</button>
-              <button className={buttonClass} disabled={Boolean(actionLoading)} onClick={() => testEndpoint('WSO2 gateway', () => api.get('/integrations/wso2/status'))}>Test WSO2 Gateway</button>
-              <button className={buttonClass} disabled={Boolean(actionLoading)} onClick={() => testEndpoint('WSO2 backend proxy', () => api.get('/integrations/wso2/status'))}>Test WSO2 Backend Proxy</button>
-              <button className={buttonClass} disabled={Boolean(actionLoading)} onClick={() => testEndpoint('Choreo notifier', () => api.get('/integrations/status').then((res) => normalizeStatus(res.data?.choreo).status === 'ok' ? res : Promise.reject(new Error('Choreo notifier is unreachable'))))}>Test Choreo Notification Health</button>
-              <button className={buttonClass} disabled={Boolean(actionLoading)} onClick={() => testEndpoint('AI health', () => api.get('/integrations/status').then((res) => normalizeStatus(res.data?.aiService).status === 'ok' ? res : Promise.reject(new Error('AI service is unreachable'))))}>Test AI Health</button>
-              <button className={buttonClass} onClick={() => openUrl(env.superset)}>Open Superset</button>
-              <button className={buttonClass} onClick={() => openUrl(env.odoo)}>Open Odoo</button>
-              <button className={buttonClass} onClick={() => openUrl(odooDeveloperUrl)}>Open Odoo Developer Mode</button>
-              <button className={buttonClass} onClick={() => openUrl(odooAppsUrl)}>Open Odoo Apps</button>
-              <button className={buttonClass} onClick={() => openUrl(odooDisasterModuleUrl)}>Open Odoo Disaster Recovery Module</button>
-              <button className={buttonClass} onClick={() => openUrl(env.asgardeoConsole)}>Open Asgardeo Console</button>
-              <button className={buttonClass} onClick={() => openUrl(env.choreoConsole)}>Open Choreo Console</button>
-              <button className={buttonClass} onClick={() => openUrl(env.wso2Gateway)}>Open WSO2 Gateway</button>
-            </div>
-          </section>
-
-          <section>
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">Platform Console Hub</h3>
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-              {[
-                ['WSO2 API Manager', `Health: ${env.wso2Gateway}/health`, ['Open WSO2 Gateway', env.wso2Gateway], ['Open WSO2 Setup Guide', '/docs/wso2/WSO2_GUIDE.md'], 'Local gateway is demo-compatible. Production uses full WSO2 API Manager.'],
-                ['Asgardeo', `Auth mode: ${asgardeo.authMode || authMode.status}. Client ID: ${asgardeo.clientIdConfigured ? 'configured' : 'not configured'}. Issuer: ${asgardeo.issuerConfigured ? 'configured' : 'not configured'}. JWKS: ${asgardeo.jwksConfigured ? 'configured' : 'not configured'}.`, ['Open Asgardeo Console', env.asgardeoConsole], ['Open GovRecover360 Asgardeo Application', env.asgardeoApplication], 'External console opens in a new tab because cloud consoles may block iframe embedding.'],
-                ['Choreo', `Local notifier: ${env.choreoNotifier}/health. Organization: ${env.choreoOrg}`, ['Open Choreo Console', env.choreoConsole], ['Open Local Notification Service', `${env.choreoNotifier}/health`], 'Use local notifier for the Docker demo and Choreo Cloud for production invoke URLs.'],
-                ['Superset', `URL: ${env.superset}`, ['Open Superset', env.superset], undefined, 'Analytics dashboard for disaster recovery KPIs.'],
-                ['Odoo', `URL: ${env.odoo}`, ['Open Odoo Developer Mode', odooDeveloperUrl], ['Open Odoo Apps', odooAppsUrl], 'ERP back office for relief operations. Use developer mode to install or upgrade GovAid Disaster Recovery.'],
-                ['OpenG2P', `Health: ${env.openg2p}/api/health`, ['Open OpenG2P Health', `${env.openg2p}/api/health`], ['Open OpenAPI', `${env.openg2p}/openapi.json`], 'Use the backend OpenG2P demo tab for beneficiary sync, eligibility, entitlement, and enrollment flows.'],
-              ].map(([title, details, primary, secondary, note]: any) => (
-                <div key={title} className={cardClass}>
-                  <p className="text-sm font-semibold text-gray-900">{title}</p>
-                  <p className="text-sm text-gray-600 mt-2 break-words">{details}</p>
-                  <p className="text-xs text-gray-500 mt-2">{note}</p>
-                  <div className="flex flex-wrap gap-2 mt-4">
-                    {primary && <button className={buttonClass} onClick={() => openUrl(primary[1])}>{primary[0]}</button>}
-                    {secondary && <button className={buttonClass} onClick={() => openUrl(secondary[1])}>{secondary[0]}</button>}
-                  </div>
-                </div>
-              ))}
-            </div>
-          </section>
-
-          <section className="mt-8">
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">API Documentation Command Center</h3>
-            
-            {/* Note & References Panel */}
-            <div className="bg-blue-50 border border-blue-100 rounded-xl p-5 mb-6">
-              <h4 className="text-sm font-semibold text-blue-900 mb-2">Developer & API Integration Information</h4>
-              <ul className="list-disc list-inside text-sm text-blue-800 space-y-2">
-                <li>
-                  <strong className="text-blue-950">Authentication Required:</strong> Protected endpoints (such as those under <code>/api/v1/disasters</code>, <code>/api/v1/households</code>, etc.) require an OAuth2 or mock Bearer token in the <code>Authorization</code> header. Use the <code>/api/v1/auth/login</code> endpoint with your admin credentials to retrieve a token for development.
-                </li>
-                <li>
-                  <strong className="text-blue-950">Postman Collection:</strong> A preconfigured Postman collection is included in the project repository under <code>/postman/GovRecover360.postman_collection.json</code>. You can import it to instantly test all endpoints.
-                </li>
-                <li>
-                  <strong className="text-blue-950">OpenAPI Schemas:</strong> JSON specification files are exposed directly for automated tool ingestion (e.g., configuring routes in WSO2 API Manager or generating client SDKs).
-                </li>
-              </ul>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {/* FastAPI Backend */}
-              <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-5 flex flex-col justify-between">
+            {activeCategoryTab === 'govt' && [
+              { label: 'OpenG2P Demo Runtime', data: openg2p, mode: 'FastAPI Simulator', purpose: 'Echos social registry eligibility and G2P program enrollment checks.', url: `${env.openg2p}/api/health` },
+              { label: 'Odoo ERP', data: odoo, mode: 'Odoo 17 Core', purpose: 'Back-office operations hub managing warehouse inventory, staff assignments, and logistics.', url: env.odoo },
+              { label: 'Official OpenG2P Odoo Addons', data: { status: status?.odoo_g2p_modules?.registry_installed ? 'ok' : 'manual' }, mode: 'Odoo Module Layer', purpose: 'Mounted official G2P registry modules providing social protection schemas in Odoo.', url: odooAppsUrl },
+              { label: 'GovAid Disaster Recovery Module', data: { status: 'ok' }, mode: 'Odoo Custom Module', purpose: 'Disaster recovery application pipeline and entitlement records in Odoo.', url: odooDisasterModuleUrl },
+              { label: 'G2P Bridge Module', data: { status: status?.odoo_g2p_modules?.bridge_installed ? 'ok' : 'manual' }, mode: 'Odoo Custom Bridge', purpose: 'Links relief applications with official social registry individual accounts.', url: odooDisasterModuleUrl }
+            ].map((item) => (
+              <div key={item.label} className="bg-white rounded-xl border border-gray-200 p-6 shadow-sm hover:shadow-md transition-shadow flex flex-col justify-between min-h-[220px]">
                 <div>
-                  <div className="flex items-center gap-2 mb-2">
-                    <span className="p-1.5 bg-green-50 text-green-700 rounded-md font-bold text-xs">FastAPI</span>
-                    <h4 className="text-sm font-semibold text-gray-900">GovRecover360 Core Backend</h4>
+                  <div className="flex items-center justify-between mb-2">
+                    <h4 className="text-base font-semibold text-gray-900">{item.label}</h4>
+                    <StatusBadge status={item.data.status} />
                   </div>
-                  <p className="text-xs text-gray-500 mb-4">
-                    Core disaster management system handling households, relief requests, inventory dispatch, user RBAC, audits, and third-party orchestration.
-                  </p>
+                  <p className="text-xs text-gray-500 mb-2 font-mono">Mode: {item.mode}</p>
+                  <p className="text-xs text-gray-600 leading-relaxed">{item.purpose}</p>
                 </div>
-                <div className="space-y-2 mt-auto">
-                  <button className="w-full text-left px-3 py-2 rounded-lg text-xs font-medium bg-gov-50 text-gov-700 hover:bg-gov-100 flex justify-between items-center" onClick={() => openUrl(env.backendSwagger)}>
-                    <span>Interactive Swagger UI</span>
-                    <span className="text-gov-400">→</span>
-                  </button>
-                  <button className="w-full text-left px-3 py-2 rounded-lg text-xs font-medium bg-gov-50 text-gov-700 hover:bg-gov-100 flex justify-between items-center" onClick={() => openUrl(env.backendRedoc)}>
-                    <span>Alternative ReDoc View</span>
-                    <span className="text-gov-400">→</span>
-                  </button>
-                  <button className="w-full text-left px-3 py-2 rounded-lg text-xs font-medium bg-gray-50 text-gray-700 hover:bg-gray-100 flex justify-between items-center" onClick={() => openUrl(env.backendOpenApi)}>
-                    <span>OpenAPI JSON Schema</span>
-                    <span className="text-gray-400">→</span>
-                  </button>
+                <div className="mt-4 pt-3 border-t border-gray-100 text-[10px] text-gray-400 break-all font-mono">
+                  URL: {item.url}
                 </div>
               </div>
+            ))}
 
-              {/* AI Decision Support */}
-              <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-5 flex flex-col justify-between">
+            {activeCategoryTab === 'cloud' && [
+              { label: 'Asgardeo Identity Provider', data: asgardeo, mode: authMode.status === 'mock' ? 'Mock Mode' : 'OIDC Cloud', purpose: 'Manages user registration, profile authentication, and role credentials.', url: env.asgardeoConsole },
+              { label: 'WSO2 API Manager Gateway', data: wso2, mode: wso2.status === 'ok' ? 'Live Proxy' : 'Demo Gateway', purpose: 'API gateway checking route rate limits, tokens, and governance metrics.', url: env.wso2Gateway },
+              { label: 'Choreo Notification Service', data: choreo, mode: choreoUserService.status === 'not_configured' ? 'Local service' : 'Cloud integration', purpose: 'Sends transactional SMS alerts informing citizens of relief status changes.', url: env.choreoNotifier }
+            ].map((item) => (
+              <div key={item.label} className="bg-white rounded-xl border border-gray-200 p-6 shadow-sm hover:shadow-md transition-shadow flex flex-col justify-between min-h-[220px]">
                 <div>
-                  <div className="flex items-center gap-2 mb-2">
-                    <span className="p-1.5 bg-purple-50 text-purple-700 rounded-md font-bold text-xs">AI/ML</span>
-                    <h4 className="text-sm font-semibold text-gray-900">AI Decision Support Service</h4>
+                  <div className="flex items-center justify-between mb-2">
+                    <h4 className="text-base font-semibold text-gray-900">{item.label}</h4>
+                    <StatusBadge status={item.data.status} />
                   </div>
-                  <p className="text-xs text-gray-500 mb-4">
-                    Provides automated triage support, disaster summarization, and predictive analytics for relief program allocations.
-                  </p>
+                  <p className="text-xs text-gray-500 mb-2 font-mono">Mode: {item.mode}</p>
+                  <p className="text-xs text-gray-600 leading-relaxed">{item.purpose}</p>
                 </div>
-                <div className="space-y-2 mt-auto">
-                  <button className="w-full text-left px-3 py-2 rounded-lg text-xs font-medium bg-gov-50 text-gov-700 hover:bg-gov-100 flex justify-between items-center" onClick={() => openUrl(env.aiSwagger)}>
-                    <span>Interactive Swagger UI</span>
-                    <span className="text-gov-400">→</span>
-                  </button>
-                  <button className="w-full text-left px-3 py-2 rounded-lg text-xs font-medium bg-gray-50 text-gray-700 hover:bg-gray-100 flex justify-between items-center" onClick={() => openUrl(env.aiOpenApi)}>
-                    <span>OpenAPI JSON Schema</span>
-                    <span className="text-gray-400">→</span>
-                  </button>
+                <div className="mt-4 pt-3 border-t border-gray-100 text-[10px] text-gray-400 break-all font-mono">
+                  URL: {item.url}
                 </div>
               </div>
+            ))}
 
-              {/* OpenG2P Demo Runtime */}
-              <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-5 flex flex-col justify-between">
+            {activeCategoryTab === 'analytics' && [
+              { label: 'Superset Analytics', data: superset, mode: 'Apache Superset BI', purpose: 'Central BI reports and interactive heatmaps tracking disaster zones and relief KPIs.', url: env.superset },
+              { label: 'AI Service', data: aiService, mode: import.meta.env.VITE_AI_PROVIDER || 'Mock provider', purpose: 'Exposes uvicorn service summarizing damage assessments and drafting notice messages.', url: env.aiService },
+              { label: 'GeoNode Catalog', data: geonode, mode: geonode.status === 'disabled' ? 'Disabled' : 'GIS Sync', purpose: 'Geospatial catalogue indexing disaster maps and risk-zone vector layers.', url: 'http://localhost:8080' }
+            ].map((item) => (
+              <div key={item.label} className="bg-white rounded-xl border border-gray-200 p-6 shadow-sm hover:shadow-md transition-shadow flex flex-col justify-between min-h-[220px]">
                 <div>
-                  <div className="flex items-center gap-2 mb-2">
-                    <span className="p-1.5 bg-blue-50 text-blue-700 rounded-md font-bold text-xs">OpenG2P</span>
-                    <h4 className="text-sm font-semibold text-gray-900">OpenG2P Demo Runtime</h4>
+                  <div className="flex items-center justify-between mb-2">
+                    <h4 className="text-base font-semibold text-gray-900">{item.label}</h4>
+                    <StatusBadge status={item.data.status} />
                   </div>
-                  <p className="text-xs text-gray-500 mb-4">
-                    Mock social protection runtime running on port 8070 to simulate registry updates, eligibility criteria checks, and entitlement management.
-                  </p>
+                  <p className="text-xs text-gray-500 mb-2 font-mono">Mode: {item.mode}</p>
+                  <p className="text-xs text-gray-600 leading-relaxed">{item.purpose}</p>
                 </div>
-                <div className="space-y-2 mt-auto">
-                  <button className="w-full text-left px-3 py-2 rounded-lg text-xs font-medium bg-gov-50 text-gov-700 hover:bg-gov-100 flex justify-between items-center" onClick={() => openUrl(`${env.openg2p}/api/health`)}>
-                    <span>Check Service Health</span>
-                    <span className="text-gov-400">→</span>
-                  </button>
-                  <button className="w-full text-left px-3 py-2 rounded-lg text-xs font-medium bg-gray-50 text-gray-700 hover:bg-gray-100 flex justify-between items-center" onClick={() => openUrl(env.openg2pOpenApi)}>
-                    <span>OpenAPI JSON Schema</span>
-                    <span className="text-gray-400">→</span>
-                  </button>
+                <div className="mt-4 pt-3 border-t border-gray-100 text-[10px] text-gray-400 break-all font-mono">
+                  URL: {item.url}
                 </div>
               </div>
+            ))}
 
-              {/* WSO2 Local Gateway */}
-              <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-5 flex flex-col justify-between">
+            {activeCategoryTab === 'manual' && manualSetup.map(([title, detail]: any) => (
+              <div key={title} className="bg-white rounded-xl border border-gray-200 p-6 shadow-sm hover:shadow-md transition-shadow flex flex-col justify-between min-h-[220px]">
                 <div>
-                  <div className="flex items-center gap-2 mb-2">
-                    <span className="p-1.5 bg-red-50 text-red-700 rounded-md font-bold text-xs">Gateway</span>
-                    <h4 className="text-sm font-semibold text-gray-900">WSO2 Demo Gateway</h4>
+                  <div className="flex items-center justify-between mb-2">
+                    <h4 className="text-base font-semibold text-gray-900">{title}</h4>
+                    <StatusBadge status="manual" />
                   </div>
-                  <p className="text-xs text-gray-500 mb-4">
-                    Handles rate-limiting, API protection, governance, and traffic proxying to backend services.
-                  </p>
+                  <p className="text-xs text-gray-600 leading-relaxed">{detail}</p>
                 </div>
-                <div className="space-y-2 mt-auto">
-                  <button className="w-full text-left px-3 py-2 rounded-lg text-xs font-medium bg-gov-50 text-gov-700 hover:bg-gov-100 flex justify-between items-center" onClick={() => openUrl(`${env.wso2Gateway}/health`)}>
-                    <span>Check Gateway Health</span>
-                    <span className="text-gov-400">→</span>
-                  </button>
+                <div className="mt-4 pt-3 border-t border-gray-100 text-[10px] text-gray-400 font-medium">
+                  Requires manual configuration in production env
                 </div>
               </div>
+            ))}
+          </div>
+        )}
+      </div>
 
-              {/* Choreo Notification Service */}
-              <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-5 flex flex-col justify-between">
-                <div>
-                  <div className="flex items-center gap-2 mb-2">
-                    <span className="p-1.5 bg-yellow-50 text-yellow-700 rounded-md font-bold text-xs">Notifier</span>
-                    <h4 className="text-sm font-semibold text-gray-900">Choreo Notification Service</h4>
-                  </div>
-                  <p className="text-xs text-gray-500 mb-4">
-                    Real-time microservice that dispatches SMS/email alerts for application status updates, payments, and dispatch events.
-                  </p>
-                </div>
-                <div className="space-y-2 mt-auto">
-                  <button className="w-full text-left px-3 py-2 rounded-lg text-xs font-medium bg-gov-50 text-gov-700 hover:bg-gov-100 flex justify-between items-center" onClick={() => openUrl(`${env.choreoNotifier}/health`)}>
-                    <span>Check Service Health</span>
-                    <span className="text-gov-400">→</span>
-                  </button>
-                </div>
-              </div>
-            </div>
-          </section>
-        </>
-      )}
-
-      <div className={cardClass}>
-        <div className="flex items-center justify-between gap-3 mb-4">
-          <h3 className="text-lg font-semibold text-gray-900">Manual Setup Required</h3>
-          <span className="px-3 py-1 rounded-full bg-yellow-100 text-yellow-800 text-xs font-semibold">Production Setup Required</span>
+      {/* E. API Documentation */}
+      <div className="bg-white rounded-xl border border-gray-200 p-6 shadow-sm">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-5 border-b border-gray-100 pb-4">
+          <div>
+            <h3 className="text-base font-semibold text-gray-900">API Documentation</h3>
+            <p className="text-xs text-gray-500 mt-1">Open the live backend Swagger and OpenAPI documentation used by this demo.</p>
+          </div>
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
-          {manualSetup.map(([title, detail]) => (
-            <div key={title} className="rounded-lg border border-gray-200 p-4">
-              <p className="text-sm font-semibold text-gray-900">{title}</p>
-              <p className="text-sm text-gray-600 mt-2">{detail}</p>
+
+        <div className="bg-blue-50 border border-blue-100 rounded-lg p-4 mb-6 text-xs text-blue-800 leading-relaxed">
+          <p className="font-semibold text-blue-900 mb-1">How to test protected APIs:</p>
+          Protected endpoints require a Bearer token. Authenticate using the <code>/api/v1/auth/login</code> endpoint, or use the pre-packaged Postman Collection at <code>/postman/GovRecover360.postman_collection.json</code> inside the repo.
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="border border-gray-200 rounded-xl p-5 flex flex-col justify-between min-h-[180px]">
+            <div>
+              <h4 className="text-sm font-semibold text-gray-900">GovRecover360 Backend</h4>
+              <p className="text-xs text-gray-500 mt-1">Primary uvicorn REST API managing households, applications, and inventories.</p>
             </div>
-          ))}
+            <div className="flex flex-wrap gap-2 mt-4">
+              <button className={buttonClass} onClick={() => openUrl(env.backendSwagger)}>Swagger UI</button>
+              <button className={buttonClass} onClick={() => openUrl(env.backendRedoc)}>ReDoc</button>
+              <button className={buttonClass} onClick={() => openUrl(env.backendOpenApi)}>OpenAPI JSON</button>
+            </div>
+          </div>
+
+          <div className="border border-gray-200 rounded-xl p-5 flex flex-col justify-between min-h-[180px]">
+            <div>
+              <h4 className="text-sm font-semibold text-gray-900">AI Service</h4>
+              <p className="text-xs text-gray-500 mt-1">Decision support service assisting triage summaries and situation reports.</p>
+            </div>
+            <div className="flex flex-wrap gap-2 mt-4">
+              <button className={buttonClass} onClick={() => openUrl(env.aiSwagger)}>Swagger UI</button>
+              <button className={buttonClass} onClick={() => openUrl(env.aiOpenApi)}>OpenAPI JSON</button>
+            </div>
+          </div>
+
+          <div className="border border-gray-200 rounded-xl p-5 flex flex-col justify-between min-h-[180px]">
+            <div>
+              <h4 className="text-sm font-semibold text-gray-900">OpenG2P Demo Runtime</h4>
+              <p className="text-xs text-gray-500 mt-1">Simulates standard social protection G2P registry operations.</p>
+            </div>
+            <div className="flex flex-wrap gap-2 mt-4">
+              <button className={buttonClass} onClick={() => openUrl(env.openg2pOpenApi)}>OpenAPI JSON</button>
+              <button className={buttonClass} onClick={() => openUrl(`${env.openg2p}/api/health`)}>Health</button>
+            </div>
+          </div>
+
+          <div className="border border-gray-200 rounded-xl p-5 flex flex-col justify-between min-h-[180px]">
+            <div>
+              <h4 className="text-sm font-semibold text-gray-900">WSO2 Demo Gateway</h4>
+              <p className="text-xs text-gray-500 mt-1">Monitors the health and gateway proxying paths.</p>
+            </div>
+            <div className="flex flex-wrap gap-2 mt-4">
+              <button className={buttonClass} onClick={() => openUrl(`${env.wso2Gateway}/health`)}>Gateway Health</button>
+            </div>
+          </div>
+
+          <div className="border border-gray-200 rounded-xl p-5 flex flex-col justify-between min-h-[180px]">
+            <div>
+              <h4 className="text-sm font-semibold text-gray-900">Choreo Notification Service</h4>
+              <p className="text-xs text-gray-500 mt-1">Dispatches SMS alerts to verified relief recipients.</p>
+            </div>
+            <div className="flex flex-wrap gap-2 mt-4">
+              <button className={buttonClass} onClick={() => openUrl(`${env.choreoNotifier}/health`)}>Health</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* F. Odoo + OpenG2P Module Status */}
+      <div className="bg-white rounded-xl border border-gray-200 p-6 shadow-sm">
+        <h3 className="text-base font-semibold text-gray-900 mb-4">Odoo + OpenG2P Module Status</h3>
+        
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="space-y-3 text-xs font-semibold text-gray-700">
+            <div className="flex justify-between items-center pb-2 border-b border-gray-100">
+              <span>Official OpenG2P Addons Mounted:</span>
+              <StatusBadge status={status?.odoo_g2p_modules?.mounted ? 'ok' : 'manual'} label={status?.odoo_g2p_modules?.mounted ? 'Yes' : 'No'} />
+            </div>
+            <div className="flex justify-between items-center pb-2 border-b border-gray-100">
+              <span>Registry Modules Installed:</span>
+              <StatusBadge status={status?.odoo_g2p_modules?.registry_installed ? 'ok' : 'manual'} label={status?.odoo_g2p_modules?.registry_installed ? 'Yes' : 'No'} />
+            </div>
+            <div className="flex justify-between items-center pb-2 border-b border-gray-100">
+              <span>PBMS Modules Installed:</span>
+              <StatusBadge status={status?.odoo_g2p_modules?.pbms_installed ? 'ok' : 'manual'} label={status?.odoo_g2p_modules?.pbms_installed ? 'Yes' : 'No - Manual Setup Required'} />
+            </div>
+            <div className="flex justify-between items-center pb-2 border-b border-gray-100">
+              <span>GovAid Disaster Recovery Module:</span>
+              <StatusBadge status="ok" label="Installed" />
+            </div>
+            <div className="flex justify-between items-center">
+              <span>G2P Bridge Module:</span>
+              <StatusBadge status={status?.odoo_g2p_modules?.bridge_installed ? 'ok' : 'manual'} label={status?.odoo_g2p_modules?.bridge_installed ? 'Installed' : 'Not Installed'} />
+            </div>
+          </div>
+
+          <div className="bg-gray-50 border border-gray-100 rounded-xl p-5 text-xs text-gray-500 leading-relaxed md:col-span-2">
+            <p className="font-semibold text-gray-700 mb-2">About Odoo G2P Registry Integration:</p>
+            The GovAid Disaster Recovery ERP runs side-by-side with official OpenG2P Social Registry modules. In Odoo, search <strong>"g2p"</strong> to view registry databases. If Odoo reports missing package dependencies, use Odoo Developer Mode to inspect logs or install required modules.
+          </div>
+        </div>
+
+        <div className="flex flex-wrap gap-2 mt-6 pt-5 border-t border-gray-100">
+          <button className={buttonClass} onClick={() => openUrl(odooAppsUrl)}>Open Odoo Apps Search G2P</button>
+          {status?.odoo_g2p_modules?.registry_installed && (
+            <button className={buttonClass} onClick={() => openUrl(`${env.odoo}/web?debug=1#menu_id=g2p_registry_base.g2p_main_menu_root`)}>Open G2P Registry Menu</button>
+          )}
+          <button className={buttonClass} onClick={() => openUrl(odooDisasterModuleUrl)}>Open GovAid Disaster Recovery Menu</button>
+          <button className={buttonClass} onClick={() => openUrl(odooDeveloperUrl)}>Open Odoo Developer Mode</button>
         </div>
       </div>
     </div>

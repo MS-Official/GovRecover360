@@ -18,7 +18,7 @@ export default function Header() {
     .slice(0, 3);
 
   return (
-    <header className="min-h-16 bg-white border-b border-gray-200 flex items-center justify-between gap-4 px-6 lg:px-8 py-3">
+    <header className="min-h-16 bg-white border-b border-gray-200 flex items-center justify-between gap-4 pl-16 pr-6 lg:px-8 py-3">
       <div className="min-w-0">
         <div className="flex items-center gap-3 flex-wrap">
           <h1 className="text-lg font-semibold text-gray-900">GovRecover360</h1>

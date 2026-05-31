@@ -7,6 +7,8 @@ import LoginPage from './pages/LoginPage';
 import CallbackPage from './pages/CallbackPage';
 import LogoutPage from './pages/LogoutPage';
 import AdminDashboard from './pages/AdminDashboard';
+import AdminReportsPage from './pages/AdminReportsPage';
+import AdminAiToolsPage from './pages/AdminAiToolsPage';
 import FieldOfficerDashboard from './pages/FieldOfficerDashboard';
 import VerifierDashboard from './pages/VerifierDashboard';
 import ProgramManagerDashboard from './pages/ProgramManagerDashboard';
@@ -63,6 +65,16 @@ export default function App() {
       >
         <Route path="/" element={<RootRedirect />} />
 
+        <Route path="/admin/reports" element={
+          <RoleRoute roles={['admin']}>
+            <AdminReportsPage />
+          </RoleRoute>
+        } />
+        <Route path="/admin/ai-tools" element={
+          <RoleRoute roles={['admin']}>
+            <AdminAiToolsPage />
+          </RoleRoute>
+        } />
         <Route path="/admin/*" element={
           <RoleRoute roles={['admin']}>
             <AdminDashboard />
