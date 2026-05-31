@@ -363,6 +363,12 @@ function IntegrationStatusPanel() {
     openg2p: import.meta.env.VITE_OPENG2P_URL || 'http://localhost:8070',
     choreoNotifier: import.meta.env.VITE_CHOREO_NOTIFIER_URL || 'http://localhost:8095',
     aiService: import.meta.env.VITE_AI_SERVICE_URL || 'http://localhost:8050',
+    backendSwagger: import.meta.env.VITE_BACKEND_SWAGGER_URL || 'http://localhost:8000/docs',
+    backendRedoc: import.meta.env.VITE_BACKEND_REDOC_URL || 'http://localhost:8000/redoc',
+    backendOpenApi: import.meta.env.VITE_BACKEND_OPENAPI_URL || 'http://localhost:8000/openapi.json',
+    openg2pOpenApi: import.meta.env.VITE_OPENG2P_OPENAPI_URL || 'http://localhost:8070/openapi.json',
+    aiSwagger: import.meta.env.VITE_AI_SWAGGER_URL || 'http://localhost:8050/docs',
+    aiOpenApi: import.meta.env.VITE_AI_OPENAPI_URL || 'http://localhost:8050/openapi.json',
   };
 
   const loadStatus = async () => {
@@ -661,6 +667,139 @@ function IntegrationStatusPanel() {
                   </div>
                 </div>
               ))}
+            </div>
+          </section>
+
+          <section className="mt-8">
+            <h3 className="text-lg font-semibold text-gray-900 mb-4">API Documentation Command Center</h3>
+            
+            {/* Note & References Panel */}
+            <div className="bg-blue-50 border border-blue-100 rounded-xl p-5 mb-6">
+              <h4 className="text-sm font-semibold text-blue-900 mb-2">Developer & API Integration Information</h4>
+              <ul className="list-disc list-inside text-sm text-blue-800 space-y-2">
+                <li>
+                  <strong className="text-blue-950">Authentication Required:</strong> Protected endpoints (such as those under <code>/api/v1/disasters</code>, <code>/api/v1/households</code>, etc.) require an OAuth2 or mock Bearer token in the <code>Authorization</code> header. Use the <code>/api/v1/auth/login</code> endpoint with your admin credentials to retrieve a token for development.
+                </li>
+                <li>
+                  <strong className="text-blue-950">Postman Collection:</strong> A preconfigured Postman collection is included in the project repository under <code>/postman/GovRecover360.postman_collection.json</code>. You can import it to instantly test all endpoints.
+                </li>
+                <li>
+                  <strong className="text-blue-950">OpenAPI Schemas:</strong> JSON specification files are exposed directly for automated tool ingestion (e.g., configuring routes in WSO2 API Manager or generating client SDKs).
+                </li>
+              </ul>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {/* FastAPI Backend */}
+              <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-5 flex flex-col justify-between">
+                <div>
+                  <div className="flex items-center gap-2 mb-2">
+                    <span className="p-1.5 bg-green-50 text-green-700 rounded-md font-bold text-xs">FastAPI</span>
+                    <h4 className="text-sm font-semibold text-gray-900">GovRecover360 Core Backend</h4>
+                  </div>
+                  <p className="text-xs text-gray-500 mb-4">
+                    Core disaster management system handling households, relief requests, inventory dispatch, user RBAC, audits, and third-party orchestration.
+                  </p>
+                </div>
+                <div className="space-y-2 mt-auto">
+                  <button className="w-full text-left px-3 py-2 rounded-lg text-xs font-medium bg-gov-50 text-gov-700 hover:bg-gov-100 flex justify-between items-center" onClick={() => openUrl(env.backendSwagger)}>
+                    <span>Interactive Swagger UI</span>
+                    <span className="text-gov-400">→</span>
+                  </button>
+                  <button className="w-full text-left px-3 py-2 rounded-lg text-xs font-medium bg-gov-50 text-gov-700 hover:bg-gov-100 flex justify-between items-center" onClick={() => openUrl(env.backendRedoc)}>
+                    <span>Alternative ReDoc View</span>
+                    <span className="text-gov-400">→</span>
+                  </button>
+                  <button className="w-full text-left px-3 py-2 rounded-lg text-xs font-medium bg-gray-50 text-gray-700 hover:bg-gray-100 flex justify-between items-center" onClick={() => openUrl(env.backendOpenApi)}>
+                    <span>OpenAPI JSON Schema</span>
+                    <span className="text-gray-400">→</span>
+                  </button>
+                </div>
+              </div>
+
+              {/* AI Decision Support */}
+              <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-5 flex flex-col justify-between">
+                <div>
+                  <div className="flex items-center gap-2 mb-2">
+                    <span className="p-1.5 bg-purple-50 text-purple-700 rounded-md font-bold text-xs">AI/ML</span>
+                    <h4 className="text-sm font-semibold text-gray-900">AI Decision Support Service</h4>
+                  </div>
+                  <p className="text-xs text-gray-500 mb-4">
+                    Provides automated triage support, disaster summarization, and predictive analytics for relief program allocations.
+                  </p>
+                </div>
+                <div className="space-y-2 mt-auto">
+                  <button className="w-full text-left px-3 py-2 rounded-lg text-xs font-medium bg-gov-50 text-gov-700 hover:bg-gov-100 flex justify-between items-center" onClick={() => openUrl(env.aiSwagger)}>
+                    <span>Interactive Swagger UI</span>
+                    <span className="text-gov-400">→</span>
+                  </button>
+                  <button className="w-full text-left px-3 py-2 rounded-lg text-xs font-medium bg-gray-50 text-gray-700 hover:bg-gray-100 flex justify-between items-center" onClick={() => openUrl(env.aiOpenApi)}>
+                    <span>OpenAPI JSON Schema</span>
+                    <span className="text-gray-400">→</span>
+                  </button>
+                </div>
+              </div>
+
+              {/* OpenG2P Demo Runtime */}
+              <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-5 flex flex-col justify-between">
+                <div>
+                  <div className="flex items-center gap-2 mb-2">
+                    <span className="p-1.5 bg-blue-50 text-blue-700 rounded-md font-bold text-xs">OpenG2P</span>
+                    <h4 className="text-sm font-semibold text-gray-900">OpenG2P Demo Runtime</h4>
+                  </div>
+                  <p className="text-xs text-gray-500 mb-4">
+                    Mock social protection runtime running on port 8070 to simulate registry updates, eligibility criteria checks, and entitlement management.
+                  </p>
+                </div>
+                <div className="space-y-2 mt-auto">
+                  <button className="w-full text-left px-3 py-2 rounded-lg text-xs font-medium bg-gov-50 text-gov-700 hover:bg-gov-100 flex justify-between items-center" onClick={() => openUrl(`${env.openg2p}/api/health`)}>
+                    <span>Check Service Health</span>
+                    <span className="text-gov-400">→</span>
+                  </button>
+                  <button className="w-full text-left px-3 py-2 rounded-lg text-xs font-medium bg-gray-50 text-gray-700 hover:bg-gray-100 flex justify-between items-center" onClick={() => openUrl(env.openg2pOpenApi)}>
+                    <span>OpenAPI JSON Schema</span>
+                    <span className="text-gray-400">→</span>
+                  </button>
+                </div>
+              </div>
+
+              {/* WSO2 Local Gateway */}
+              <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-5 flex flex-col justify-between">
+                <div>
+                  <div className="flex items-center gap-2 mb-2">
+                    <span className="p-1.5 bg-red-50 text-red-700 rounded-md font-bold text-xs">Gateway</span>
+                    <h4 className="text-sm font-semibold text-gray-900">WSO2 Demo Gateway</h4>
+                  </div>
+                  <p className="text-xs text-gray-500 mb-4">
+                    Handles rate-limiting, API protection, governance, and traffic proxying to backend services.
+                  </p>
+                </div>
+                <div className="space-y-2 mt-auto">
+                  <button className="w-full text-left px-3 py-2 rounded-lg text-xs font-medium bg-gov-50 text-gov-700 hover:bg-gov-100 flex justify-between items-center" onClick={() => openUrl(`${env.wso2Gateway}/health`)}>
+                    <span>Check Gateway Health</span>
+                    <span className="text-gov-400">→</span>
+                  </button>
+                </div>
+              </div>
+
+              {/* Choreo Notification Service */}
+              <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-5 flex flex-col justify-between">
+                <div>
+                  <div className="flex items-center gap-2 mb-2">
+                    <span className="p-1.5 bg-yellow-50 text-yellow-700 rounded-md font-bold text-xs">Notifier</span>
+                    <h4 className="text-sm font-semibold text-gray-900">Choreo Notification Service</h4>
+                  </div>
+                  <p className="text-xs text-gray-500 mb-4">
+                    Real-time microservice that dispatches SMS/email alerts for application status updates, payments, and dispatch events.
+                  </p>
+                </div>
+                <div className="space-y-2 mt-auto">
+                  <button className="w-full text-left px-3 py-2 rounded-lg text-xs font-medium bg-gov-50 text-gov-700 hover:bg-gov-100 flex justify-between items-center" onClick={() => openUrl(`${env.choreoNotifier}/health`)}>
+                    <span>Check Service Health</span>
+                    <span className="text-gov-400">→</span>
+                  </button>
+                </div>
+              </div>
             </div>
           </section>
         </>

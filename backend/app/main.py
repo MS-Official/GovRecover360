@@ -11,7 +11,14 @@ from app.api import (
 from app.middleware.audit_middleware import AuditMiddleware
 from app.middleware.rbac_middleware import RBACMiddleware
 
-app = FastAPI(title="GovRecover360 API", version="1.0.0")
+app = FastAPI(
+    title="GovRecover360 API",
+    description="Disaster Recovery, Beneficiary Management, OpenG2P, WSO2, Choreo, Odoo, Superset, AI, and RBAC APIs",
+    version="1.0.0",
+    docs_url="/docs",
+    redoc_url="/redoc",
+    openapi_url="/openapi.json"
+)
 
 # OLD IMPLEMENTATION - kept for reference
 # Reason: replaced with env-based FRONTEND_URL support for deployed frontends.
@@ -30,20 +37,20 @@ app.add_middleware(
 app.add_middleware(RBACMiddleware)
 app.add_middleware(AuditMiddleware)
 
-app.include_router(auth.router)
-app.include_router(disasters.router)
-app.include_router(households.router)
-app.include_router(verification.router)
-app.include_router(payments.router)
-app.include_router(inventory.router)
-app.include_router(gis.router)
-app.include_router(reports.router)
-app.include_router(audit.router)
-app.include_router(ai.router)
-app.include_router(notifications.router)
-app.include_router(integrations.router)
-app.include_router(openg2p.router)
-app.include_router(admin.router)
+app.include_router(auth.router, tags=["Authentication"])
+app.include_router(disasters.router, tags=["Disaster Events"])
+app.include_router(households.router, tags=["Households"])
+app.include_router(verification.router, tags=["Relief Applications"])
+app.include_router(payments.router, tags=["Payments"])
+app.include_router(inventory.router, tags=["Inventory"])
+app.include_router(gis.router, tags=["GIS & Triage"])
+app.include_router(reports.router, tags=["Reports"])
+app.include_router(audit.router, tags=["Audit Logs"])
+app.include_router(ai.router, tags=["AI Tools"])
+app.include_router(notifications.router, tags=["Choreo Notifications"])
+app.include_router(integrations.router, tags=["Integrations"])
+app.include_router(openg2p.router, tags=["OpenG2P Connector"])
+app.include_router(admin.router, tags=["Admin"])
 
 
 @app.on_event("startup")
@@ -51,6 +58,6 @@ def on_startup():
     Base.metadata.create_all(bind=engine)
 
 
-@app.get("/api/health")
+@app.get("/api/health", tags=["Health"])
 def health_check():
     return {"status": "healthy", "service": "GovRecover360 API"}
