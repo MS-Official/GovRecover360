@@ -327,14 +327,20 @@ export type IntegrationStatusValue =
   | 'local_spatial_check'
   | 'not_enabled';
 
+export type IntegrationStatusField = IntegrationStatusValue | {
+  status?: IntegrationStatusValue;
+  mode?: string;
+  [key: string]: unknown;
+};
+
 export interface IntegrationStatus {
-  backend: IntegrationStatusValue;
-  database: IntegrationStatusValue;
-  redis: IntegrationStatusValue;
-  odoo: IntegrationStatusValue;
-  openg2p: IntegrationStatusValue;
-  wso2: IntegrationStatusValue;
-  asgardeo: {
+  backend?: IntegrationStatusField;
+  database?: IntegrationStatusField;
+  redis?: IntegrationStatusField;
+  odoo?: IntegrationStatusField;
+  openg2p?: IntegrationStatusField;
+  wso2?: IntegrationStatusField;
+  asgardeo?: {
     status: IntegrationStatusValue;
     authMode: 'mock' | 'asgardeo';
     clientIdConfigured: boolean;
@@ -342,11 +348,11 @@ export interface IntegrationStatus {
     jwksConfigured: boolean;
     registerUrlConfigured: boolean;
   };
-  choreo: IntegrationStatusValue;
-  choreoUserService?: IntegrationStatusValue;
-  superset: IntegrationStatusValue;
-  geonode: IntegrationStatusValue;
-  aiService: IntegrationStatusValue;
-  authMode: 'mock' | 'asgardeo';
-  timestamp: string;
+  choreo?: IntegrationStatusField;
+  choreoUserService?: IntegrationStatusField;
+  superset?: IntegrationStatusField;
+  geonode?: IntegrationStatusField;
+  aiService?: IntegrationStatusField;
+  authMode?: 'mock' | 'asgardeo';
+  timestamp?: string;
 }

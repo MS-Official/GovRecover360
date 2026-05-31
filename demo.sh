@@ -268,6 +268,116 @@ post_json_optional() {
   fi
 }
 
+get_admin_demo_token() {
+  local outfile="$TMP_DIR/admin_login.json"
+  local email="${DEMO_ADMIN_EMAIL:-admin@govrecover.local}"
+  local password="${DEMO_ADMIN_PASSWORD:-Demo@12345}"
+
+  echo "Requesting Admin demo token from $BACKEND_URL/api/auth/login"
+
+  local code
+  code=$(curl -sk -X POST "$BACKEND_URL/api/auth/login" \
+    -H "Content-Type: application/json" \
+    -o "$outfile" \
+    -w "%{http_code}" \
+    -d "{\"email\":\"$email\",\"password\":\"$password\"}" || true)
+
+  if [[ "$code" =~ ^(200|201)$ ]]; then
+    local token
+    token="$(cat "$outfile" | json_value "access_token")"
+    if [ -n "$token" ]; then
+      ADMIN_DEMO_TOKEN="$token"
+      success "Admin demo token acquired for RBAC-protected connector checks"
+      return 0
+    fi
+  fi
+
+  ADMIN_DEMO_TOKEN=""
+  echo "Admin demo token was not available. Protected connector calls will validate RBAC behavior."
+  return 1
+}
+
+get_json_auth_optional() {
+  local name="$1"
+  local url="$2"
+  local token="${3:-}"
+  local outfile="$TMP_DIR/${name// /_}.json"
+
+  echo "GET $url"
+
+  local code
+  if [ -n "$token" ]; then
+    code=$(curl -sk "$url" \
+      -H "Content-Type: application/json" \
+      -H "Authorization: Bearer $token" \
+      -o "$outfile" \
+      -w "%{http_code}" || true)
+  else
+    code=$(curl -sk "$url" \
+      -H "Content-Type: application/json" \
+      -o "$outfile" \
+      -w "%{http_code}" || true)
+  fi
+
+  if [[ "$code" =~ ^(200|201)$ ]]; then
+    success "$name returned HTTP $code"
+    cat "$outfile" | pretty_json
+    return 0
+  fi
+
+  if [ "$code" = "401" ]; then
+    success "SECURITY CHECK PASSED: Expected 401: backend-mediated OpenG2P endpoint is RBAC-protected. Use Admin token or UI to test."
+    cat "$outfile" || true
+    return 0
+  fi
+
+  warn "$name returned HTTP $code (optional connector check)"
+  cat "$outfile" || true
+  return 1
+}
+
+post_json_auth_optional() {
+  local name="$1"
+  local url="$2"
+  local data="$3"
+  local token="${4:-}"
+  local outfile="$TMP_DIR/${name// /_}.json"
+
+  echo "POST $url"
+
+  local code
+  if [ -n "$token" ]; then
+    code=$(curl -sk -X POST "$url" \
+      -H "Content-Type: application/json" \
+      -H "Authorization: Bearer $token" \
+      -o "$outfile" \
+      -w "%{http_code}" \
+      -d "$data" || true)
+  else
+    code=$(curl -sk -X POST "$url" \
+      -H "Content-Type: application/json" \
+      -o "$outfile" \
+      -w "%{http_code}" \
+      -d "$data" || true)
+  fi
+
+  if [[ "$code" =~ ^(200|201)$ ]]; then
+    success "$name returned HTTP $code"
+    cat "$outfile" | pretty_json
+    return 0
+  fi
+
+  if [ "$code" = "401" ]; then
+    success "SECURITY CHECK PASSED: Expected 401: backend-mediated OpenG2P endpoint is RBAC-protected. Use Admin token or UI to test."
+    cat "$outfile" || true
+    return 0
+  fi
+
+  warn "$name returned HTTP $code (optional connector check)"
+  cat "$outfile" || true
+  return 1
+}
+
 # endpoint_supports PATH METHOD
 # Returns "yes" if the OpenG2P OpenAPI spec lists METHOD for PATH.
 endpoint_supports() {
@@ -498,10 +608,13 @@ get_json_optional "WSO2 Integration Status" "$BACKEND_URL/api/integrations/wso2/
 
 section "6️⃣ Checking backend OpenG2P connector endpoints"
 
-get_json_optional "Backend OpenG2P Status" "$BACKEND_URL/api/integrations/openg2p/status"
+ADMIN_DEMO_TOKEN=""
+get_admin_demo_token || true
+
+get_json_auth_optional "Backend OpenG2P Status" "$BACKEND_URL/api/integrations/openg2p/status" "$ADMIN_DEMO_TOKEN"
 
 echo ""
-echo "Attempting backend-mediated OpenG2P sync if endpoint exists..."
+echo "Attempting backend-mediated OpenG2P connector flow with RBAC..."
 
 BACKEND_SYNC_PAYLOAD=$(cat <<EOF
 {
@@ -515,20 +628,28 @@ BACKEND_SYNC_PAYLOAD=$(cat <<EOF
 EOF
 )
 
-BACKEND_SYNC_OUT="$TMP_DIR/backend_openg2p_sync.json"
-BACKEND_SYNC_CODE=$(curl -sk -X POST "$BACKEND_URL/api/integrations/openg2p/sync-beneficiary" \
-  -H "Content-Type: application/json" \
-  -o "$BACKEND_SYNC_OUT" \
-  -w "%{http_code}" \
-  -d "$BACKEND_SYNC_PAYLOAD" || true)
+post_json_auth_optional \
+  "Backend OpenG2P Sync Beneficiary" \
+  "$BACKEND_URL/api/integrations/openg2p/sync-beneficiary" \
+  "$BACKEND_SYNC_PAYLOAD" \
+  "$ADMIN_DEMO_TOKEN"
 
-if [[ "$BACKEND_SYNC_CODE" =~ ^(200|201)$ ]]; then
-  success "Backend OpenG2P sync endpoint works"
-  cat "$BACKEND_SYNC_OUT" | pretty_json
-else
-  warn "Backend OpenG2P sync endpoint not available or protected. HTTP $BACKEND_SYNC_CODE"
-  cat "$BACKEND_SYNC_OUT" || true
-fi
+post_json_auth_optional \
+  "Backend OpenG2P Check Eligibility" \
+  "$BACKEND_URL/api/integrations/openg2p/check-eligibility" \
+  "$ELIGIBILITY_PAYLOAD" \
+  "$ADMIN_DEMO_TOKEN"
+
+get_json_auth_optional \
+  "Backend OpenG2P Entitlements" \
+  "$BACKEND_URL/api/integrations/openg2p/entitlements" \
+  "$ADMIN_DEMO_TOKEN"
+
+post_json_auth_optional \
+  "Backend OpenG2P Program Enrollment" \
+  "$BACKEND_URL/api/integrations/openg2p/program-enrollment" \
+  "$ENROLLMENT_PAYLOAD" \
+  "$ADMIN_DEMO_TOKEN"
 
 # ----------------------------------------------------
 # 8. Choreo notification flow

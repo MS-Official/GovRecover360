@@ -139,3 +139,17 @@ OPENG2P_PASSWORD=<your-password>
 ```
 
 The backend's `integrations/openg2p` connector will then route through your real OpenG2P cluster instead of the demo runtime container.
+
+## Frontend and Backend Connector Paths
+
+The Admin -> Integrations command center shows OpenG2P as a first-class platform dependency and links to the local runtime health and OpenAPI URLs. It also keeps non-technical demo text visible: beneficiary registry, eligibility check, entitlement lookup, and program enrollment.
+
+Backend connector endpoints are available for UI and script-driven demos:
+
+- `GET /api/integrations/openg2p/status`
+- `POST /api/integrations/openg2p/sync-beneficiary`
+- `POST /api/integrations/openg2p/check-eligibility`
+- `GET /api/integrations/openg2p/entitlements`
+- `POST /api/integrations/openg2p/program-enrollment`
+
+The sync connector tries `/api/beneficiaries/sync` first and falls back to `/api/beneficiaries` for runtimes that only expose the create endpoint. Optional connector failures should not stop the full demo flow; the core OpenG2P runtime health and direct beneficiary flow remain the primary proof points.

@@ -66,6 +66,22 @@ class OpenG2PService:
             },
         )
 
+    def sync_beneficiary(self, payload: dict) -> dict:
+        fallback = lambda: {
+            "beneficiary_id": payload.get("beneficiaryId") or payload.get("beneficiary_id") or f"openg2p-demo-{uuid4().hex[:10]}",
+            "status": "synced",
+            "source": "mock",
+            "payload": payload,
+        }
+        if not self._live_ready():
+            return self._mock_response("mock", fallback())
+        try:
+            return self._request("POST", "/beneficiaries/sync", json=payload)
+        except httpx.HTTPStatusError as exc:
+            if exc.response.status_code == 404:
+                return self._request("POST", "/beneficiaries", json=payload)
+            raise
+
     def get_beneficiary(self, beneficiary_id: str) -> dict:
         if not self._live_ready():
             return self._mock_response(
@@ -106,6 +122,17 @@ class OpenG2PService:
                 "payload": payload,
             },
         )
+
+    def list_entitlements(self) -> dict:
+        if not self._live_ready():
+            return self._mock_response(
+                "mock",
+                {
+                    "entitlements": [],
+                    "message": "No live OpenG2P entitlement list is available in mock mode.",
+                },
+            )
+        return self._request("GET", "/entitlements")
 
     def enroll_in_program(self, payload: dict) -> dict:
         return self._post_or_mock(

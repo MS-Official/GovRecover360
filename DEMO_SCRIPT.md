@@ -280,6 +280,60 @@ Total demo time: approximately 30-40 minutes.
 
 ---
 
+## Step 10A: Integration Command Center
+
+**Who**: Admin / Presenter  
+**What they do**: Show platform integrations and console access from the frontend  
+**What they see**: Government-style integration dashboard with status cards, demo actions, architecture journey, and platform console hub
+
+**Action**:
+1. Log in as admin (`admin@govrecover.local` / `Demo@12345`).
+2. Open Admin -> Integrations.
+3. Confirm the banner says `GovRecover360 Integration Command Center`.
+4. Show the architecture journey: Citizen / Officer -> Asgardeo Login -> WSO2 API Gateway -> Backend -> OpenG2P / Odoo / Choreo / Superset.
+5. Click test actions for Backend, OpenG2P, WSO2 gateway, Choreo notifier, and AI health.
+6. Open Superset, Odoo, Asgardeo, Choreo, and WSO2 in new tabs from the Platform Console Hub.
+
+**Presenter Talking Points**:
+- "Local demo mode keeps the recovery workflow running while external platforms are configured."
+- "Asgardeo and Choreo open in new tabs because cloud consoles often block embedded iframes."
+- "The local WSO2 gateway is demo-compatible; production uses full WSO2 API Manager."
+- "If Odoo Settings shows a stock/SMS popup, use the direct Disaster Recovery module button for the demo."
+
+**Expected Outcome**: The Integrations page renders without crashing, status badges are visible even if a backend key is missing, and API calls use `VITE_API_BASE_URL` instead of the frontend static container.
+
+---
+
+## Step 10B: OpenG2P Connector Security
+
+**Who**: Presenter / Developer  
+**What they do**: Demonstrate both direct OpenG2P runtime flow and backend-mediated connector security  
+**What they see**: Direct OpenG2P runtime calls pass, then backend connector calls run with an Admin demo token
+
+**Action**:
+1. Run `./demo.sh .env.demo`.
+2. Confirm the direct OpenG2P runtime section passes:
+   - Beneficiary sync
+   - Eligibility check
+   - Entitlements
+   - Program enrollment
+3. Confirm the backend connector section requests an Admin demo token from `/api/auth/login`.
+4. Confirm the script uses that token for:
+   - `GET /api/integrations/openg2p/status`
+   - `POST /api/integrations/openg2p/sync-beneficiary`
+   - `POST /api/integrations/openg2p/check-eligibility`
+   - `GET /api/integrations/openg2p/entitlements`
+   - `POST /api/integrations/openg2p/program-enrollment`
+
+**Presenter Talking Points**:
+- "The direct OpenG2P demo runtime proves the beneficiary, eligibility, entitlement, and enrollment API flow."
+- "The backend-mediated connector is protected by RBAC, so write operations require a valid platform token."
+- "A 401 without a token is expected and demonstrates security. The demo script now uses the Admin token for the protected connector flow."
+
+**Expected Outcome**: `./demo.sh .env.demo` exits 0 with no scary warning for protected OpenG2P connector endpoints.
+
+---
+
 ## Step 11: AI Features
 
 **Who**: Presenter  

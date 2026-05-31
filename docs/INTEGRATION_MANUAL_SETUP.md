@@ -13,6 +13,8 @@ This document covers external platform setup that cannot be completed purely fro
 7. Install or Upgrade the module.
 8. Open the Disaster Recovery menu and confirm the views load.
 
+Demo workaround: if General Settings shows `"res.config.settings"."stock_move_sms_validation" field is undefined`, avoid General Settings during the presentation and open the GovAid Disaster Recovery menu directly. A frontend button is available for the direct module URL. Only add an Odoo dependency after confirming which installed standard module owns that settings field.
+
 ## B. Asgardeo
 
 Detailed setup is also available in `integrations/asgardeo/ASGARDEO_SETUP.md`.
@@ -49,6 +51,8 @@ Detailed setup is also available in `integrations/asgardeo/ASGARDEO_SETUP.md`.
 8. Restart the backend.
 9. Test notification health and send flows.
 
+The frontend opens Choreo in a new browser tab instead of relying on iframe embedding. Choreo Cloud may block embedding with browser security headers, which is expected.
+
 ## E. Superset
 
 1. Open Superset.
@@ -68,4 +72,25 @@ Current demo alignment:
 - Relief packages align to entitlement concepts.
 - Payment requests and dispatch orders align to benefit delivery concepts.
 
-Future full runtime integration would require connecting to actual OpenG2P services, synchronizing beneficiary registry data, mapping program enrollment APIs, and validating benefit delivery flows end to end.
+The local Docker demo also includes an OpenG2P-compatible runtime with `/api/health`, beneficiary sync, eligibility, entitlements, and program enrollment endpoints. Future full runtime integration would require connecting to actual OpenG2P services, synchronizing beneficiary registry data, mapping program enrollment APIs, and validating benefit delivery flows end to end.
+
+## G. Admin Integration Command Center
+
+Open Admin -> Integrations to present the full platform view. The page includes:
+
+- Integration Overview cards for Backend, Database, Redis, Odoo, OpenG2P, WSO2, Asgardeo, Choreo, Superset, AI Service, and GeoNode.
+- Architecture Journey: Citizen / Officer -> Asgardeo Login -> WSO2 API Gateway -> GovRecover360 Backend -> OpenG2P / Odoo / Choreo / Superset.
+- Demo Actions for backend health, OpenG2P health, WSO2 gateway/proxy, Choreo notifier, AI health, and console launch buttons.
+- Manual setup labels that separate local demo mode from production setup requirements.
+
+For the local Docker frontend on `http://localhost:3000`, use `VITE_API_BASE_URL=http://localhost:8000`. For the Nginx-hosted demo, use `VITE_API_BASE_URL=http://localhost/api`. If this is wrong, the frontend will show `Backend API returned HTML instead of JSON. Check VITE_API_BASE_URL.` instead of crashing.
+
+## H. Final Government / UN Demo Flow
+
+1. Start with Admin -> Integrations to show platform readiness and demo mode.
+2. Open WSO2 gateway health and backend proxy to show governed routing.
+3. Open OpenG2P health/OpenAPI and run the OpenG2P demo tab for beneficiary, eligibility, entitlement, and enrollment.
+4. Open Choreo local notifier and run notification approvals.
+5. Open Odoo directly to the Disaster Recovery module for back-office workflows.
+6. Open Superset for KPI dashboards.
+7. Explain that Asgardeo, real WSO2 APIM, Choreo Cloud, GeoNode, and production Odoo configuration are manual production setup steps.

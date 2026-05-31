@@ -341,15 +341,30 @@ function IntegrationStatusPanel() {
   const [status, setStatus] = useState<IntegrationStatus | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [actionLoading, setActionLoading] = useState('');
+
+  const env = {
+    apiBase: import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000',
+    asgardeoConsole: import.meta.env.VITE_ASGARDEO_CONSOLE_URL || 'https://console.asgardeo.io/t/teamcodeme',
+    asgardeoApplication: import.meta.env.VITE_ASGARDEO_APPLICATION_URL || 'https://console.asgardeo.io/t/teamcodeme/app/fullscreen/onboarding',
+    choreoConsole: import.meta.env.VITE_CHOREO_CONSOLE_URL || 'https://console.choreo.dev/organizations/choreodemo/home',
+    choreoOrg: import.meta.env.VITE_CHOREO_ORG_URL || 'https://console.choreo.dev/organizations/choreodemo/home',
+    wso2Gateway: import.meta.env.VITE_WSO2_LOCAL_GATEWAY_URL || 'http://localhost:8243',
+    odoo: import.meta.env.VITE_ODOO_URL || 'http://localhost:8069',
+    superset: import.meta.env.VITE_SUPERSET_URL || 'http://localhost:8088',
+    openg2p: import.meta.env.VITE_OPENG2P_URL || 'http://localhost:8070',
+    choreoNotifier: import.meta.env.VITE_CHOREO_NOTIFIER_URL || 'http://localhost:8095',
+    aiService: import.meta.env.VITE_AI_SERVICE_URL || 'http://localhost:8050',
+  };
 
   const loadStatus = async () => {
     setLoading(true);
     setError('');
     try {
       const res = await api.get('/integrations/status');
-      setStatus(res.data);
-    } catch {
-      setError('Integration status could not be loaded. Please check backend health.');
+      setStatus(typeof res.data === 'object' && res.data ? res.data : null);
+    } catch (err: any) {
+      setError(err?.message || 'Integration status could not be loaded. Please check backend health.');
     } finally {
       setLoading(false);
     }
@@ -359,82 +374,199 @@ function IntegrationStatusPanel() {
     loadStatus();
   }, []);
 
-  const statusCards = status ? [
-    { label: 'Backend API', value: status.backend },
-    { label: 'Database', value: status.database },
-    { label: 'Redis', value: status.redis },
-    { label: 'Odoo', value: status.odoo },
-    { label: 'OpenG2P Runtime', value: status.openg2p },
-    { label: 'Asgardeo', value: status.asgardeo.status },
-    { label: 'WSO2 API Manager', value: status.wso2 },
-    { label: 'Choreo Notification Service', value: status.choreo },
-    { label: 'Superset', value: status.superset },
-    { label: 'GeoNode', value: status.geonode },
-    { label: 'AI Service', value: status.aiService },
-    { label: 'Auth Mode', value: status.authMode },
-  ] : [];
+  const normalizeStatus = (value: any, fallback = 'not_configured') => {
+    if (!value) return { status: fallback };
+    if (typeof value === 'string') return { status: value };
+    if (typeof value === 'object') return { status: value.status || value.mode || fallback, ...value };
+    return { status: fallback };
+  };
 
-  const setupCards = [
-    { title: 'Asgardeo Setup', path: 'docs/asgardeo/ASGARDEO_GUIDE.md' },
-    { title: 'WSO2 Setup', path: 'docs/wso2/WSO2_GUIDE.md' },
-    { title: 'Choreo Deployment', path: 'docs/choreo/CHOREO_GUIDE.md' },
-    { title: 'Odoo Module Verification', path: 'docs/INTEGRATION_MANUAL_SETUP.md' },
-    { title: 'Superset Dashboard', path: 'docs/superset/SUPERSET_GUIDE.md' },
-    { title: 'OpenG2P Alignment', path: 'docs/INTEGRATION_MANUAL_SETUP.md' },
-    { title: 'OpenG2P Demo Setup', path: 'INTEGRATION_SETUP.md' },
-    { title: 'GeoNode GIS Setup', path: 'docs/INTEGRATION_MANUAL_SETUP.md' },
+  const openUrl = (url?: string) => {
+    if (url) window.open(url, '_blank', 'noopener,noreferrer');
+  };
+
+  const testEndpoint = async (label: string, request: () => Promise<any>) => {
+    setActionLoading(label);
+    try {
+      await request();
+      toast.success(`${label} passed`);
+    } catch (err: any) {
+      toast.error(err?.message || `${label} failed`);
+    } finally {
+      setActionLoading('');
+    }
+  };
+
+  const checkedAt = status?.timestamp ? new Date(status.timestamp).toLocaleString() : 'Not checked yet';
+  const backend = normalizeStatus(status?.backend);
+  const database = normalizeStatus(status?.database);
+  const redis = normalizeStatus(status?.redis);
+  const odoo = normalizeStatus(status?.odoo);
+  const openg2p = normalizeStatus(status?.openg2p);
+  const wso2 = normalizeStatus(status?.wso2);
+  const asgardeo = normalizeStatus(status?.asgardeo);
+  const choreo = normalizeStatus(status?.choreo);
+  const choreoUserService = normalizeStatus(status?.choreoUserService);
+  const superset = normalizeStatus(status?.superset);
+  const geonode = normalizeStatus(status?.geonode);
+  const aiService = normalizeStatus(status?.aiService);
+  const authMode = normalizeStatus(status?.authMode || import.meta.env.VITE_AUTH_MODE || 'mock');
+
+  const cardClass = 'bg-white rounded-lg shadow-sm border border-gray-200 p-5';
+  const buttonClass = 'px-3 py-2 rounded-lg text-sm font-medium bg-white border border-gray-200 text-gray-700 hover:bg-gray-50 disabled:opacity-60';
+
+  const integrations = [
+    { label: 'Backend API', data: backend, mode: 'Core service', publicUrl: `${env.apiBase.replace(/\/api$/, '')}/api/health`, internalUrl: 'http://backend:8000/api/health', purpose: 'Central API for role-based workflows, disaster records, beneficiary operations, audit logs, and integration orchestration.' },
+    { label: 'Database', data: database, mode: 'PostgreSQL/PostGIS', internalUrl: 'postgres:5432', purpose: 'System of record for users, disaster events, applications, inventory, payments, GIS metadata, and audit history.' },
+    { label: 'Redis', data: redis, mode: 'Cache/session support', internalUrl: 'redis:6379', purpose: 'Fast cache and operational support service for the Docker demo stack.' },
+    { label: 'Odoo ERP', data: odoo, mode: 'Back office ERP', publicUrl: env.odoo, internalUrl: 'http://odoo:8069', purpose: 'ERP back office for relief operations, inventory, dispatch, and finance workflows.' },
+    { label: 'OpenG2P Demo Runtime', data: openg2p, mode: openg2p.mode || 'Demo runtime', publicUrl: `${env.openg2p}/api/health`, internalUrl: 'http://openg2p:8070/api/health', purpose: 'Beneficiary registry, eligibility check, entitlement lookup, and program enrollment demo runtime.' },
+    { label: 'WSO2 API Manager Gateway', data: wso2, mode: wso2.mode || 'Demo gateway', publicUrl: `${env.wso2Gateway}/health`, internalUrl: 'http://wso2-api-manager:8243/health', purpose: 'Demo-compatible API gateway showing governed API routing. In production this points to full WSO2 API Manager.' },
+    { label: 'Asgardeo Identity Provider', data: asgardeo, mode: asgardeo.authMode || authMode.status, publicUrl: env.asgardeoConsole, purpose: 'Identity and access management for users, roles, groups, and OIDC login.' },
+    { label: 'Choreo Notification Service', data: choreo, mode: choreoUserService.status === 'not_configured' ? 'Local notifier' : 'Cloud integration', publicUrl: env.choreoNotifier, internalUrl: 'http://choreo-notification-service:8095/health', purpose: 'Cloud-native integration service for disaster approval, payment, and dispatch notifications.' },
+    { label: 'Superset Analytics', data: superset, mode: 'Analytics dashboard', publicUrl: env.superset, internalUrl: 'http://superset:8088', purpose: 'Analytics dashboard for disaster recovery KPIs.' },
+    { label: 'AI Service', data: aiService, mode: 'Decision support', publicUrl: `${env.aiService}/health`, internalUrl: 'http://ai-service:8050/health', purpose: 'AI-assisted summaries, triage support, and demo-safe analytical responses.' },
+    { label: 'GeoNode', data: geonode, mode: geonode.status === 'disabled' ? 'Disabled' : 'GIS integration', purpose: 'External geospatial catalogue integration. Local GIS data remains available when GeoNode is disabled.' },
+  ];
+
+  const manualSetup = [
+    ['Asgardeo', 'Manual console setup required unless issuer, client ID, and JWKS values are configured.'],
+    ['Real WSO2 APIM', 'The bundled gateway is demo-compatible. Production uses full WSO2 API Manager with published APIs and token validation.'],
+    ['Choreo Cloud', 'Local notification service works for the demo. Choreo Cloud deployment requires organization and invoke URL setup.'],
+    ['Odoo Module', 'Use the direct Disaster Recovery module menu for demos. If General Settings shows a stock_move_sms_validation popup, avoid Settings and install the missing stock/SMS dependency only after confirming the Odoo module source.'],
+    ['GeoNode', 'Disabled unless GEONODE_ENABLED and GeoNode credentials are configured.'],
   ];
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between gap-3">
-        <div>
-          <h3 className="text-lg font-semibold text-gray-900">Integration Status</h3>
-          {status?.timestamp && (
-            <p className="text-sm text-gray-500 mt-1">Last checked {new Date(status.timestamp).toLocaleString()}</p>
-          )}
+      <div className="bg-gov-800 text-white rounded-lg p-6">
+        <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+          <div>
+            <h3 className="text-2xl font-bold">GovRecover360 Integration Command Center</h3>
+            <p className="text-sm text-gov-100 mt-2 max-w-3xl">Operational view of the local Docker demo, external platform readiness, and government recovery workflow dependencies.</p>
+          </div>
+          <div className="flex flex-wrap gap-2">
+            <span className="px-3 py-1 rounded-full bg-white/10 text-sm border border-white/20">Last checked: {checkedAt}</span>
+            {authMode.status === 'mock' && <span className="px-3 py-1 rounded-full bg-blue-100 text-blue-800 text-sm font-medium">Demo Mode</span>}
+          </div>
         </div>
-        <button
-          onClick={loadStatus}
-          className="inline-flex items-center gap-2 px-4 py-2 bg-gov-500 text-white rounded-lg text-sm hover:bg-gov-600 disabled:opacity-60"
-          disabled={loading}
-        >
-          <ArrowPathIcon className={`h-4 w-4 ${loading ? 'animate-spin' : ''}`} />
-          Refresh
-        </button>
       </div>
 
       {error && (
-        <div className="bg-red-50 border border-red-200 text-red-700 rounded-lg p-4 text-sm">
-          {error}
+        <div className="bg-red-50 border border-red-200 text-red-800 rounded-lg p-4 text-sm">
+          <p className="font-semibold">Integration status is unavailable</p>
+          <p className="mt-1">{error}</p>
         </div>
       )}
 
       {loading && !status ? (
-        <LoadingSpinner size="md" text="Loading integration status..." />
-      ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
-          {statusCards.map((item) => (
-            <div key={item.label} className="bg-white rounded-xl shadow-sm border border-gray-200 p-5">
-              <div className="flex items-center justify-between gap-3">
-                <div className="flex items-center gap-3">
-                  <ServerIcon className="h-5 w-5 text-gray-400" />
-                  <p className="text-sm font-medium text-gray-900">{item.label}</p>
-                </div>
-                <StatusBadge status={item.value} />
-              </div>
+          {Array.from({ length: 6 }).map((_, idx) => (
+            <div key={idx} className={`${cardClass} animate-pulse`}>
+              <div className="h-4 bg-gray-200 rounded w-1/2" />
+              <div className="h-3 bg-gray-100 rounded w-full mt-5" />
+              <div className="h-3 bg-gray-100 rounded w-2/3 mt-3" />
             </div>
           ))}
         </div>
+      ) : (
+        <>
+          <section>
+            <div className="flex items-center justify-between gap-3 mb-4">
+              <h3 className="text-lg font-semibold text-gray-900">Integration Overview</h3>
+              <button onClick={loadStatus} className="inline-flex items-center gap-2 px-4 py-2 bg-gov-600 text-white rounded-lg text-sm hover:bg-gov-700 disabled:opacity-60" disabled={loading}>
+                <ArrowPathIcon className={`h-4 w-4 ${loading ? 'animate-spin' : ''}`} />
+                Refresh
+              </button>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+              {integrations.map((item) => (
+                <div key={item.label} className={cardClass}>
+                  <div className="flex items-start justify-between gap-3">
+                    <div className="flex items-center gap-3 min-w-0">
+                      <ServerIcon className="h-5 w-5 text-gov-600 flex-shrink-0" />
+                      <p className="text-sm font-semibold text-gray-900">{item.label}</p>
+                    </div>
+                    <StatusBadge status={item.data.status} />
+                  </div>
+                  <p className="text-sm text-gray-600 mt-4 min-h-[60px]">{item.purpose}</p>
+                  <div className="mt-4 space-y-2 text-xs text-gray-500">
+                    <p><span className="font-semibold text-gray-700">Mode:</span> {String(item.mode || item.data.status)}</p>
+                    {item.publicUrl && <p className="break-all"><span className="font-semibold text-gray-700">Public URL:</span> {item.publicUrl}</p>}
+                    {item.internalUrl && <p className="break-all"><span className="font-semibold text-gray-700">Docker URL:</span> {item.internalUrl}</p>}
+                    <p><span className="font-semibold text-gray-700">Last checked:</span> {checkedAt}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </section>
+
+          <section className={cardClass}>
+            <h3 className="text-lg font-semibold text-gray-900 mb-4">Architecture Journey</h3>
+            <div className="flex flex-col md:flex-row md:items-center gap-3 text-sm">
+              {['Citizen / Officer', 'Asgardeo Login', 'WSO2 API Gateway', 'GovRecover360 Backend', 'OpenG2P / Odoo / Choreo / Superset'].map((step, idx) => (
+                <div key={step} className="flex md:flex-1 items-center gap-3">
+                  <div className="w-full rounded-lg border border-blue-100 bg-blue-50 px-4 py-3 text-blue-950 font-medium text-center">{step}</div>
+                  {idx < 4 && <span className="hidden md:block text-gray-400">→</span>}
+                </div>
+              ))}
+            </div>
+          </section>
+
+          <section className={cardClass}>
+            <h3 className="text-lg font-semibold text-gray-900 mb-4">Demo Actions</h3>
+            <div className="flex flex-wrap gap-3">
+              <button className={buttonClass} disabled={Boolean(actionLoading)} onClick={() => testEndpoint('Backend health', () => api.get('/health'))}>Test Backend Health</button>
+              <button className={buttonClass} disabled={Boolean(actionLoading)} onClick={() => testEndpoint('OpenG2P health', () => api.get('/openg2p/health'))}>Test OpenG2P Health</button>
+              <button className={buttonClass} disabled={Boolean(actionLoading)} onClick={() => testEndpoint('WSO2 gateway', () => api.get('/integrations/wso2/status'))}>Test WSO2 Gateway</button>
+              <button className={buttonClass} disabled={Boolean(actionLoading)} onClick={() => testEndpoint('WSO2 backend proxy', () => api.get('/integrations/wso2/status'))}>Test WSO2 Backend Proxy</button>
+              <button className={buttonClass} disabled={Boolean(actionLoading)} onClick={() => testEndpoint('Choreo notifier', () => api.get('/integrations/status').then((res) => normalizeStatus(res.data?.choreo).status === 'ok' ? res : Promise.reject(new Error('Choreo notifier is unreachable'))))}>Test Choreo Notification Health</button>
+              <button className={buttonClass} disabled={Boolean(actionLoading)} onClick={() => testEndpoint('AI health', () => api.get('/integrations/status').then((res) => normalizeStatus(res.data?.aiService).status === 'ok' ? res : Promise.reject(new Error('AI service is unreachable'))))}>Test AI Health</button>
+              <button className={buttonClass} onClick={() => openUrl(env.superset)}>Open Superset</button>
+              <button className={buttonClass} onClick={() => openUrl(env.odoo)}>Open Odoo</button>
+              <button className={buttonClass} onClick={() => openUrl(`${env.odoo}/web#menu_id=govaid_disaster_recovery.menu_govaid_root`)}>Open Odoo Disaster Recovery Module</button>
+              <button className={buttonClass} onClick={() => openUrl(env.asgardeoConsole)}>Open Asgardeo Console</button>
+              <button className={buttonClass} onClick={() => openUrl(env.choreoConsole)}>Open Choreo Console</button>
+              <button className={buttonClass} onClick={() => openUrl(env.wso2Gateway)}>Open WSO2 Gateway</button>
+            </div>
+          </section>
+
+          <section>
+            <h3 className="text-lg font-semibold text-gray-900 mb-4">Platform Console Hub</h3>
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+              {[
+                ['WSO2 API Manager', `Health: ${env.wso2Gateway}/health`, ['Open WSO2 Gateway', env.wso2Gateway], ['Open WSO2 Setup Guide', '/docs/wso2/WSO2_GUIDE.md'], 'Local gateway is demo-compatible. Production uses full WSO2 API Manager.'],
+                ['Asgardeo', `Auth mode: ${asgardeo.authMode || authMode.status}. Client ID: ${asgardeo.clientIdConfigured ? 'configured' : 'not configured'}. Issuer: ${asgardeo.issuerConfigured ? 'configured' : 'not configured'}. JWKS: ${asgardeo.jwksConfigured ? 'configured' : 'not configured'}.`, ['Open Asgardeo Console', env.asgardeoConsole], ['Open GovRecover360 Asgardeo Application', env.asgardeoApplication], 'External console opens in a new tab because cloud consoles may block iframe embedding.'],
+                ['Choreo', `Local notifier: ${env.choreoNotifier}/health. Organization: ${env.choreoOrg}`, ['Open Choreo Console', env.choreoConsole], ['Open Local Notification Service', `${env.choreoNotifier}/health`], 'Use local notifier for the Docker demo and Choreo Cloud for production invoke URLs.'],
+                ['Superset', `URL: ${env.superset}`, ['Open Superset', env.superset], undefined, 'Analytics dashboard for disaster recovery KPIs.'],
+                ['Odoo', `URL: ${env.odoo}`, ['Open Odoo', env.odoo], ['Open Odoo Disaster Recovery Module', `${env.odoo}/web#menu_id=govaid_disaster_recovery.menu_govaid_root`], 'If an Odoo settings popup appears, use the module menu directly during the demo.'],
+                ['OpenG2P', `Health: ${env.openg2p}/api/health`, ['Open OpenG2P Health', `${env.openg2p}/api/health`], ['Open OpenAPI', `${env.openg2p}/openapi.json`], 'Use the backend OpenG2P demo tab for beneficiary sync, eligibility, entitlement, and enrollment flows.'],
+              ].map(([title, details, primary, secondary, note]: any) => (
+                <div key={title} className={cardClass}>
+                  <p className="text-sm font-semibold text-gray-900">{title}</p>
+                  <p className="text-sm text-gray-600 mt-2 break-words">{details}</p>
+                  <p className="text-xs text-gray-500 mt-2">{note}</p>
+                  <div className="flex flex-wrap gap-2 mt-4">
+                    {primary && <button className={buttonClass} onClick={() => openUrl(primary[1])}>{primary[0]}</button>}
+                    {secondary && <button className={buttonClass} onClick={() => openUrl(secondary[1])}>{secondary[0]}</button>}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </section>
+        </>
       )}
 
-      <div>
-        <h3 className="text-lg font-semibold text-gray-900 mb-4">Manual Setup References</h3>
+      <div className={cardClass}>
+        <div className="flex items-center justify-between gap-3 mb-4">
+          <h3 className="text-lg font-semibold text-gray-900">Manual Setup Required</h3>
+          <span className="px-3 py-1 rounded-full bg-yellow-100 text-yellow-800 text-xs font-semibold">Production Setup Required</span>
+        </div>
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
-          {setupCards.map((item) => (
-            <div key={item.title} className="bg-white rounded-xl shadow-sm border border-gray-200 p-5">
-              <p className="text-sm font-semibold text-gray-900">{item.title}</p>
-              <p className="text-xs text-gray-500 mt-2 font-mono break-all">{item.path}</p>
+          {manualSetup.map(([title, detail]) => (
+            <div key={title} className="rounded-lg border border-gray-200 p-4">
+              <p className="text-sm font-semibold text-gray-900">{title}</p>
+              <p className="text-sm text-gray-600 mt-2">{detail}</p>
             </div>
           ))}
         </div>

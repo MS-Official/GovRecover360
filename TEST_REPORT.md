@@ -102,6 +102,16 @@
 - **2026-05-31**: Added `endpoint_supports()` helper and robust fallback discovery to demo.sh OpenG2P section.
 - **2026-05-31**: Added `/notify/*` route aliases to Choreo notification service.
 - **2026-05-31**: Added `docs/OPENG2P_ALIGNMENT.md`.
+- **2026-05-31**: Fixed frontend API base handling for Docker demo (`VITE_API_BASE_URL=http://localhost:8000`) and added HTML-response detection for misrouted API calls.
+- **2026-05-31**: Rebuilt Admin Integrations as the GovRecover360 Integration Command Center with normalized statuses, demo actions, platform console hub, and manual setup panel.
+- **2026-05-31**: Added optional backend connector endpoints for WSO2 status and OpenG2P status, sync, eligibility, entitlements, and program enrollment.
+- **2026-05-31**: Updated `demo.sh` to request an Admin demo token before backend-mediated OpenG2P connector calls. The protected connector flow now returns 200 with a token; 401 without a token remains expected RBAC behavior and is treated as a security pass.
+
+## OpenG2P Security Note
+
+The direct OpenG2P runtime flow passes without platform authentication because it is the local demo runtime service. The backend-mediated OpenG2P connector is intentionally RBAC-protected. Calls such as `/api/integrations/openg2p/sync-beneficiary`, `/check-eligibility`, `/entitlements`, and `/program-enrollment` require a valid GovRecover360 token with the required permissions.
+
+`demo.sh` now logs in as `admin@govrecover.local` using the seeded demo password and sends `Authorization: Bearer <token>` for those connector calls. If the same endpoints are called without a token, `401 Unauthorized` is expected and demonstrates that backend RBAC is active.
 
 ## Manual Actions Required
 
@@ -117,6 +127,8 @@ The module is installed by CLI. To verify in the UI:
 6. Search `GovAid Disaster Recovery` or `govaid_disaster_recovery`.
 7. Confirm the module is installed.
 8. Open the Disaster Recovery menu and verify views load.
+
+If General Settings shows `"res.config.settings"."stock_move_sms_validation" field is undefined`, do not block the GovRecover360 demo on that popup. The string is not referenced by the local custom module; use the direct Disaster Recovery module URL/button and avoid General Settings during the presentation unless the missing optional Odoo stock/SMS dependency is intentionally installed.
 
 ### Asgardeo Console
 

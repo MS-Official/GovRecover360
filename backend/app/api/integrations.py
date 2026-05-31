@@ -151,8 +151,16 @@ def _geonode_status() -> str:
 
 
 @router.get("/api/integrations/wso2/health")
+@router.get("/api/integrations/wso2/status")
 def wso2_health():
-    return wso2_service.health()
+    health = wso2_service.health()
+    checks = {
+        "gatewayUrlConfigured": bool(settings.WSO2_GATEWAY_URL),
+        "health": _http_health(settings.WSO2_GATEWAY_URL, "/health"),
+        "version": _http_health(settings.WSO2_GATEWAY_URL, "/services/Version"),
+        "backendProxy": _http_health(settings.WSO2_GATEWAY_URL, "/api/health"),
+    }
+    return {**health, "checks": checks}
 
 
 @router.get("/api/integrations/geonode/health")

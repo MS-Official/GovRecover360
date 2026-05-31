@@ -257,15 +257,28 @@ For the bundled connected demo, run `docker compose --env-file .env.demo up -d -
 Integration health endpoints:
 
 - `GET /api/integrations/openg2p/health`
+- `GET /api/integrations/openg2p/status`
 - `GET /api/integrations/wso2/health`
+- `GET /api/integrations/wso2/status`
 - `GET /api/integrations/geonode/health`
 
 Integration functions:
 
 - OpenG2P beneficiary sync: `POST /api/openg2p/beneficiaries`
+- Backend-mediated OpenG2P sync: `POST /api/integrations/openg2p/sync-beneficiary`
+- Backend-mediated OpenG2P eligibility: `POST /api/integrations/openg2p/check-eligibility`
+- Backend-mediated OpenG2P entitlements: `GET /api/integrations/openg2p/entitlements`
 - OpenG2P relief program enrollment: `POST /api/openg2p/program-enrollments`
 - WSO2 scope support: when `WSO2_APIM_ENABLED=true` and JWT settings are present, backend can validate WSO2-issued JWTs and map scopes such as `citizen:create`, `relief:approve`, `payment:approve`, and `geo:manage` to platform permissions.
 - GeoNode layers and GIS fallback: `GET /api/gis/layers`, `GET /api/gis/zones`, and `POST /api/gis/eligibility-check`
+
+### Admin Integration Command Center
+
+Admins can open `/admin/integrations` to show the GovRecover360 Integration Command Center. The page normalizes both string and object integration statuses, shows demo mode vs production setup requirements, and provides console buttons for WSO2, Asgardeo, Choreo, Superset, Odoo, OpenG2P, and the AI service.
+
+For the local Docker frontend on `http://localhost:3000`, set `VITE_API_BASE_URL=http://localhost:8000` so browser API calls go directly to FastAPI. For the Nginx-hosted demo, use `VITE_API_BASE_URL=http://localhost/api`. If the browser receives the React HTML shell instead of JSON, the page displays: `Backend API returned HTML instead of JSON. Check VITE_API_BASE_URL.`
+
+Asgardeo and Choreo are opened in new tabs because cloud consoles commonly block iframe embedding with `X-Frame-Options` or Content Security Policy. The local WSO2 service is a demo-compatible gateway; production uses full WSO2 API Manager with published APIs, subscriptions, and token validation. If Odoo General Settings shows a `stock_move_sms_validation` popup, use the direct Odoo Disaster Recovery module button during the demo and install the missing optional dependency only after confirming the Odoo module source.
 
 ## Troubleshooting
 
