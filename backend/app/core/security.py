@@ -259,7 +259,10 @@ def get_current_user(
         try:
             return _get_local_user_from_token(db, token)
         except HTTPException:
-            return _get_or_create_wso2_user(db, wso2_service.validate_access_token(token))
+            try:
+                return _get_or_create_wso2_user(db, wso2_service.validate_access_token(token))
+            except JWTError:
+                raise _credentials_exception()
 
     return _get_local_user_from_token(db, token)
 

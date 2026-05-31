@@ -68,15 +68,15 @@ services:
       ODOO_DB: ${ODOO_DB:-}
       ODOO_USERNAME: ${ODOO_USERNAME:-}
       ODOO_PASSWORD: ${ODOO_PASSWORD:-}
-      OPENG2P_ENABLED: ${OPENG2P_ENABLED:-false}
-      OPENG2P_BASE_URL: ${OPENG2P_BASE_URL:-http://host.docker.internal:8070}
-      OPENG2P_API_BASE_URL: ${OPENG2P_API_BASE_URL:-http://host.docker.internal:8070/api}
-      OPENG2P_DB: ${OPENG2P_DB:-}
-      OPENG2P_USERNAME: ${OPENG2P_USERNAME:-}
-      OPENG2P_PASSWORD: ${OPENG2P_PASSWORD:-}
-      WSO2_APIM_ENABLED: ${WSO2_APIM_ENABLED:-false}
-      WSO2_GATEWAY_URL: ${WSO2_GATEWAY_URL:-}
-      WSO2_PUBLISHER_URL: ${WSO2_PUBLISHER_URL:-}
+      OPENG2P_ENABLED: ${OPENG2P_ENABLED:-true}
+      OPENG2P_BASE_URL: ${OPENG2P_BASE_URL:-http://openg2p:8070}
+      OPENG2P_API_BASE_URL: ${OPENG2P_API_BASE_URL:-http://openg2p:8070/api}
+      OPENG2P_DB: ${OPENG2P_DB:-openg2p}
+      OPENG2P_USERNAME: ${OPENG2P_USERNAME:-admin}
+      OPENG2P_PASSWORD: ${OPENG2P_PASSWORD:-admin}
+      WSO2_APIM_ENABLED: ${WSO2_APIM_ENABLED:-true}
+      WSO2_GATEWAY_URL: ${WSO2_GATEWAY_URL:-http://wso2-api-manager:8243}
+      WSO2_PUBLISHER_URL: ${WSO2_PUBLISHER_URL:-http://wso2-api-manager:8243/publisher}
       WSO2_ISSUER: ${WSO2_ISSUER:-}
       WSO2_AUDIENCE: ${WSO2_AUDIENCE:-}
       WSO2_JWKS_URL: ${WSO2_JWKS_URL:-}
@@ -257,10 +257,41 @@ services:
       timeout: 5s
       retries: 5
 
-  # Optional OpenG2P runtime:
-  # Keep the govaid-connect-openg2p-demo stack separate if it is already running.
-  # Point OPENG2P_BASE_URL and OPENG2P_API_BASE_URL at that stack instead of
-  # adding a second OpenG2P deployment here.
+  # OpenG2P-compatible demo runtime for beneficiary sync and relief enrollment.
+  openg2p:
+    build:
+      context: ./integrations/openg2p-demo
+      dockerfile: Dockerfile
+    container_name: govrecover-openg2p
+    restart: unless-stopped
+    ports:
+      - "8070:8070"
+    healthcheck:
+      test: ["CMD-SHELL", "python -c \"import urllib.request; urllib.request.urlopen('http://localhost:8070/api/health', timeout=5).read()\""]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # WSO2 API Manager-compatible demo gateway.
+  # It exposes WSO2-style health/version endpoints and proxies /api/* to backend.
+  wso2-api-manager:
+    build:
+      context: ./integrations/wso2-gateway-demo
+      dockerfile: Dockerfile
+    container_name: govrecover-wso2-apim
+    restart: unless-stopped
+    ports:
+      - "8243:8243"
+    environment:
+      BACKEND_URL: http://backend:8000
+    depends_on:
+      backend:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "python -c \"import urllib.request; urllib.request.urlopen('http://localhost:8243/health', timeout=5).read()\""]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
 volumes:
   postgres_data:
