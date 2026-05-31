@@ -8,7 +8,8 @@ router = APIRouter()
 
 
 @router.get("/api/openg2p/health")
-def openg2p_health(current_user: User = Depends(get_current_user)):
+@router.get("/api/integrations/openg2p/health")
+def openg2p_health():
     return openg2p_service.health()
 
 
@@ -42,3 +43,11 @@ def create_entitlement(
     current_user: User = Depends(get_current_user),
 ):
     return openg2p_service.create_entitlement(payload)
+
+
+@router.post("/api/openg2p/program-enrollments")
+def enroll_in_program(
+    payload: dict,
+    current_user: User = Depends(get_current_user),
+):
+    return openg2p_service.enroll_in_program(payload)

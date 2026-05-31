@@ -322,7 +322,10 @@ export type IntegrationStatusValue =
   | 'missing_env'
   | 'error'
   | 'mock'
-  | 'asgardeo';
+  | 'asgardeo'
+  | 'local_fallback'
+  | 'local_spatial_check'
+  | 'not_enabled';
 
 export interface IntegrationStatus {
   backend: IntegrationStatusValue;

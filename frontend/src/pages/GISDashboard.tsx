@@ -15,6 +15,8 @@ export default function GISDashboard() {
   const [activeTab, setActiveTab] = useState<Tab>('overview');
   const [loading, setLoading] = useState(true);
   const [stats, setStats] = useState<any>(null);
+  const [geoNodeHealth, setGeoNodeHealth] = useState<any>(null);
+  const [layers, setLayers] = useState<any[]>([]);
   const [zones, setZones] = useState<DisasterZone[]>([]);
   const [shelters, setShelters] = useState<Shelter[]>([]);
   const [distributionPoints, setDistributionPoints] = useState<DistributionPoint[]>([]);
@@ -31,8 +33,14 @@ export default function GISDashboard() {
     setLoading(true);
     try {
       if (activeTab === 'overview') {
-        const res = await api.get('/gis/stats');
-        setStats(res.data);
+        const [statsRes, healthRes, layersRes] = await Promise.all([
+          api.get('/gis/stats'),
+          api.get('/integrations/geonode/health'),
+          api.get('/gis/layers'),
+        ]);
+        setStats(statsRes.data);
+        setGeoNodeHealth(healthRes.data);
+        setLayers(Array.isArray(layersRes.data?.layers) ? layersRes.data.layers : []);
       } else if (activeTab === 'zones') {
         const res = await api.get('/gis/zones');
         setZones(Array.isArray(res.data) ? res.data : res.data.zones || []);
@@ -47,6 +55,8 @@ export default function GISDashboard() {
       setStats({
         total_zones: 12, active_shelters: 8, distribution_points: 15, population_covered: 45000,
       });
+      setGeoNodeHealth({ mode: 'disabled', geonode_enabled: false, geonode_configured: false });
+      setLayers([]);
       if (activeTab === 'zones') {
         setZones([
           { id: 'Z001', name: 'Galle Flood Zone A', disaster_id: 'D001', district: 'galle', severity: 'critical', status: 'active', affected_population: 12000, center_lat: 6.0535, center_lng: 80.2210, radius_km: 5, created_at: '2024-03-01', updated_at: '2024-03-15' },
@@ -191,11 +201,30 @@ export default function GISDashboard() {
             <div className="bg-gray-50 rounded-xl border-2 border-dashed border-gray-300 p-12 text-center">
               <MapPinIcon className="h-16 w-16 text-gov-300 mx-auto mb-4" />
               <p className="text-gray-500 text-lg mb-2">Interactive GIS Map</p>
-              <p className="text-gray-400 text-sm mb-4">GeoNode-powered spatial visualization of disaster zones, shelters, and distribution points.</p>
+              <p className="text-gray-400 text-sm mb-4">GeoNode-powered spatial visualization with local GIS fallback when GeoNode is disabled.</p>
+              <div className="flex flex-wrap justify-center gap-3 mb-4">
+                <StatusBadge status={geoNodeHealth?.mode || 'disabled'} label={`GeoNode: ${geoNodeHealth?.mode || 'disabled'}`} />
+                <StatusBadge status={layers.length ? 'active' : 'not_configured'} label={`${layers.length} map layer${layers.length === 1 ? '' : 's'}`} />
+              </div>
               <div className="inline-flex items-center gap-2 px-4 py-2 bg-gov-500 text-white rounded-lg text-sm">
                 <GlobeAltIcon className="h-4 w-4" />
                 Launch GeoNode Map
               </div>
+            </div>
+          </div>
+
+          <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 mt-6">
+            <h3 className="text-lg font-semibold mb-4">Disaster Zone Layers</h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {layers.length ? layers.map((layer: any, index) => (
+                <div key={layer.name || index} className="border border-gray-200 rounded-lg p-4">
+                  <p className="text-sm font-semibold text-gray-900">{layer.name || `Layer ${index + 1}`}</p>
+                  <p className="text-xs text-gray-500 mt-1">Source: {layer.type || geoNodeHealth?.mode || 'local'}</p>
+                  <p className="text-xs text-gray-500 mt-1">Features: {layer.count ?? layer.features?.length ?? '-'}</p>
+                </div>
+              )) : (
+                <p className="text-sm text-gray-500">No layers returned yet.</p>
+              )}
             </div>
           </div>
 

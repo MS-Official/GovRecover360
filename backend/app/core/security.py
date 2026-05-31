@@ -13,6 +13,7 @@ from sqlalchemy.orm import Session
 from app.core.config import settings
 from app.db.database import get_db
 from app.models.models import User, Role, RolePermission, Permission
+from app.services.wso2_service import wso2_service
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 security = HTTPBearer(auto_error=False)
@@ -171,6 +172,54 @@ def _get_or_create_asgardeo_user(db: Session, payload: dict) -> User:
     return user
 
 
+def _role_from_permissions(permissions: list[str]) -> str:
+    permission_set = set(permissions)
+    if "admin:manage" in permission_set:
+        return "ROLE_ADMIN"
+    if "geo:manage" in permission_set:
+        return "ROLE_GIS_OFFICER"
+    if "inventory:dispatch" in permission_set:
+        return "ROLE_WAREHOUSE_OFFICER"
+    if "payment:approve" in permission_set:
+        return "ROLE_FINANCE_OFFICER"
+    if "relief:approve" in permission_set:
+        return "ROLE_PROGRAM_MANAGER"
+    if "beneficiary:verify" in permission_set:
+        return "ROLE_VERIFIER"
+    if "citizen:create" in permission_set:
+        return "ROLE_FIELD_OFFICER"
+    if "audit:read" in permission_set:
+        return "ROLE_AUDITOR"
+    return "ROLE_CITIZEN"
+
+
+def _get_or_create_wso2_user(db: Session, payload: dict) -> User:
+    permissions = wso2_service.permissions_from_claims(payload)
+    role_name = map_asgardeo_role(payload) or _role_from_permissions(permissions)
+    email = payload.get("email") or payload.get("sub") or payload.get("username")
+    if not email:
+        raise _credentials_exception()
+
+    role_obj = db.query(Role).filter(Role.name == role_name).first()
+    user = db.query(User).filter(User.email == email).first()
+    if not user:
+        user = User(
+            id=str(uuid4()),
+            email=email,
+            password_hash=hash_password(str(uuid4())),
+        )
+        db.add(user)
+
+    user.full_name = payload.get("name") or payload.get("given_name") or email
+    user.role = role_name
+    user.role_id = role_obj.id if role_obj else None
+    user.is_active = True
+    db.commit()
+    db.refresh(user)
+    user._external_permissions = permissions
+    return user
+
+
 def _get_local_user_from_token(db: Session, token: str) -> User:
     try:
         payload = jwt.decode(token, settings.SECRET_KEY, algorithms=[settings.ALGORITHM])
@@ -200,12 +249,25 @@ def get_current_user(
         try:
             return _get_local_user_from_token(db, token)
         except HTTPException:
-            return _get_or_create_asgardeo_user(db, _validate_asgardeo_token(token))
+            try:
+                return _get_or_create_asgardeo_user(db, _validate_asgardeo_token(token))
+            except HTTPException:
+                if settings.WSO2_APIM_ENABLED:
+                    return _get_or_create_wso2_user(db, wso2_service.validate_access_token(token))
+                raise
+    if settings.WSO2_APIM_ENABLED:
+        try:
+            return _get_local_user_from_token(db, token)
+        except HTTPException:
+            return _get_or_create_wso2_user(db, wso2_service.validate_access_token(token))
 
     return _get_local_user_from_token(db, token)
 
 
 def get_user_permissions(db: Session, user: User) -> list[str]:
+    external_permissions = getattr(user, "_external_permissions", None)
+    if external_permissions:
+        return list(external_permissions)
     permissions = (
         db.query(Permission.codename)
         .join(RolePermission, RolePermission.permission_id == Permission.id)

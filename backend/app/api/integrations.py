@@ -10,7 +10,9 @@ from sqlalchemy import text
 from app.core.config import settings
 from app.db.database import engine
 from app.services.choreo_user_service import choreo_user_service
+from app.services.geonode_service import geonode_service
 from app.services.openg2p_service import openg2p_service
+from app.services.wso2_service import wso2_service
 
 router = APIRouter()
 
@@ -126,14 +128,16 @@ def _integration_env_status() -> dict:
         ),
         "openg2p_configured": openg2p_service.configured,
         "openg2p_enabled": bool(settings.OPENG2P_ENABLED),
+        "wso2_apim_configured": wso2_service.configured,
+        "wso2_apim_enabled": bool(settings.WSO2_APIM_ENABLED),
+        "geonode_configured": geonode_service.configured,
+        "geonode_enabled": bool(settings.GEONODE_ENABLED),
         "odoo_module": "govaid_disaster_recovery",
     }
 
 
 def _wso2_status() -> str:
-    if settings.WSO2_GATEWAY_URL or settings.WSO2_PUBLISHER_URL:
-        return "configured"
-    return "manual_setup_required"
+    return wso2_service.health().get("mode", "error")
 
 
 def _superset_status() -> str:
@@ -143,9 +147,17 @@ def _superset_status() -> str:
 
 
 def _geonode_status() -> str:
-    if not settings.GEONODE_URL:
-        return "not_configured"
-    return "manual_check_required"
+    return geonode_service.health().get("mode", "error")
+
+
+@router.get("/api/integrations/wso2/health")
+def wso2_health():
+    return wso2_service.health()
+
+
+@router.get("/api/integrations/geonode/health")
+def geonode_health():
+    return geonode_service.health()
 
 
 @router.get("/api/integrations/status")

@@ -107,6 +107,18 @@ class OpenG2PService:
             },
         )
 
+    def enroll_in_program(self, payload: dict) -> dict:
+        return self._post_or_mock(
+            "/program-enrollments",
+            payload,
+            lambda: {
+                "enrollment_id": f"enroll-demo-{uuid4().hex[:10]}",
+                "enrollment_status": "enrolled",
+                "source": "mock",
+                "payload": payload,
+            },
+        )
+
     def _live_ready(self) -> bool:
         if not self.configured:
             return False

@@ -233,7 +233,28 @@ The collection also keeps the original resource URLs such as `/api/households/re
 
 ### External Integrations
 
-Local demo mode works without Asgardeo, WSO2 API Manager, GeoNode, Odoo credentials, or Choreo invoke URLs. For an integrated demo, configure these values in `.env`: `AUTH_MODE=hybrid`, `ASGARDEO_*`, `WSO2_*`, `CHOREO_NOTIFIER_API_URL`, `CHOREO_USER_SERVICE_URL`, `GEONODE_URL`, `ODOO_*`, and `OPENG2P_*`. If `CHOREO_NOTIFIER_API_URL` is empty or unavailable, workflow notifications are logged in the local database instead of failing the request.
+Local demo mode works without Asgardeo, WSO2 API Manager, GeoNode, Odoo credentials, OpenG2P, or Choreo invoke URLs. Keep external runtimes disabled with:
+
+```
+OPENG2P_ENABLED=false
+WSO2_APIM_ENABLED=false
+GEONODE_ENABLED=false
+```
+
+For an integrated demo, configure these values in `.env`: `AUTH_MODE=hybrid`, `ASGARDEO_*`, `WSO2_APIM_ENABLED=true`, `WSO2_*`, `CHOREO_NOTIFIER_API_URL`, `CHOREO_USER_SERVICE_URL`, `GEONODE_ENABLED=true`, `GEONODE_URL`, `ODOO_*`, and `OPENG2P_ENABLED=true` with `OPENG2P_*`. If any external service is disabled or unavailable, the backend returns a clear health status and keeps using local fallback behavior.
+
+Integration health endpoints:
+
+- `GET /api/integrations/openg2p/health`
+- `GET /api/integrations/wso2/health`
+- `GET /api/integrations/geonode/health`
+
+Integration functions:
+
+- OpenG2P beneficiary sync: `POST /api/openg2p/beneficiaries`
+- OpenG2P relief program enrollment: `POST /api/openg2p/program-enrollments`
+- WSO2 scope support: when `WSO2_APIM_ENABLED=true` and JWT settings are present, backend can validate WSO2-issued JWTs and map scopes such as `citizen:create`, `relief:approve`, `payment:approve`, and `geo:manage` to platform permissions.
+- GeoNode layers and GIS fallback: `GET /api/gis/layers`, `GET /api/gis/zones`, and `POST /api/gis/eligibility-check`
 
 ## Troubleshooting
 

@@ -382,6 +382,7 @@ function IntegrationStatusPanel() {
     { title: 'Superset Dashboard', path: 'docs/superset/SUPERSET_GUIDE.md' },
     { title: 'OpenG2P Alignment', path: 'docs/INTEGRATION_MANUAL_SETUP.md' },
     { title: 'OpenG2P Demo Setup', path: 'INTEGRATION_SETUP.md' },
+    { title: 'GeoNode GIS Setup', path: 'docs/INTEGRATION_MANUAL_SETUP.md' },
   ];
 
   return (

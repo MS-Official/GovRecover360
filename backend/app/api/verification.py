@@ -11,6 +11,7 @@ from app.schemas.schemas import (
     VerificationRequest, VerificationResponse, ApplicationActionRequest,
 )
 from app.services.notification_service import notify_user
+from app.services.openg2p_service import openg2p_service
 
 router = APIRouter()
 
@@ -215,6 +216,16 @@ def approve_relief(
             "message": "Please monitor your status for payment and dispatch updates.",
         },
     )
+    enrollment = openg2p_service.enroll_in_program({
+        "relief_application_id": app.id,
+        "household_id": app.household_id,
+        "household_head": app.household.head_full_name if app.household else None,
+        "program": "Emergency Disaster Relief",
+        "required_items": app.required_items,
+        "status": app.status,
+    })
+    if enrollment.get("enrollment_id"):
+        app.rejection_reason = None
     db.commit()
     db.refresh(app)
     return ReliefApplicationResponse(

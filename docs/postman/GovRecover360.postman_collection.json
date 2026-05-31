@@ -2173,6 +2173,214 @@
           "response": []
         }
       ]
+    },
+    {
+      "name": "External Integrations",
+      "description": "Optional OpenG2P, WSO2 API Manager, and GeoNode integration smoke tests. Expected to work with disabled/mock fallback locally.",
+      "item": [
+        {
+          "name": "OpenG2P Integration Health",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token_admin}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/integrations/openg2p/health",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "integrations",
+                "openg2p",
+                "health"
+              ]
+            },
+            "description": "Expected: 200. Disabled/local fallback is acceptable when OPENG2P_ENABLED=false."
+          },
+          "response": []
+        },
+        {
+          "name": "WSO2 API Manager Health",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token_admin}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/integrations/wso2/health",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "integrations",
+                "wso2",
+                "health"
+              ]
+            },
+            "description": "Expected: 200. Disabled/local fallback is acceptable when WSO2_APIM_ENABLED=false."
+          },
+          "response": []
+        },
+        {
+          "name": "GeoNode Integration Health",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token_admin}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/integrations/geonode/health",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "integrations",
+                "geonode",
+                "health"
+              ]
+            },
+            "description": "Expected: 200. Disabled/local fallback is acceptable when GEONODE_ENABLED=false."
+          },
+          "response": []
+        },
+        {
+          "name": "OpenG2P Beneficiary Sync Fallback",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token_admin}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/openg2p/beneficiaries",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "openg2p",
+                "beneficiaries"
+              ]
+            },
+            "description": "Expected: 200 with mock beneficiary when OpenG2P is disabled/unreachable.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"full_name\": \"Mohamed Rizwan\",\n  \"national_id\": \"901234567V\",\n  \"district\": \"Gampaha\",\n  \"family_size\": 5,\n  \"damage_level\": \"SEVERE\"\n}"
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "OpenG2P Program Enrollment Fallback",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token_admin}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/openg2p/program-enrollments",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "openg2p",
+                "program-enrollments"
+              ]
+            },
+            "description": "Expected: 200 with mock enrollment when OpenG2P is disabled/unreachable.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"beneficiary_id\": \"openg2p-demo-postman\",\n  \"program\": \"Emergency Disaster Relief\",\n  \"relief_application_id\": \"{{application_id}}\"\n}"
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "GeoNode Layers Fallback",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token_gis}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/gis/layers",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "gis",
+                "layers"
+              ]
+            },
+            "description": "Expected: 200 with local disaster zone and GIS location layers when GeoNode is disabled/unreachable."
+          },
+          "response": []
+        },
+        {
+          "name": "GeoNode Household Eligibility Check",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token_gis}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/gis/eligibility-check",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "gis",
+                "eligibility-check"
+              ]
+            },
+            "description": "Expected: 200. Uses local spatial/damage fallback when GeoNode is disabled.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"latitude\": 7.2083,\n  \"longitude\": 79.8358,\n  \"damage_level\": \"SEVERE\"\n}"
+            }
+          },
+          "response": []
+        }
+      ]
     }
   ]
 }
