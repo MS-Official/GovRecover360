@@ -1,6 +1,7 @@
 const AUTH_MODE = import.meta.env.VITE_AUTH_MODE || 'mock';
 const CLIENT_ID = import.meta.env.VITE_ASGARDEO_CLIENT_ID || '';
 const BASE_URL = (import.meta.env.VITE_ASGARDEO_BASE_URL || '').replace(/\/$/, '');
+const AUTH_URL = (import.meta.env.VITE_ASGARDEO_AUTH_URL || BASE_URL).replace(/\/$/, '');
 const REDIRECT_URL =
   import.meta.env.VITE_ASGARDEO_REDIRECT_URI ||
   `${window.location.origin}/callback`;
@@ -30,7 +31,7 @@ async function sha256(value: string) {
 }
 
 export function isAsgardeoConfigured() {
-  return AUTH_MODE === 'asgardeo' && Boolean(CLIENT_ID && BASE_URL && REDIRECT_URL);
+  return AUTH_MODE === 'asgardeo' && Boolean(CLIENT_ID && BASE_URL && AUTH_URL && REDIRECT_URL);
 }
 
 export function getAuthMode() {
@@ -60,7 +61,10 @@ export async function startAsgardeoLogin() {
     code_challenge: challenge,
     code_challenge_method: 'S256',
   });
-  window.location.href = `${BASE_URL}/oauth2/authorize?${params.toString()}`;
+  // OLD IMPLEMENTATION - kept for reference
+  // Reason: replaced with VITE_ASGARDEO_AUTH_URL so authorize can use accounts.asgardeo.io.
+  // window.location.href = `${BASE_URL}/oauth2/authorize?${params.toString()}`;
+  window.location.href = `${AUTH_URL}/oauth2/authorize?${params.toString()}`;
 }
 
 export function startAsgardeoRegistration() {
@@ -98,8 +102,11 @@ export async function exchangeCodeForToken(code: string, state: string | null) {
 }
 
 export function getAsgardeoLogoutUrl(idToken?: string | null) {
-  if (!BASE_URL) return '/login';
+  if (!AUTH_URL) return '/login';
   const params = new URLSearchParams({ post_logout_redirect_uri: LOGOUT_REDIRECT_URL });
   if (idToken) params.set('id_token_hint', idToken);
-  return `${BASE_URL}/oidc/logout?${params.toString()}`;
+  // OLD IMPLEMENTATION - kept for reference
+  // Reason: replaced with VITE_ASGARDEO_AUTH_URL for browser auth endpoints.
+  // return `${BASE_URL}/oidc/logout?${params.toString()}`;
+  return `${AUTH_URL}/oidc/logout?${params.toString()}`;
 }

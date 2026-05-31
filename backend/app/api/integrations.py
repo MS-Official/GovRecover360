@@ -9,6 +9,7 @@ from sqlalchemy import text
 
 from app.core.config import settings
 from app.db.database import engine
+from app.services.choreo_user_service import choreo_user_service
 
 router = APIRouter()
 
@@ -50,8 +51,9 @@ def _redis_status() -> str:
 
 
 def _odoo_status() -> str:
+    odoo_url = settings.ODOO_BASE_URL or settings.ODOO_URL
     required = [
-        settings.ODOO_URL,
+        odoo_url,
         settings.ODOO_DB,
         settings.ODOO_USERNAME,
         settings.ODOO_PASSWORD,
@@ -59,7 +61,13 @@ def _odoo_status() -> str:
     if not all(required):
         return "not_configured"
     try:
-        common = xmlrpc.client.ServerProxy(f"{settings.ODOO_URL.rstrip('/')}/xmlrpc/2/common")
+        # Local Odoo defaults to http://localhost:8069 from the host, or the
+        # docker-compose service URL from another container.
+        #
+        # OLD IMPLEMENTATION - kept for reference
+        # Reason: replaced with env-based ODOO_BASE_URL with ODOO_URL fallback.
+        # common = xmlrpc.client.ServerProxy(f"{settings.ODOO_URL.rstrip('/')}/xmlrpc/2/common")
+        common = xmlrpc.client.ServerProxy(f"{odoo_url.rstrip('/')}/xmlrpc/2/common")
         uid = common.authenticate(
             settings.ODOO_DB,
             settings.ODOO_USERNAME,
@@ -98,6 +106,27 @@ def _asgardeo_status() -> dict:
     }
 
 
+def _integration_env_status() -> dict:
+    odoo_url = settings.ODOO_BASE_URL or settings.ODOO_URL
+    asgardeo_configured = all([
+        settings.ASGARDEO_ISSUER,
+        settings.ASGARDEO_JWKS_URL,
+        settings.ASGARDEO_CLIENT_ID,
+    ])
+    return {
+        "frontend_url_configured": bool(settings.FRONTEND_URL),
+        "asgardeo_configured": bool(asgardeo_configured),
+        "choreo_user_service_configured": choreo_user_service.configured,
+        "odoo_configured": bool(
+            odoo_url
+            and settings.ODOO_DB
+            and settings.ODOO_USERNAME
+            and settings.ODOO_PASSWORD
+        ),
+        "odoo_module": "govaid_disaster_recovery",
+    }
+
+
 def _wso2_status() -> str:
     if settings.WSO2_GATEWAY_URL or settings.WSO2_PUBLISHER_URL:
         return "configured"
@@ -128,9 +157,15 @@ def integration_status():
         "wso2": _wso2_status(),
         "asgardeo": _asgardeo_status(),
         "choreo": _http_health(settings.CHOREO_NOTIFIER_API_URL),
+        "choreoUserService": choreo_user_service.health(),
         "superset": _superset_status(),
         "geonode": _geonode_status(),
         "aiService": _http_health(settings.AI_SERVICE_URL),
         "authMode": "asgardeo" if auth_mode == "asgardeo" else "mock",
         "timestamp": datetime.now(timezone.utc).isoformat(),
     }
+
+
+@router.get("/api/integration/health")
+def integration_health():
+    return _integration_env_status()

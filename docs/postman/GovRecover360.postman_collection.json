@@ -75,6 +75,20 @@
           "response": []
         },
         {
+          "name": "Integration Health",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/integration/health",
+              "host": ["{{base_url}}"],
+              "path": ["api", "integration", "health"]
+            },
+            "description": "Expected: 200 OK. Returns env configuration booleans only; does not expose secrets."
+          },
+          "response": []
+        },
+        {
           "name": "Mock Login - Admin",
           "event": [
             {

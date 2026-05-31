@@ -13,6 +13,9 @@ from app.middleware.rbac_middleware import RBACMiddleware
 
 app = FastAPI(title="GovRecover360 API", version="1.0.0")
 
+# OLD IMPLEMENTATION - kept for reference
+# Reason: replaced with env-based FRONTEND_URL support for deployed frontends.
+# cors_origins = ["http://localhost:3000"]
 cors_origins = ["http://localhost:3000", "http://localhost:5173"]
 if settings.FRONTEND_URL:
     cors_origins.append(settings.FRONTEND_URL.rstrip("/"))

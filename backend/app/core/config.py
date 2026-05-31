@@ -9,7 +9,11 @@ class Settings(BaseSettings):
     REDIS_URL: str | None = None
     AI_SERVICE_URL: str | None = None
     CHOREO_NOTIFIER_API_URL: str | None = None
+    CHOREO_USER_SERVICE_URL: str | None = None
+    CHOREO_SECURITY_HEADER_NAME: str | None = None
+    CHOREO_SECURITY_HEADER_VALUE: str | None = None
     FRONTEND_URL: str | None = None
+    ODOO_BASE_URL: str | None = None
     ODOO_URL: str | None = None
     ODOO_DB: str | None = None
     ODOO_USERNAME: str | None = None
@@ -28,6 +32,7 @@ class Settings(BaseSettings):
 
     class Config:
         env_file = ".env"
+        extra = "ignore"
 
 
 settings = Settings()
